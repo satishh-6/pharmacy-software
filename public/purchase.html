@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Purchase - MedXpert</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Segoe UI',sans-serif; background:#f0f4f8; }
+  .navbar { background:#1a73e8; color:white; padding:0 24px; display:flex; align-items:center; height:58px; position:fixed; width:100%; top:0; z-index:100; box-shadow:0 2px 8px rgba(0,0,0,0.15); }
+  .navbar h1 { font-size:20px; font-weight:700; flex:1; }
+  .navbar span { font-size:13px; opacity:0.85; margin-right:16px; }
+  .navbar button { background:rgba(255,255,255,0.2); border:none; color:white; padding:7px 16px; border-radius:6px; cursor:pointer; font-size:13px; }
+  .sidebar { position:fixed; left:0; top:58px; width:220px; height:calc(100vh - 58px); background:white; border-right:1px solid #e0e0e0; padding:16px 0; overflow-y:auto; }
+  .sidebar a { display:flex; align-items:center; gap:12px; padding:12px 20px; color:#444; text-decoration:none; font-size:14.5px; border-left:3px solid transparent; transition:all 0.2s; }
+  .sidebar a:hover, .sidebar a.active { background:#e8f0fe; color:#1a73e8; border-left-color:#1a73e8; }
+  .main { margin-left:220px; margin-top:58px; padding:20px; display:grid; grid-template-columns:1fr 360px; gap:20px; }
+  .card { background:white; border-radius:12px; padding:20px; box-shadow:0 2px 8px rgba(0,0,0,0.07); margin-bottom:16px; }
+  .card h3 { font-size:15px; color:#333; margin-bottom:14px; font-weight:600; }
+  .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .form-group { display:flex; flex-direction:column; gap:5px; }
+  .form-group.full { grid-column:1/-1; }
+  .form-group label { font-size:11px; color:#888; font-weight:600; text-transform:uppercase; }
+  .form-group input, .form-group select { padding:9px 12px; border:1.5px solid #ddd; border-radius:7px; font-size:14px; outline:none; transition:border 0.2s; }
+  .form-group input:focus, .form-group select:focus { border-color:#1a73e8; }
+  .btn { padding:10px 20px; border:none; border-radius:8px; cursor:pointer; font-size:14px; font-weight:600; transition:all 0.2s; }
+  .btn-primary { background:#1a73e8; color:white; }
+  .btn-primary:hover { background:#1557b0; }
+  .btn-success { background:#2e7d32; color:white; }
+  .btn-success:hover { background:#1b5e20; }
+  .btn-danger { background:#ffebee; color:#c62828; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; font-size:12px; }
+  .search-box { position:relative; }
+  .search-box input { width:100%; padding:10px 14px; border:2px solid #1a73e8; border-radius:8px; font-size:14px; outline:none; }
+  .search-results { position:absolute; top:100%; left:0; right:0; background:white; border:1px solid #ddd; border-radius:8px; box-shadow:0 8px 24px rgba(0,0,0,0.12); z-index:50; max-height:240px; overflow-y:auto; margin-top:4px; }
+  .search-item { padding:11px 14px; cursor:pointer; border-bottom:1px solid #f5f5f5; font-size:13.5px; }
+  .search-item:hover { background:#e8f0fe; }
+  .search-item .s-name { font-weight:600; }
+  .search-item .s-meta { font-size:11px; color:#888; margin-top:2px; }
+  table { width:100%; border-collapse:collapse; }
+  th { background:#f8f9fa; padding:10px 12px; text-align:left; font-size:11px; color:#666; font-weight:600; border-bottom:1px solid #eee; text-transform:uppercase; }
+  td { padding:10px 12px; font-size:13px; border-bottom:1px solid #f9f9f9; vertical-align:middle; }
+  td input { width:100%; padding:6px 8px; border:1px solid #ddd; border-radius:5px; font-size:13px; outline:none; }
+  td input:focus { border-color:#1a73e8; }
+  .summary-row { display:flex; justify-content:space-between; padding:8px 0; font-size:14px; border-bottom:1px solid #f5f5f5; }
+  .summary-row.total { font-size:17px; font-weight:700; border-bottom:none; padding-top:12px; }
+  .history-item { padding:10px 0; border-bottom:1px solid #f5f5f5; }
+  .history-item:last-child { border-bottom:none; }
+  .modal-bg { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:200; align-items:center; justify-content:center; }
+  .modal-bg.show { display:flex; }
+  .modal { background:white; border-radius:16px; padding:28px; width:460px; max-height:90vh; overflow-y:auto; }
+</style>
+</head>
+<body>
+
+<div class="navbar">
+  <h1>💊 MedXpert Pharmacy</h1>
+  <span id="navUser"></span>
+  <button onclick="logout()">Logout</button>
+</div>
+
+<div class="sidebar">
+  <a href="index.html">🏠 Dashboard</a>
+  <a href="stock.html">📦 Stock / Inventory</a>
+  <a href="billing.html">🧾 Billing</a>
+  <a href="purchase.html" class="active">🛒 Purchase Entry</a>
+  <a href="reports.html">📊 Reports</a>
+</div>
+
+<div class="main">
+  <!-- LEFT PANEL -->
+  <div>
+    <!-- Supplier -->
+    <div class="card">
+      <h3>🏪 Supplier Details</h3>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Supplier Name *</label>
+          <input id="supplier" placeholder="e.g. Medico Distributors" list="supplierList" />
+          <datalist id="supplierList"></datalist>
+        </div>
+        <div class="form-group">
+          <label>Invoice No</label>
+          <input id="invoiceNo" placeholder="e.g. INV-2024-001" />
+        </div>
+        <div class="form-group">
+          <label>Purchase Date</label>
+          <input type="date" id="purchaseDate" />
+        </div>
+        <div class="form-group">
+          <label>Payment Mode</label>
+          <select id="payMode">
+            <option value="credit">Credit (Udhaar)</option>
+            <option value="cash">Cash</option>
+            <option value="upi">UPI</option>
+            <option value="cheque">Cheque</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search -->
+    <div class="card">
+      <h3>🔍 Search & Add Item</h3>
+      <div class="search-box">
+        <input type="text" id="searchInput" placeholder="Type medicine or item name..." oninput="searchProducts()" autocomplete="off" />
+        <div class="search-results" id="searchResults" style="display:none;"></div>
+      </div>
+    </div>
+
+    <!-- Items Table -->
+    <div class="card">
+      <h3>📋 Purchase Items <span id="itemCount" style="font-size:13px;color:#888;font-weight:400;"></span></h3>
+      <div id="emptyMsg" style="text-align:center;padding:24px;color:#bbb;font-size:14px;">No items added. Search above.</div>
+      <div style="overflow-x:auto;">
+        <table id="itemsTable" style="display:none;">
+          <thead>
+            <tr>
+              <th>Item</th><th>Batch</th><th>Expiry</th>
+              <th>Qty</th><th>Purchase ₹</th><th>MRP ₹</th><th>GST%</th><th>Total</th><th></th>
+            </tr>
+          </thead>
+          <tbody id="itemsBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div>
+    <!-- Summary -->
+    <div class="card">
+      <h3>💰 Purchase Summary</h3>
+      <div class="summary-row"><span>Total Items</span><span id="totalItems">0</span></div>
+      <div class="summary-row"><span>Subtotal</span><span id="subtotal">₹0.00</span></div>
+      <div class="summary-row"><span>GST Amount</span><span id="gstAmt">₹0.00</span></div>
+      <div class="summary-row total"><span>GRAND TOTAL</span><span id="grandTotal" style="color:#1a73e8;">₹0.00</span></div>
+      <div class="form-group" style="margin-top:16px;">
+        <label>Amount Paid Now (₹)</label>
+        <input type="number" id="paidAmt" placeholder="0 = full credit" />
+      </div>
+      <button class="btn btn-success" style="width:100%;margin-top:14px;" onclick="savePurchase()">💾 Save Purchase</button>
+    </div>
+
+    <!-- Recent Purchases -->
+    <div class="card">
+      <h3>🕒 Supplier Ledger</h3>
+      <div style="margin-bottom:12px;">
+        <input type="text" id="supplierFilter" placeholder="🔍 Filter by supplier..." oninput="filterPurchases()"
+          style="width:100%;padding:8px 12px;border:1.5px solid #ddd;border-radius:7px;font-size:13px;outline:none;" />
+      </div>
+      <div id="recentPurchases"><p style="color:#aaa;font-size:13px;">Loading...</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- PAYMENT MODAL -->
+<div class="modal-bg" id="payModalBg">
+  <div class="modal">
+    <h2 style="margin-bottom:6px;font-size:18px;">💳 Pay Supplier</h2>
+    <p id="paySupplierName" style="color:#888;font-size:13px;margin-bottom:20px;"></p>
+
+    <div style="background:#f8f9fa;border-radius:10px;padding:14px;margin-bottom:18px;">
+      <div style="display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px;">
+        <span>Total Amount</span><strong id="payTotal">₹0</strong>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px;">
+        <span>Already Paid</span><strong id="payAlready" style="color:#2e7d32;">₹0</strong>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:15px;font-weight:700;border-top:1px solid #eee;padding-top:8px;">
+        <span>Balance Due</span><span id="payBalance" style="color:#c62828;">₹0</span>
+      </div>
+    </div>
+
+    <!-- Payment History -->
+    <div id="payHistory" style="margin-bottom:16px;"></div>
+
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <div class="form-group">
+        <label>Payment Amount (₹) *</label>
+        <input type="number" id="payAmount" placeholder="Enter amount to pay" />
+      </div>
+      <div class="form-group">
+        <label>Payment Mode</label>
+        <select id="payModeNew">
+          <option value="cash">💵 Cash</option>
+          <option value="upi">📱 UPI</option>
+          <option value="cheque">📝 Cheque</option>
+          <option value="bank">🏦 Bank Transfer</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Note (Optional)</label>
+        <input id="payNote" placeholder="e.g. Partial payment, cheque no." />
+      </div>
+    </div>
+
+    <div style="display:flex;gap:10px;margin-top:20px;">
+      <button class="btn" style="background:#f5f5f5;color:#333;flex:1;" onclick="closePayModal()">Cancel</button>
+      <button class="btn btn-success" style="flex:2;" onclick="submitPayment()">✅ Mark Payment</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let products = [];
+let allPurchases = [];
+let purchaseItems = [];
+let currentPayPurchaseId = null;
+
+function checkAuth() {
+  const user = JSON.parse(localStorage.getItem('user') || 'null');
+  if (!localStorage.getItem('token')) { location.href='index.html'; return; }
+  document.getElementById('navUser').textContent = '👤 ' + (user?.name || '');
+}
+
+function logout() { localStorage.clear(); location.href='index.html'; }
+
+async function loadProducts() {
+  const res = await fetch('/api/products');
+  products = await res.json();
+}
+
+async function loadSupplierSuggestions() {
+  const purchases = await fetch('/api/purchases').then(r => r.json());
+  const suppliers = [...new Set(purchases.map(p => p.supplier))];
+  const dl = document.getElementById('supplierList');
+  dl.innerHTML = suppliers.map(s => `<option value="${s}">`).join('');
+}
+
+// Set today's date
+document.getElementById('purchaseDate').value = new Date().toISOString().split('T')[0];
+
+function searchProducts() {
+  const q = document.getElementById('searchInput').value.toLowerCase().trim();
+  const box = document.getElementById('searchResults');
+  if (!q) { box.style.display='none'; return; }
+  const matches = products.filter(p =>
+    p.name.toLowerCase().includes(q) ||
+    (p.generic||'').toLowerCase().includes(q) ||
+    (p.company||'').toLowerCase().includes(q)
+  ).slice(0,8);
+  if (!matches.length) { box.style.display='none'; return; }
+  box.innerHTML = matches.map(p => {
+    const stock = p.sellType === 'loose'
+      ? `${p.stripStock||0} strips + ${p.looseStock||0} loose`
+      : `${p.stock||0} units`;
+    return `<div class="search-item" onclick="addItem('${p._id}')">
+      <div class="s-name">${p.name}</div>
+      <div class="s-meta">${p.company||''} · Stock: ${stock} · MRP: ₹${p.mrp} · Purchase: ₹${p.purchasePrice||0}</div>
+    </div>`;
+  }).join('');
+  box.style.display = 'block';
+}
+
+function addItem(id) {
+  const p = products.find(x => x._id === id);
+  if (!p) return;
+  if (purchaseItems.find(x => x.productId === id)) {
+    alert('Yeh item already added hai!'); return;
+  }
+  purchaseItems.push({
+    productId: id,
+    name: p.name,
+    batch: p.batch || '',
+    expiry: p.expiry || '',
+    qty: 1,
+    purchasePrice: p.purchasePrice || 0,
+    mrp: p.mrp || 0,
+    gst: p.gst || 12
+  });
+  document.getElementById('searchInput').value = '';
+  document.getElementById('searchResults').style.display = 'none';
+  renderItems();
+}
+
+function renderItems() {
+  const tbody = document.getElementById('itemsBody');
+  const table = document.getElementById('itemsTable');
+  const emptyMsg = document.getElementById('emptyMsg');
+  const countEl = document.getElementById('itemCount');
+
+  if (purchaseItems.length === 0) {
+    table.style.display = 'none';
+    emptyMsg.style.display = 'block';
+    countEl.textContent = '';
+    calcSummary();
+    return;
+  }
+
+  table.style.display = 'table';
+  emptyMsg.style.display = 'none';
+  countEl.textContent = `(${purchaseItems.length} items)`;
+
+  tbody.innerHTML = purchaseItems.map((item, i) => {
+    const total = (item.qty * item.purchasePrice).toFixed(2);
+    return `<tr>
+      <td><strong style="font-size:13px;">${item.name}</strong></td>
+      <td><input value="${item.batch}" placeholder="Batch No" onchange="updateItem(${i},'batch',this.value)" /></td>
+      <td><input value="${item.expiry}" placeholder="MM/YY" onchange="updateItem(${i},'expiry',this.value)" style="width:70px;" /></td>
+      <td><input type="number" value="${item.qty}" min="1" onchange="updateItem(${i},'qty',this.value)" style="width:60px;" /></td>
+      <td><input type="number" value="${item.purchasePrice}" min="0" step="0.01" onchange="updateItem(${i},'purchasePrice',this.value)" style="width:80px;" /></td>
+      <td><input type="number" value="${item.mrp}" min="0" step="0.01" onchange="updateItem(${i},'mrp',this.value)" style="width:80px;" /></td>
+      <td><input type="number" value="${item.gst}" min="0" max="28" onchange="updateItem(${i},'gst',this.value)" style="width:50px;" /></td>
+      <td><strong>₹${total}</strong></td>
+      <td><button class="btn-danger" onclick="removeItem(${i})">✕</button></td>
+    </tr>`;
+  }).join('');
+
+  calcSummary();
+}
+
+function updateItem(i, field, val) {
+  if (['qty','purchasePrice','mrp','gst'].includes(field)) {
+    purchaseItems[i][field] = parseFloat(val) || 0;
+  } else {
+    purchaseItems[i][field] = val;
+  }
+  renderItems();
+}
+
+function removeItem(i) {
+  purchaseItems.splice(i, 1);
+  renderItems();
+}
+
+function calcSummary() {
+  let subtotal = 0, gstTotal = 0;
+  purchaseItems.forEach(item => {
+    const base = item.qty * item.purchasePrice;
+    subtotal += base;
+    gstTotal += base * (item.gst / 100);
+  });
+  const grand = subtotal + gstTotal;
+  document.getElementById('totalItems').textContent = purchaseItems.length;
+  document.getElementById('subtotal').textContent = '₹' + subtotal.toFixed(2);
+  document.getElementById('gstAmt').textContent = '₹' + gstTotal.toFixed(2);
+  document.getElementById('grandTotal').textContent = '₹' + grand.toFixed(2);
+  return grand;
+}
+
+async function savePurchase() {
+  if (!document.getElementById('supplier').value.trim()) {
+    alert('Supplier name zaroori hai!'); return;
+  }
+  if (purchaseItems.length === 0) {
+    alert('Koi item nahi add kiya!'); return;
+  }
+
+  const grand = calcSummary();
+  const paid = parseFloat(document.getElementById('paidAmt').value) || 0;
+  const payMode = document.getElementById('payMode').value;
+  const payStatus = paid >= grand ? 'paid' : paid > 0 ? 'partial' : 'unpaid';
+
+  const data = {
+    supplier: document.getElementById('supplier').value.trim(),
+    invoiceNo: document.getElementById('invoiceNo').value.trim(),
+    date: document.getElementById('purchaseDate').value,
+    paymentMode: payMode,
+    paymentStatus: payStatus,
+    items: purchaseItems.map(item => ({
+      product: item.productId,
+      productName: item.name,
+      batch: item.batch,
+      expiry: item.expiry,
+      qty: item.qty,
+      purchasePrice: item.purchasePrice,
+      mrp: item.mrp,
+      gst: item.gst
+    })),
+    totalAmount: parseFloat(grand.toFixed(2)),
+    paidAmount: paid,
+    paymentHistory: paid > 0 ? [{ amount: paid, date: new Date(), note: 'Initial payment' }] : []
+  };
+
+  try {
+    const res = await fetch('/api/purchases', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    const result = await res.json();
+    if (result.success) {
+      alert('✅ Purchase saved! Stock updated.');
+      purchaseItems = [];
+      document.getElementById('supplier').value = '';
+      document.getElementById('invoiceNo').value = '';
+      document.getElementById('paidAmt').value = '';
+      renderItems();
+      loadRecentPurchases();
+      loadProducts();
+      loadSupplierSuggestions();
+    } else {
+      alert('Error: ' + result.message);
+    }
+  } catch(e) { alert('Server error!'); }
+}
+
+async function loadRecentPurchases() {
+  const res = await fetch('/api/purchases');
+  allPurchases = await res.json();
+  renderPurchases(allPurchases);
+}
+
+function filterPurchases() {
+  const q = document.getElementById('supplierFilter').value.toLowerCase();
+  if (!q) { renderPurchases(allPurchases); return; }
+  renderPurchases(allPurchases.filter(p => p.supplier.toLowerCase().includes(q)));
+}
+
+async function openPayModalById(id) {
+  const res = await fetch('/api/purchases');
+  const purchases = await res.json();
+  const purchase = purchases.find(p => p._id === id);
+  if (purchase) openPayModal(purchase);
+}
+
+function renderPurchases(purchases) {
+  const el = document.getElementById('recentPurchases');
+  if (!purchases.length) {
+    el.innerHTML = '<p style="color:#aaa;font-size:13px;">No purchases found.</p>';
+    return;
+  }
+
+  // Group by supplier and show totals
+  const supplierTotals = {};
+  purchases.forEach(p => {
+    if (!supplierTotals[p.supplier]) {
+      supplierTotals[p.supplier] = { total: 0, paid: 0, count: 0 };
+    }
+    supplierTotals[p.supplier].total += p.totalAmount || 0;
+    supplierTotals[p.supplier].paid += p.paidAmount || 0;
+    supplierTotals[p.supplier].count++;
+  });
+
+  el.innerHTML = purchases.slice(0, 10).map(p => {
+    const balance = (p.totalAmount || 0) - (p.paidAmount || 0);
+    const status = p.paymentStatus || (balance <= 0 ? 'paid' : p.paidAmount > 0 ? 'partial' : 'unpaid');
+    const statusColor = status === 'paid' ? '#2e7d32' : status === 'partial' ? '#e65100' : '#c62828';
+    const statusBg = status === 'paid' ? '#e8f5e9' : status === 'partial' ? '#fff3e0' : '#ffebee';
+    const statusText = status === 'paid' ? '✅ Paid' : status === 'partial' ? '⚡ Partial' : '❌ Unpaid';
+
+    return `
+    <div class="history-item">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
+        <div style="flex:1;">
+          <strong style="font-size:13.5px;">${p.supplier}</strong>
+          <span style="background:${statusBg};color:${statusColor};font-size:11px;padding:2px 8px;border-radius:10px;font-weight:600;margin-left:6px;">${statusText}</span>
+          <div style="color:#888;font-size:12px;margin-top:3px;">
+            ${p.invoiceNo||'No Invoice'} · ${new Date(p.date).toLocaleDateString('en-IN')} · ${p.items?.length||0} items
+          </div>
+        </div>
+        <strong style="color:#1a73e8;font-size:14px;">₹${(p.totalAmount||0).toFixed(0)}</strong>
+      </div>
+      ${balance > 0.01 ? `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;background:#fff8f8;padding:8px 10px;border-radius:8px;">
+        <div>
+          <span style="font-size:12px;color:#888;">Paid: </span>
+          <span style="font-size:12px;color:#2e7d32;font-weight:600;">₹${(p.paidAmount||0).toFixed(0)}</span>
+          <span style="font-size:12px;color:#888;margin-left:8px;">Due: </span>
+          <span style="font-size:12px;color:#c62828;font-weight:700;">₹${balance.toFixed(0)}</span>
+        </div>
+        <button onclick="openPayModalById('${p._id}')"
+          style="background:#1a73e8;color:white;border:none;padding:6px 14px;border-radius:6px;font-size:12px;cursor:pointer;font-weight:600;">
+          💳 Pay Now
+        </button>
+      </div>` : `
+      <div style="font-size:12px;color:#2e7d32;margin-top:6px;">✅ Fully Paid · ₹${(p.paidAmount||0).toFixed(0)}</div>`}
+    </div>`;
+  }).join('');
+}
+
+// ── PAYMENT MODAL ──
+function openPayModal(purchase) {
+  currentPayPurchaseId = purchase._id || purchase.id;
+  console.log('Purchase ID:', currentPayPurchaseId);
+  const balance = (purchase.totalAmount || 0) - (purchase.paidAmount || 0);
+
+  document.getElementById('paySupplierName').textContent =
+    `${purchase.supplier} · Invoice: ${purchase.invoiceNo || 'N/A'} · ${new Date(purchase.date).toLocaleDateString('en-IN')}`;
+  document.getElementById('payTotal').textContent = '₹' + (purchase.totalAmount || 0).toFixed(2);
+  document.getElementById('payAlready').textContent = '₹' + (purchase.paidAmount || 0).toFixed(2);
+  document.getElementById('payBalance').textContent = '₹' + balance.toFixed(2);
+  document.getElementById('payAmount').value = balance.toFixed(2);
+  document.getElementById('payNote').value = '';
+
+  const histEl = document.getElementById('payHistory');
+  if (purchase.paymentHistory && purchase.paymentHistory.length > 0) {
+    histEl.innerHTML = `
+      <div style="font-size:12px;font-weight:600;color:#666;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">Payment History</div>
+      <div style="background:#f8f9fa;border-radius:8px;padding:10px;">
+        ${purchase.paymentHistory.map(h => `
+          <div style="display:flex;justify-content:space-between;font-size:13px;padding:5px 0;border-bottom:1px solid #eee;">
+            <span style="color:#555;">
+              ${new Date(h.date).toLocaleDateString('en-IN')}
+              ${h.note ? `<span style="color:#888;font-size:11px;"> · ${h.note}</span>` : ''}
+            </span>
+            <strong style="color:#2e7d32;">₹${h.amount.toFixed(2)}</strong>
+          </div>
+        `).join('')}
+      </div>`;
+  } else {
+    histEl.innerHTML = '';
+  }
+
+  document.getElementById('payModalBg').classList.add('show');
+}
+
+function closePayModal() {
+  document.getElementById('payModalBg').classList.remove('show');
+  currentPayPurchaseId = null;
+}
+
+async function submitPayment() {
+  const amount = parseFloat(document.getElementById('payAmount').value);
+  if (!amount || amount <= 0) { alert('Amount enter karo!'); return; }
+  const note = document.getElementById('payModeNew').value + (document.getElementById('payNote').value ? ' - ' + document.getElementById('payNote').value : '');
+
+  try {
+    const res = await fetch(`/api/purchases/${currentPayPurchaseId}/payment`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ amount, note })
+    });
+    const data = await res.json();
+    if (data.success) {
+      alert('✅ Payment recorded!');
+      closePayModal();
+      loadRecentPurchases();
+    } else {
+      alert('Error: ' + data.message);
+    }
+  } catch(e) { alert('Server error!'); }
+}
+
+// Close search on outside click
+document.addEventListener('click', e => {
+  if (!e.target.closest('.search-box'))
+    document.getElementById('searchResults').style.display = 'none';
+});
+
+// Close modal on outside click
+document.getElementById('payModalBg').addEventListener('click', e => {
+  if (e.target === document.getElementById('payModalBg')) closePayModal();
+});
+
+checkAuth();
+loadProducts();
+loadRecentPurchases();
+loadSupplierSuggestions();
+</script>
+</body>
+</html>

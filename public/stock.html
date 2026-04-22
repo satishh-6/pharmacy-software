@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stock - MedXpert</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Segoe UI',sans-serif; background:#f0f4f8; }
+  .navbar { background:#1a73e8; color:white; padding:0 24px; display:flex; align-items:center; height:58px; position:fixed; width:100%; top:0; z-index:100; box-shadow:0 2px 8px rgba(0,0,0,0.15); }
+  .navbar h1 { font-size:20px; font-weight:700; flex:1; }
+  .navbar span { font-size:13px; opacity:0.85; margin-right:16px; }
+  .navbar button { background:rgba(255,255,255,0.2); border:none; color:white; padding:7px 16px; border-radius:6px; cursor:pointer; font-size:13px; }
+  .sidebar { position:fixed; left:0; top:58px; width:220px; height:calc(100vh - 58px); background:white; border-right:1px solid #e0e0e0; padding:16px 0; overflow-y:auto; }
+  .sidebar a { display:flex; align-items:center; gap:12px; padding:12px 20px; color:#444; text-decoration:none; font-size:14.5px; border-left:3px solid transparent; transition:all 0.2s; }
+  .sidebar a:hover, .sidebar a.active { background:#e8f0fe; color:#1a73e8; border-left-color:#1a73e8; }
+  .main { margin-left:220px; margin-top:58px; padding:24px; }
+  .top-bar { display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap; align-items:center; }
+  .top-bar input { padding:10px 14px; border:1.5px solid #ddd; border-radius:8px; font-size:14px; width:260px; outline:none; }
+  .top-bar input:focus { border-color:#1a73e8; }
+  .filter-tabs { display:flex; gap:8px; }
+  .tab { padding:9px 18px; border:1.5px solid #ddd; border-radius:8px; cursor:pointer; font-size:13px; background:white; color:#555; font-weight:500; transition:all 0.2s; }
+  .tab.active { background:#1a73e8; color:white; border-color:#1a73e8; }
+  .btn { padding:10px 20px; border:none; border-radius:8px; cursor:pointer; font-size:14px; font-weight:600; transition:all 0.2s; }
+  .btn-primary { background:#1a73e8; color:white; }
+  .btn-primary:hover { background:#1557b0; }
+  .btn-danger { background:#ffebee; color:#c62828; }
+  .btn-edit { background:#e8f0fe; color:#1a73e8; }
+  table { width:100%; border-collapse:collapse; background:white; border-radius:12px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,0.07); }
+  th { background:#f8f9fa; padding:13px 16px; text-align:left; font-size:12px; color:#666; font-weight:600; border-bottom:1px solid #eee; text-transform:uppercase; }
+  td { padding:11px 16px; font-size:13.5px; border-bottom:1px solid #f5f5f5; }
+  tr:hover td { background:#fafafa; }
+  .badge { padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600; }
+  .badge-ok { background:#e8f5e9; color:#2e7d32; }
+  .badge-low { background:#fff3e0; color:#e65100; }
+  .badge-out { background:#ffebee; color:#c62828; }
+  .badge-med { background:#e8f0fe; color:#1a73e8; }
+  .badge-fmcg { background:#f3e5f5; color:#7b1fa2; }
+  .badge-other { background:#f5f5f5; color:#555; }
+  .modal-bg { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:200; align-items:center; justify-content:center; }
+  .modal-bg.show { display:flex; }
+  .modal { background:white; border-radius:16px; padding:28px; width:560px; max-height:90vh; overflow-y:auto; }
+  .modal h2 { margin-bottom:20px; font-size:18px; color:#333; }
+  .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .form-group { display:flex; flex-direction:column; gap:5px; }
+  .form-group.full { grid-column:1/-1; }
+  .form-group label { font-size:12px; color:#666; font-weight:600; text-transform:uppercase; }
+  .form-group input, .form-group select { padding:9px 12px; border:1.5px solid #ddd; border-radius:7px; font-size:14px; outline:none; transition:border 0.2s; }
+  .form-group input:focus, .form-group select:focus { border-color:#1a73e8; }
+  .modal-actions { display:flex; gap:10px; margin-top:20px; justify-content:flex-end; }
+  .section-divider { grid-column:1/-1; border-top:1.5px dashed #e0e0e0; padding-top:12px; margin-top:4px; }
+  .section-label { grid-column:1/-1; font-size:12px; font-weight:700; color:#1a73e8; text-transform:uppercase; letter-spacing:0.5px; }
+  .strip-info { background:#e8f0fe; border-radius:8px; padding:10px 14px; font-size:13px; color:#1a73e8; grid-column:1/-1; }
+  #medicineFields { display:contents; }
+  #fmcgFields { display:contents; }
+</style>
+</head>
+<body>
+
+<div class="navbar">
+  <h1>💊 MedXpert Pharmacy</h1>
+  <span id="navUser"></span>
+  <button onclick="logout()">Logout</button>
+</div>
+
+<div class="sidebar">
+  <a href="index.html">🏠 Dashboard</a>
+  <a href="stock.html" class="active">📦 Stock / Inventory</a>
+  <a href="billing.html">🧾 Billing</a>
+  <a href="purchase.html">🛒 Purchase Entry</a>
+  <a href="reports.html">📊 Reports</a>
+</div>
+
+<div class="main">
+  <div class="top-bar">
+    <input type="text" id="searchInput" placeholder="🔍 Search item..." oninput="filterProducts()" />
+    <div class="filter-tabs">
+      <div class="tab active" onclick="setFilter('all',this)">All</div>
+      <div class="tab" onclick="setFilter('medicine',this)">💊 Medicine</div>
+      <div class="tab" onclick="setFilter('fmcg',this)">🛍️ FMCG</div>
+      <div class="tab" onclick="setFilter('other',this)">📦 Other</div>
+    </div>
+    <button class="btn btn-primary" onclick="openModal()">+ Add Item</button>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th><th>Category</th><th>Company</th>
+        <th>Batch/Expiry</th><th>MRP</th><th>Sale Price</th>
+        <th>Stock</th><th>Status</th><th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="productTable">
+      <tr><td colspan="9" style="text-align:center;padding:30px;color:#aaa;">Loading...</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ADD/EDIT MODAL -->
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <h2 id="modalTitle">Add Item</h2>
+    <div class="form-grid">
+
+      <!-- Category -->
+      <div class="form-group full">
+        <label>Category *</label>
+        <select id="f_category" onchange="onCategoryChange()">
+          <option value="medicine">💊 Medicine</option>
+          <option value="fmcg">🛍️ FMCG (Maggi, Chips, etc.)</option>
+          <option value="other">📦 Other</option>
+        </select>
+      </div>
+
+      <div class="form-group full"><label>Item Name *</label><input id="f_name" placeholder="e.g. Paracetamol 500mg / Maggi 70g" /></div>
+      <div class="form-group"><label>Generic / Variant</label><input id="f_generic" placeholder="e.g. Paracetamol / Masala" /></div>
+      <div class="form-group"><label>Company / Brand</label><input id="f_company" placeholder="e.g. Cipla / Nestle" /></div>
+
+      <!-- Medicine only fields -->
+      <div id="medicineFields">
+        <div class="form-group full section-label" style="margin-top:4px;">Medicine Details</div>
+        <div class="form-group"><label>Batch No</label><input id="f_batch" placeholder="e.g. BT2024" /></div>
+        <div class="form-group"><label>Expiry (MM/YY)</label><input id="f_expiry" placeholder="e.g. 12/26" /></div>
+        <div class="form-group"><label>HSN Code</label><input id="f_hsn" placeholder="e.g. 3004" /></div>
+        <div class="form-group"><label>GST %</label>
+          <select id="f_gst">
+            <option value="0">0%</option><option value="5">5%</option>
+            <option value="12" selected>12%</option><option value="18">18%</option>
+          </select>
+        </div>
+
+        <!-- Sell Type -->
+        <div class="form-group full section-label">Selling Type</div>
+        <div class="form-group full">
+          <label>How is this sold?</label>
+          <select id="f_sellType" onchange="onSellTypeChange()">
+            <option value="strip">Strip only (e.g. full strip of 10)</option>
+            <option value="loose">Strip + Loose pills (e.g. can sell 3 pills from strip)</option>
+            <option value="piece">Piece / Bottle / Unit</option>
+          </select>
+        </div>
+
+        <div id="stripFields" style="display:contents;">
+          <div class="strip-info full" id="stripInfoBox">
+            Loose selling: Customer sirf 3 pills bhi le sakta hai — aapko strip mein se nikaal ke dena hoga.
+          </div>
+          <div class="form-group"><label>Units Per Strip</label><input id="f_unitsPerStrip" type="number" placeholder="e.g. 10" value="10" oninput="calcUnitPrice()" /></div>
+          <div class="form-group"><label>Price Per Unit (₹)</label><input id="f_pricePerUnit" type="number" placeholder="Auto-calculated" readonly style="background:#f9f9f9;" /></div>
+          <div class="form-group"><label>Strips in Stock</label><input id="f_stripStock" type="number" placeholder="0" oninput="calcLoose()" /></div>
+          <div class="form-group"><label>Loose Pills in Stock</label><input id="f_looseStock" type="number" placeholder="0" /></div>
+        </div>
+      </div>
+
+      <!-- Pricing (common) -->
+      <div class="form-group full section-label" style="margin-top:4px;">Pricing</div>
+      <div class="form-group"><label>MRP (₹) *</label><input id="f_mrp" type="number" placeholder="0.00" oninput="calcUnitPrice()" /></div>
+      <div class="form-group"><label>Purchase Price (₹) *</label><input id="f_purchase" type="number" placeholder="0.00" /></div>
+      <div class="form-group"><label>Sale Price (₹) *</label><input id="f_sale" type="number" placeholder="0.00" /></div>
+      <div class="form-group"><label>Stock (pieces/units)</label><input id="f_stock" type="number" placeholder="0" /></div>
+      <div class="form-group"><label>Min Stock Alert</label><input id="f_min" type="number" placeholder="10" /></div>
+      <div class="form-group"><label>Rack / Location</label><input id="f_rack" placeholder="e.g. A-12" /></div>
+
+    </div>
+    <div class="modal-actions">
+      <button class="btn" style="background:#f5f5f5;color:#333;" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveProduct()">Save Item</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let allProducts = [];
+let editingId = null;
+let currentFilter = 'all';
+
+function checkAuth() {
+  const user = JSON.parse(localStorage.getItem('user') || 'null');
+  if (!localStorage.getItem('token')) { location.href='index.html'; return; }
+  document.getElementById('navUser').textContent = '👤 ' + (user?.name || '');
+}
+
+function logout() { localStorage.clear(); location.href='index.html'; }
+
+async function loadProducts() {
+  const res = await fetch('/api/products');
+  allProducts = await res.json();
+  renderTable();
+}
+
+function setFilter(f, el) {
+  currentFilter = f;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderTable();
+}
+
+function renderTable() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  let products = allProducts;
+  if (currentFilter !== 'all') products = products.filter(p => p.category === currentFilter);
+  if (q) products = products.filter(p =>
+    p.name.toLowerCase().includes(q) ||
+    (p.generic||'').toLowerCase().includes(q) ||
+    (p.company||'').toLowerCase().includes(q)
+  );
+
+  const tbody = document.getElementById('productTable');
+  if (products.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:30px;color:#aaa;">No items found.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = products.map(p => {
+    const catBadge = p.category === 'medicine' ? '<span class="badge badge-med">💊 Medicine</span>'
+      : p.category === 'fmcg' ? '<span class="badge badge-fmcg">🛍️ FMCG</span>'
+      : '<span class="badge badge-other">📦 Other</span>';
+
+    let stockDisplay = '';
+    let totalUnits = 0;
+    if (p.category === 'medicine' && p.sellType === 'loose') {
+      const strips = p.stripStock || 0;
+      const loose = p.looseStock || 0;
+      const ups = p.unitsPerStrip || 10;
+      totalUnits = strips * ups + loose;
+      stockDisplay = `${strips} strips + ${loose} loose<br><small style="color:#888;">(${totalUnits} units total)</small>`;
+    } else {
+      totalUnits = p.stock || 0;
+      stockDisplay = `<strong>${totalUnits}</strong>`;
+    }
+
+    const minStock = p.minStock || 10;
+    const status = totalUnits === 0
+      ? '<span class="badge badge-out">Out of Stock</span>'
+      : totalUnits <= minStock
+      ? '<span class="badge badge-low">Low Stock</span>'
+      : '<span class="badge badge-ok">In Stock</span>';
+
+    return `<tr>
+      <td><strong>${p.name}</strong>${p.generic ? `<br><small style="color:#888;">${p.generic}</small>` : ''}</td>
+      <td>${catBadge}</td>
+      <td>${p.company||'-'}</td>
+      <td>${p.batch ? p.batch : '-'}${p.expiry ? `<br><small style="color:#e65100;">${p.expiry}</small>` : ''}</td>
+      <td>₹${p.mrp}</td>
+      <td>₹${p.salePrice}${p.category==='medicine' && p.sellType==='loose' && p.pricePerUnit ? `<br><small style="color:#888;">₹${p.pricePerUnit}/pill</small>` : ''}</td>
+      <td>${stockDisplay}</td>
+      <td>${status}</td>
+      <td>
+        <button class="btn btn-edit" style="padding:5px 12px;font-size:12px;margin-right:5px;" onclick="editProduct('${p._id}')">Edit</button>
+        <button class="btn btn-danger" style="padding:5px 12px;font-size:12px;" onclick="deleteProduct('${p._id}')">Delete</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function filterProducts() { renderTable(); }
+
+function onCategoryChange() {
+  const cat = document.getElementById('f_category').value;
+  const medFields = document.getElementById('medicineFields');
+  medFields.style.display = cat === 'medicine' ? 'contents' : 'none';
+  if (cat === 'fmcg' || cat === 'other') {
+    document.getElementById('f_gst').value = cat === 'fmcg' ? '5' : '0';
+  }
+}
+
+function onSellTypeChange() {
+  const type = document.getElementById('f_sellType').value;
+  const stripFields = document.getElementById('stripFields');
+  const infoBox = document.getElementById('stripInfoBox');
+  if (type === 'loose') {
+    stripFields.style.display = 'contents';
+    infoBox.style.display = 'block';
+  } else if (type === 'strip') {
+    stripFields.style.display = 'contents';
+    infoBox.style.display = 'none';
+    document.getElementById('f_looseStock').value = 0;
+  } else {
+    stripFields.style.display = 'none';
+  }
+}
+
+function calcUnitPrice() {
+  const mrp = parseFloat(document.getElementById('f_mrp').value) || 0;
+  const ups = parseInt(document.getElementById('f_unitsPerStrip').value) || 10;
+  if (mrp && ups) {
+    document.getElementById('f_pricePerUnit').value = (mrp / ups).toFixed(2);
+  }
+}
+
+function calcLoose() {}
+
+function openModal(reset=true) {
+  if (reset) {
+    editingId = null;
+    document.getElementById('modalTitle').textContent = 'Add Item';
+    ['f_name','f_generic','f_company','f_batch','f_expiry','f_mrp','f_purchase',
+     'f_sale','f_stock','f_min','f_hsn','f_rack','f_stripStock','f_looseStock'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+    document.getElementById('f_gst').value = '12';
+    document.getElementById('f_unitsPerStrip').value = '10';
+    document.getElementById('f_category').value = 'medicine';
+    document.getElementById('f_sellType').value = 'strip';
+    onCategoryChange();
+    onSellTypeChange();
+  }
+  document.getElementById('modalBg').classList.add('show');
+}
+
+function closeModal() { document.getElementById('modalBg').classList.remove('show'); }
+
+function editProduct(id) {
+  const p = allProducts.find(x => x._id === id);
+  if (!p) return;
+  editingId = id;
+  document.getElementById('modalTitle').textContent = 'Edit Item';
+  document.getElementById('f_category').value = p.category || 'medicine';
+  document.getElementById('f_name').value = p.name;
+  document.getElementById('f_generic').value = p.generic||'';
+  document.getElementById('f_company').value = p.company||'';
+  document.getElementById('f_batch').value = p.batch||'';
+  document.getElementById('f_expiry').value = p.expiry||'';
+  document.getElementById('f_mrp').value = p.mrp;
+  document.getElementById('f_purchase').value = p.purchasePrice;
+  document.getElementById('f_sale').value = p.salePrice;
+  document.getElementById('f_stock').value = p.stock||0;
+  document.getElementById('f_min').value = p.minStock||10;
+  document.getElementById('f_gst').value = p.gst||12;
+  document.getElementById('f_hsn').value = p.hsn||'';
+  document.getElementById('f_rack').value = p.rack||'';
+  document.getElementById('f_sellType').value = p.sellType||'strip';
+  document.getElementById('f_unitsPerStrip').value = p.unitsPerStrip||10;
+  document.getElementById('f_stripStock').value = p.stripStock||0;
+  document.getElementById('f_looseStock').value = p.looseStock||0;
+  document.getElementById('f_pricePerUnit').value = p.pricePerUnit||0;
+  onCategoryChange();
+  onSellTypeChange();
+  openModal(false);
+}
+
+async function saveProduct() {
+  const name = document.getElementById('f_name').value.trim();
+  const mrp = parseFloat(document.getElementById('f_mrp').value)||0;
+  const salePrice = parseFloat(document.getElementById('f_sale').value)||0;
+  if (!name || !mrp || !salePrice) { alert('Name, MRP aur Sale Price zaroori hai!'); return; }
+
+  const data = {
+    name,
+    category: document.getElementById('f_category').value,
+    generic: document.getElementById('f_generic').value,
+    company: document.getElementById('f_company').value,
+    batch: document.getElementById('f_batch').value,
+    expiry: document.getElementById('f_expiry').value,
+    mrp, salePrice,
+    purchasePrice: parseFloat(document.getElementById('f_purchase').value)||0,
+    stock: parseInt(document.getElementById('f_stock').value)||0,
+    minStock: parseInt(document.getElementById('f_min').value)||10,
+    gst: parseInt(document.getElementById('f_gst').value)||0,
+    hsn: document.getElementById('f_hsn').value,
+    rack: document.getElementById('f_rack').value,
+    sellType: document.getElementById('f_sellType').value,
+    unitsPerStrip: parseInt(document.getElementById('f_unitsPerStrip').value)||10,
+    stripStock: parseInt(document.getElementById('f_stripStock').value)||0,
+    looseStock: parseInt(document.getElementById('f_looseStock').value)||0,
+    pricePerUnit: parseFloat(document.getElementById('f_pricePerUnit').value)||0
+  };
+
+  const url = editingId ? `/api/products/${editingId}` : '/api/products';
+  const method = editingId ? 'PUT' : 'POST';
+  await fetch(url, { method, headers:{'Content-Type':'application/json'}, body:JSON.stringify(data) });
+  closeModal();
+  loadProducts();
+}
+
+async function deleteProduct(id) {
+  if (!confirm('Delete karna chahte ho?')) return;
+  await fetch(`/api/products/${id}`, { method:'DELETE' });
+  loadProducts();
+}
+
+checkAuth();
+loadProducts();
+</script>
+</body>
+</html>

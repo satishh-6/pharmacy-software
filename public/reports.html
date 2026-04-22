@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reports - MedXpert</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Segoe UI',sans-serif; background:#f0f4f8; }
+  .navbar { background:#1a73e8; color:white; padding:0 24px; display:flex; align-items:center; height:58px; position:fixed; width:100%; top:0; z-index:100; box-shadow:0 2px 8px rgba(0,0,0,0.15); }
+  .navbar h1 { font-size:20px; font-weight:700; flex:1; }
+  .navbar span { font-size:13px; opacity:0.85; margin-right:16px; }
+  .navbar button { background:rgba(255,255,255,0.2); border:none; color:white; padding:7px 16px; border-radius:6px; cursor:pointer; font-size:13px; }
+  .sidebar { position:fixed; left:0; top:58px; width:220px; height:calc(100vh - 58px); background:white; border-right:1px solid #e0e0e0; padding:16px 0; overflow-y:auto; }
+  .sidebar a { display:flex; align-items:center; gap:12px; padding:12px 20px; color:#444; text-decoration:none; font-size:14.5px; border-left:3px solid transparent; transition:all 0.2s; }
+  .sidebar a:hover, .sidebar a.active { background:#e8f0fe; color:#1a73e8; border-left-color:#1a73e8; }
+  .main { margin-left:220px; margin-top:58px; padding:20px; max-width:calc(100vw - 220px); overflow-x:hidden; }
+  .card { background:white; border-radius:12px; padding:20px 24px; box-shadow:0 2px 8px rgba(0,0,0,0.07); margin-bottom:20px; }
+  .card h3 { font-size:15px; color:#333; margin-bottom:16px; font-weight:600; }
+  .tabs { display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap; }
+  .tab { padding:9px 16px; border:1.5px solid #ddd; border-radius:8px; cursor:pointer; font-size:13px; background:white; color:#555; font-weight:500; transition:all 0.2s; white-space:nowrap; }
+  .tab.active { background:#1a73e8; color:white; border-color:#1a73e8; }
+  .date-row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:20px; }
+  .date-row input[type=date] { padding:8px 10px; border:1.5px solid #ddd; border-radius:7px; font-size:13px; outline:none; }
+  .date-row input[type=date]:focus { border-color:#1a73e8; }
+  .btn { padding:9px 16px; border:none; border-radius:8px; cursor:pointer; font-size:13px; font-weight:600; white-space:nowrap; transition:all 0.2s; }
+  .btn-primary { background:#1a73e8; color:white; }
+  .btn-success { background:#2e7d32; color:white; }
+  .btn-filter { background:#f0f4f8; color:#333; border:1.5px solid #ddd; }
+  .btn-filter.active { background:#1a73e8; color:white; border-color:#1a73e8; }
+  .stat-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(155px,1fr)); gap:14px; margin-bottom:20px; }
+  .stat-card { background:white; border-radius:12px; padding:16px 18px; box-shadow:0 2px 8px rgba(0,0,0,0.07); border-left:4px solid #1a73e8; min-width:0; }
+  .stat-card.green { border-left-color:#2e7d32; }
+  .stat-card.orange { border-left-color:#f57c00; }
+  .stat-card.red { border-left-color:#c62828; }
+  .stat-card.purple { border-left-color:#6a1b9a; }
+  .stat-card .label { font-size:11px; color:#888; margin-bottom:5px; text-transform:uppercase; font-weight:600; }
+  .stat-card .value { font-size:22px; font-weight:700; color:#222; word-break:break-all; }
+  .stat-card .sub { font-size:11px; color:#aaa; margin-top:3px; }
+  table { width:100%; border-collapse:collapse; }
+  th { background:#f8f9fa; padding:10px 12px; text-align:left; font-size:11px; color:#666; font-weight:600; border-bottom:1px solid #eee; text-transform:uppercase; white-space:nowrap; }
+  td { padding:10px 12px; font-size:13px; border-bottom:1px solid #f5f5f5; }
+  tr:hover td { background:#fafafa; }
+  .profit { color:#2e7d32; font-weight:600; }
+  .loss { color:#c62828; font-weight:600; }
+  .section { display:none; }
+  .section.active { display:block; }
+  .chart-bar-wrap { display:flex; flex-direction:column; gap:8px; }
+  .bar-row { display:flex; align-items:center; gap:10px; font-size:13px; }
+  .bar-label { width:70px; text-align:right; color:#555; font-size:11px; flex-shrink:0; }
+  .bar-track { flex:1; background:#f0f4f8; border-radius:4px; height:22px; overflow:hidden; min-width:0; }
+  .bar-fill { height:100%; border-radius:4px; display:flex; align-items:center; padding-left:8px; font-size:11px; color:white; font-weight:600; transition:width 0.6s ease; }
+  .bar-val { width:70px; font-size:12px; color:#333; font-weight:600; flex-shrink:0; }
+  @media print {
+    .navbar,.sidebar,.tabs,.date-row,.no-print { display:none !important; }
+    .main { margin:0 !important; padding:10px !important; max-width:100% !important; }
+    .section { display:block !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="navbar">
+  <h1>💊 MedXpert Pharmacy</h1>
+  <span id="navUser"></span>
+  <button onclick="logout()">Logout</button>
+</div>
+
+<div class="sidebar">
+  <a href="index.html">🏠 Dashboard</a>
+  <a href="stock.html">📦 Stock / Inventory</a>
+  <a href="billing.html">🧾 Billing</a>
+  <a href="purchase.html">🛒 Purchase Entry</a>
+  <a href="reports.html" class="active">📊 Reports</a>
+</div>
+
+<div class="main">
+
+  <!-- Tabs -->
+  <div class="tabs no-print">
+    <div class="tab active" onclick="showSection('sales',this)">📈 Sales Report</div>
+    <div class="tab" onclick="showSection('pl',this)">💰 Profit & Loss</div>
+    <div class="tab" onclick="showSection('purchase',this)">🛒 Purchase Report</div>
+    <div class="tab" onclick="showSection('stock',this)">📦 Stock Report</div>
+    <div class="tab" onclick="showSection('gst',this)">🧾 GST Report</div>
+    <div class="tab" onclick="showSection('pending',this)">⏳ Pending Payments</div>
+  </div>
+
+  <!-- Date Filter -->
+  <div class="date-row no-print">
+    <label style="font-size:13px;color:#666;font-weight:600;">From:</label>
+    <input type="date" id="fromDate" onchange="clearActiveBtn()" />
+    <label style="font-size:13px;color:#666;font-weight:600;">To:</label>
+    <input type="date" id="toDate" onchange="clearActiveBtn()" />
+    <button class="btn btn-primary" onclick="loadAll()">🔍 Apply</button>
+    <button class="btn btn-filter" id="btnToday" onclick="setToday(this)">Today</button>
+    <button class="btn btn-filter" id="btnMonth" onclick="setThisMonth(this)">This Month</button>
+    <button class="btn btn-filter" id="btnYear" onclick="setThisYear(this)">This Year</button>
+    <button class="btn btn-success" onclick="window.print()">🖨️ Print</button>
+  </div>
+
+  <!-- SALES REPORT -->
+  <div class="section active" id="sec-sales">
+    <div class="stat-grid">
+      <div class="stat-card green">
+        <div class="label">Total Sales</div>
+        <div class="value" id="s-total">₹0</div>
+        <div class="sub" id="s-bills">0 bills</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Cash Sales</div>
+        <div class="value" id="s-cash">₹0</div>
+      </div>
+      <div class="stat-card purple">
+        <div class="label">UPI Sales</div>
+        <div class="value" id="s-upi">₹0</div>
+      </div>
+      <div class="stat-card orange">
+        <div class="label">Credit Sales</div>
+        <div class="value" id="s-credit">₹0</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Avg Bill Value</div>
+        <div class="value" id="s-avg">₹0</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>📅 Monthly Sales Chart</h3>
+      <div class="chart-bar-wrap" id="monthlyChart"></div>
+    </div>
+
+    <div class="card">
+      <h3>🧾 Sales Details</h3>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Bill No</th><th>Date</th><th>Customer</th><th>Items</th>
+              <th>Subtotal</th><th>GST</th><th>Discount</th><th>Total</th>
+              <th>Paid</th><th>Due</th><th>Payment</th>
+            </tr>
+          </thead>
+          <tbody id="salesTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROFIT & LOSS -->
+  <div class="section" id="sec-pl">
+    <div class="stat-grid">
+      <div class="stat-card green">
+        <div class="label">Total Revenue</div>
+        <div class="value" id="pl-revenue">₹0</div>
+        <div class="sub">From sales</div>
+      </div>
+      <div class="stat-card red">
+        <div class="label">Total Cost</div>
+        <div class="value" id="pl-cost">₹0</div>
+        <div class="sub">Purchase price</div>
+      </div>
+      <div class="stat-card green">
+        <div class="label">Gross Profit</div>
+        <div class="value" id="pl-profit">₹0</div>
+        <div class="sub" id="pl-margin">0% margin</div>
+      </div>
+      <div class="stat-card orange">
+        <div class="label">GST Collected</div>
+        <div class="value" id="pl-gst">₹0</div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>📊 Product-wise Profit</h3>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr><th>Product</th><th>Qty Sold</th><th>Revenue</th><th>Cost</th><th>Profit</th><th>Margin%</th></tr>
+          </thead>
+          <tbody id="plTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- PURCHASE REPORT -->
+  <div class="section" id="sec-purchase">
+    <div class="stat-grid">
+      <div class="stat-card red">
+        <div class="label">Total Purchased</div>
+        <div class="value" id="p-total">₹0</div>
+      </div>
+      <div class="stat-card orange">
+        <div class="label">Total Due</div>
+        <div class="value" id="p-due">₹0</div>
+        <div class="sub">Unpaid to suppliers</div>
+      </div>
+      <div class="stat-card green">
+        <div class="label">Total Paid</div>
+        <div class="value" id="p-paid">₹0</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Suppliers</div>
+        <div class="value" id="p-suppliers">0</div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>🏪 Supplier-wise Summary</h3>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr><th>Supplier</th><th>Purchases</th><th>Total Amount</th><th>Paid</th><th>Balance Due</th><th>Status</th></tr>
+          </thead>
+          <tbody id="purchaseTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- STOCK REPORT -->
+  <div class="section" id="sec-stock">
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="label">Total Products</div>
+        <div class="value" id="st-total">0</div>
+      </div>
+      <div class="stat-card green">
+        <div class="label">Stock Value MRP</div>
+        <div class="value" id="st-mrp">₹0</div>
+      </div>
+      <div class="stat-card orange">
+        <div class="label">Stock Value Cost</div>
+        <div class="value" id="st-cost">₹0</div>
+      </div>
+      <div class="stat-card red">
+        <div class="label">Low Stock</div>
+        <div class="value" id="st-low">0</div>
+      </div>
+      <div class="stat-card red">
+        <div class="label">Expiring 90 Days</div>
+        <div class="value" id="st-exp">0</div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>📦 Stock Details</h3>
+      <div style="margin-bottom:12px;">
+        <input type="text" id="stockSearch" placeholder="🔍 Search medicine/item..."
+          oninput="filterStockTable()"
+          style="padding:8px 12px;border:1.5px solid #ddd;border-radius:7px;font-size:13px;outline:none;width:260px;" />
+      </div>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr><th>Name</th><th>Category</th><th>Batch</th><th>Expiry</th><th>Stock</th><th>MRP</th><th>Purchase Price</th><th>Stock Value</th><th>Status</th></tr>
+          </thead>
+          <tbody id="stockTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- GST REPORT -->
+  <div class="section" id="sec-gst">
+    <div class="stat-grid">
+      <div class="stat-card green">
+        <div class="label">GST Collected Sales</div>
+        <div class="value" id="g-collected">₹0</div>
+      </div>
+      <div class="stat-card red">
+        <div class="label">GST Paid Purchase</div>
+        <div class="value" id="g-paid">₹0</div>
+      </div>
+      <div class="stat-card purple">
+        <div class="label">Net GST Payable</div>
+        <div class="value" id="g-net">₹0</div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>🧾 GST Slab-wise Summary</h3>
+      <table>
+        <thead>
+          <tr><th>GST Slab</th><th>Taxable Amount</th><th>GST Collected</th><th>Bills</th></tr>
+        </thead>
+        <tbody id="gstTable"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- PENDING PAYMENTS -->
+  <div class="section" id="sec-pending">
+    <div class="stat-grid">
+      <div class="stat-card red">
+        <div class="label">Customer Dues</div>
+        <div class="value" id="pd-custdue">₹0</div>
+        <div class="sub" id="pd-custcount">0 customers</div>
+      </div>
+      <div class="stat-card orange">
+        <div class="label">Supplier Dues</div>
+        <div class="value" id="pd-suppdue">₹0</div>
+        <div class="sub" id="pd-suppcount">0 suppliers</div>
+      </div>
+      <div class="stat-card red">
+        <div class="label">Total Pending</div>
+        <div class="value" id="pd-total">₹0</div>
+        <div class="sub">Inward + Outward</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>👥 Customer-wise Pending <span style="font-size:13px;color:#888;font-weight:400;">(Aapko Milna Hai)</span></h3>
+      <div style="margin-bottom:12px;">
+        <input type="text" id="custSearch" placeholder="🔍 Search customer name..."
+          oninput="filterCustPending()"
+          style="padding:9px 14px;border:1.5px solid #ddd;border-radius:7px;font-size:13px;outline:none;width:260px;" />
+      </div>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Customer Name</th>
+              <th>Bills</th>
+              <th>Total Amount</th>
+              <th>Paid</th>
+              <th>Balance Due</th>
+              <th>Last Bill</th>
+            </tr>
+          </thead>
+          <tbody id="custPendingTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card" id="custBillBreakdown" style="display:none;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+        <h3 id="custBillTitle" style="margin-bottom:0;">Bill Details</h3>
+        <button onclick="document.getElementById('custBillBreakdown').style.display='none'"
+          style="background:#f5f5f5;border:none;padding:6px 14px;border-radius:6px;cursor:pointer;font-size:13px;">✕ Close</button>
+      </div>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr><th>Bill No</th><th>Date</th><th>Items</th><th>Total</th><th>Paid</th><th>Due</th><th>Status</th></tr>
+          </thead>
+          <tbody id="custBillTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>🏪 Supplier-wise Pending <span style="font-size:13px;color:#888;font-weight:400;">(Aapko Dena Hai)</span></h3>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Supplier Name</th>
+              <th>Invoices</th>
+              <th>Total</th>
+              <th>Paid</th>
+              <th>Balance Due</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="suppPendingTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+let salesData = [];
+let purchasesData = [];
+let productsData = [];
+let custPendingData = {};
+let allStockData = [];
+
+function checkAuth() {
+  const user = JSON.parse(localStorage.getItem('user') || 'null');
+  if (!localStorage.getItem('token')) { location.href='index.html'; return; }
+  document.getElementById('navUser').textContent = '👤 ' + (user?.name || '');
+}
+
+function logout() { localStorage.clear(); location.href='index.html'; }
+
+function showSection(name, el) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('sec-'+name).classList.add('active');
+  el.classList.add('active');
+}
+
+// ── DATE HELPERS ──
+function getLocalDate(date) {
+  const d = date || new Date();
+  const year = d.getFullYear();
+  const month = String(d.getMonth()+1).padStart(2,'0');
+  const day = String(d.getDate()).padStart(2,'0');
+  return `${year}-${month}-${day}`;
+}
+
+function clearActiveBtn() {
+  ['btnToday','btnMonth','btnYear'].forEach(id => {
+    const b = document.getElementById(id);
+    if (b) { b.classList.remove('active'); }
+  });
+}
+
+function setToday(btn) {
+  const today = getLocalDate();
+  document.getElementById('fromDate').value = today;
+  document.getElementById('toDate').value = today;
+  clearActiveBtn();
+  if (btn) btn.classList.add('active');
+  loadAll();
+}
+
+function setThisMonth(btn) {
+  const now = new Date();
+  const from = getLocalDate(new Date(now.getFullYear(), now.getMonth(), 1));
+  const to = getLocalDate(new Date(now.getFullYear(), now.getMonth()+1, 0));
+  document.getElementById('fromDate').value = from;
+  document.getElementById('toDate').value = to;
+  clearActiveBtn();
+  if (btn) btn.classList.add('active');
+  loadAll();
+}
+
+function setThisYear(btn) {
+  const y = new Date().getFullYear();
+  document.getElementById('fromDate').value = `${y}-01-01`;
+  document.getElementById('toDate').value = `${y}-12-31`;
+  clearActiveBtn();
+  if (btn) btn.classList.add('active');
+  loadAll();
+}
+
+async function loadAll() {
+  const from = document.getElementById('fromDate').value;
+  const to = document.getElementById('toDate').value;
+  let salesUrl = '/api/sales';
+  let purchaseUrl = '/api/purchases';
+  if (from && to) {
+    salesUrl += `?from=${from}T00:00:00&to=${to}T23:59:59`;
+  }
+
+  try {
+    const [sales, purchases, products] = await Promise.all([
+      fetch(salesUrl).then(r => r.json()),
+      fetch(purchaseUrl).then(r => r.json()),
+      fetch('/api/products').then(r => r.json())
+    ]);
+    salesData = Array.isArray(sales) ? sales : [];
+    purchasesData = Array.isArray(purchases) ? purchases : [];
+    productsData = Array.isArray(products) ? products : [];
+  } catch(e) {
+    console.log('Load error:', e);
+    salesData = []; purchasesData = []; productsData = [];
+  }
+
+  renderSales();
+  renderPL();
+  renderPurchases();
+  renderStock();
+  renderGST();
+  renderPending();
+}
+
+// ── SALES ──
+function renderSales() {
+  const total = salesData.reduce((a,b) => a+(b.totalAmount||0), 0);
+  const cash = salesData.filter(s=>s.paymentMode==='cash').reduce((a,b)=>a+(b.totalAmount||0),0);
+  const upi = salesData.filter(s=>s.paymentMode==='upi').reduce((a,b)=>a+(b.totalAmount||0),0);
+  const credit = salesData.filter(s=>s.paymentMode==='credit').reduce((a,b)=>a+(b.totalAmount||0),0);
+
+  document.getElementById('s-total').textContent = '₹'+total.toFixed(0);
+  document.getElementById('s-bills').textContent = salesData.length+' bills';
+  document.getElementById('s-cash').textContent = '₹'+cash.toFixed(0);
+  document.getElementById('s-upi').textContent = '₹'+upi.toFixed(0);
+  document.getElementById('s-credit').textContent = '₹'+credit.toFixed(0);
+  document.getElementById('s-avg').textContent = salesData.length ? '₹'+(total/salesData.length).toFixed(0) : '₹0';
+
+  const monthly = {};
+  salesData.forEach(s => {
+    const key = new Date(s.date).toLocaleString('en-IN',{month:'short',year:'numeric'});
+    monthly[key] = (monthly[key]||0)+(s.totalAmount||0);
+  });
+  const maxVal = Math.max(...Object.values(monthly), 1);
+  const chartEl = document.getElementById('monthlyChart');
+  if (!Object.keys(monthly).length) {
+    chartEl.innerHTML = '<p style="color:#aaa;font-size:13px;text-align:center;padding:20px;">No data for selected period.</p>';
+  } else {
+    chartEl.innerHTML = Object.entries(monthly).map(([month,val]) => `
+      <div class="bar-row">
+        <div class="bar-label">${month}</div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width:${(val/maxVal*100).toFixed(1)}%;background:#1a73e8;">
+            ${val>maxVal*0.15?'₹'+val.toFixed(0):''}
+          </div>
+        </div>
+        <div class="bar-val">₹${val.toFixed(0)}</div>
+      </div>`).join('');
+  }
+
+  const tbody = document.getElementById('salesTable');
+  if (!salesData.length) {
+    tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:20px;color:#aaa;">No sales in selected period.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = salesData.map(s => {
+    const due = (s.totalAmount||0)-(s.paidAmount||0);
+    const modeColor = s.paymentMode==='cash'?'#2e7d32':s.paymentMode==='upi'?'#4527a0':s.paymentMode==='credit'?'#c62828':'#e65100';
+    const modeBg = s.paymentMode==='cash'?'#e8f5e9':s.paymentMode==='upi'?'#ede7f6':s.paymentMode==='credit'?'#ffebee':'#fff3e0';
+    return `<tr>
+      <td><strong>${s.billNo||'-'}</strong></td>
+      <td>${new Date(s.date).toLocaleDateString('en-IN')}</td>
+      <td>${s.customer||'Walk-in'}</td>
+      <td>${s.items?.length||0}</td>
+      <td>₹${(s.subtotal||0).toFixed(2)}</td>
+      <td>₹${(s.gstAmount||0).toFixed(2)}</td>
+      <td>₹${(s.discount||0).toFixed(2)}</td>
+      <td><strong>₹${(s.totalAmount||0).toFixed(2)}</strong></td>
+      <td style="color:#2e7d32;font-weight:600;">₹${(s.paidAmount||0).toFixed(2)}</td>
+      <td style="color:${due>0.01?'#c62828':'#2e7d32'};font-weight:600;">₹${due.toFixed(2)}</td>
+      <td><span style="background:${modeBg};color:${modeColor};padding:3px 8px;border-radius:12px;font-size:11px;font-weight:600;">${s.paymentMode||'cash'}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+// ── PROFIT & LOSS ──
+function renderPL() {
+  let revenue=0, cost=0, gstCollected=0;
+  const productMap = {};
+
+  salesData.forEach(sale => {
+    gstCollected += sale.gstAmount||0;
+    (sale.items||[]).forEach(item => {
+      revenue += item.total||0;
+      const product = productsData.find(p => p._id===(item.product?._id||item.product));
+      const purchasePrice = product ? (product.purchasePrice||0) : 0;
+      const itemCost = purchasePrice*item.qty;
+      cost += itemCost;
+      const key = item.productName||'Unknown';
+      if (!productMap[key]) productMap[key] = {qty:0,revenue:0,cost:0};
+      productMap[key].qty += item.qty;
+      productMap[key].revenue += item.total||0;
+      productMap[key].cost += itemCost;
+    });
+  });
+
+  const profit = revenue-cost;
+  const margin = revenue>0?(profit/revenue*100).toFixed(1):0;
+  document.getElementById('pl-revenue').textContent = '₹'+revenue.toFixed(0);
+  document.getElementById('pl-cost').textContent = '₹'+cost.toFixed(0);
+  document.getElementById('pl-profit').textContent = '₹'+profit.toFixed(0);
+  document.getElementById('pl-profit').className = 'value '+(profit>=0?'profit':'loss');
+  document.getElementById('pl-margin').textContent = margin+'% margin';
+  document.getElementById('pl-gst').textContent = '₹'+gstCollected.toFixed(0);
+
+  const tbody = document.getElementById('plTable');
+  const sorted = Object.entries(productMap).sort((a,b)=>b[1].revenue-a[1].revenue);
+  if (!sorted.length) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:20px;color:#aaa;">No data.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = sorted.map(([name,d]) => {
+    const p=d.revenue-d.cost;
+    const m=d.revenue>0?(p/d.revenue*100).toFixed(1):0;
+    return `<tr>
+      <td><strong>${name}</strong></td>
+      <td>${d.qty}</td>
+      <td>₹${d.revenue.toFixed(2)}</td>
+      <td>₹${d.cost.toFixed(2)}</td>
+      <td class="${p>=0?'profit':'loss'}">₹${p.toFixed(2)}</td>
+      <td class="${p>=0?'profit':'loss'}">${m}%</td>
+    </tr>`;
+  }).join('');
+}
+
+// ── PURCHASES ──
+function renderPurchases() {
+  const total = purchasesData.reduce((a,b)=>a+(b.totalAmount||0),0);
+  const paid = purchasesData.reduce((a,b)=>a+(b.paidAmount||0),0);
+  const due = total-paid;
+  const suppliers = [...new Set(purchasesData.map(p=>p.supplier))];
+
+  document.getElementById('p-total').textContent = '₹'+total.toFixed(0);
+  document.getElementById('p-due').textContent = '₹'+due.toFixed(0);
+  document.getElementById('p-paid').textContent = '₹'+paid.toFixed(0);
+  document.getElementById('p-suppliers').textContent = suppliers.length;
+
+  const supplierMap = {};
+  purchasesData.forEach(p => {
+    if (!supplierMap[p.supplier]) supplierMap[p.supplier]={count:0,total:0,paid:0};
+    supplierMap[p.supplier].count++;
+    supplierMap[p.supplier].total += p.totalAmount||0;
+    supplierMap[p.supplier].paid += p.paidAmount||0;
+  });
+
+  const tbody = document.getElementById('purchaseTable');
+  if (!Object.keys(supplierMap).length) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:20px;color:#aaa;">No purchases.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = Object.entries(supplierMap).map(([name,d]) => {
+    const balance=d.total-d.paid;
+    const status=balance<=0?'✅ Paid':d.paid>0?'⚡ Partial':'❌ Unpaid';
+    const statusColor=balance<=0?'#2e7d32':d.paid>0?'#e65100':'#c62828';
+    return `<tr>
+      <td><strong>${name}</strong></td>
+      <td>${d.count}</td>
+      <td>₹${d.total.toFixed(2)}</td>
+      <td class="profit">₹${d.paid.toFixed(2)}</td>
+      <td class="${balance>0?'loss':'profit'}">₹${balance.toFixed(2)}</td>
+      <td style="color:${statusColor};font-weight:600;">${status}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ── STOCK ──
+function renderStock() {
+  allStockData = productsData;
+  const now = new Date();
+  const in90 = new Date(); in90.setDate(now.getDate()+90);
+  let mrpVal=0, costVal=0, lowCount=0, expCount=0;
+
+  productsData.forEach(p => {
+    const qty = p.sellType==='loose'?(p.stripStock||0)*(p.unitsPerStrip||10)+(p.looseStock||0):(p.stock||0);
+    mrpVal += qty*(p.mrp||0);
+    costVal += qty*(p.purchasePrice||0);
+    if (qty<=(p.minStock||10)) lowCount++;
+    if (p.expiry) {
+      const [m,y] = p.expiry.split('/');
+      const exp = new Date(parseInt('20'+y),parseInt(m)-1,28);
+      if (exp<=in90) expCount++;
+    }
+  });
+
+  document.getElementById('st-total').textContent = productsData.length;
+  document.getElementById('st-mrp').textContent = '₹'+mrpVal.toFixed(0);
+  document.getElementById('st-cost').textContent = '₹'+costVal.toFixed(0);
+  document.getElementById('st-low').textContent = lowCount;
+  document.getElementById('st-exp').textContent = expCount;
+  renderStockTable(productsData);
+}
+
+function renderStockTable(data) {
+  const tbody = document.getElementById('stockTable');
+  const now = new Date();
+  const in90 = new Date(); in90.setDate(now.getDate()+90);
+
+  if (!data.length) {
+    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:20px;color:#aaa;">No products found.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = data.map(p => {
+    const qty = p.sellType==='loose'?(p.stripStock||0)*(p.unitsPerStrip||10)+(p.looseStock||0):(p.stock||0);
+    const stockVal = qty*(p.purchasePrice||0);
+    let expColor='#333', expNote='';
+    if (p.expiry) {
+      const [m,y] = p.expiry.split('/');
+      const exp = new Date(parseInt('20'+y),parseInt(m)-1,28);
+      if (exp<now) { expColor='#c62828'; expNote=' ⚠️EXP'; }
+      else if (exp<=in90) { expColor='#e65100'; expNote=' ⚡Soon'; }
+    }
+    const stockStatus = qty===0
+      ? '<span style="background:#ffebee;color:#c62828;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;">Out</span>'
+      : qty<=(p.minStock||10)
+      ? '<span style="background:#fff3e0;color:#e65100;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;">Low</span>'
+      : '<span style="background:#e8f5e9;color:#2e7d32;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;">OK</span>';
+
+    return `<tr>
+      <td><strong>${p.name}</strong>${p.generic?`<br><small style="color:#aaa;">${p.generic}</small>`:''}</td>
+      <td>${p.category==='medicine'?'💊':p.category==='fmcg'?'🛍️':'📦'} ${p.category||'-'}</td>
+      <td>${p.batch||'-'}</td>
+      <td style="color:${expColor};">${p.expiry||'-'}${expNote}</td>
+      <td><strong>${qty}</strong>${p.sellType==='loose'?`<br><small style="color:#888;">${p.stripStock||0}s+${p.looseStock||0}l</small>`:''}</td>
+      <td>₹${p.mrp||0}</td>
+      <td>₹${p.purchasePrice||0}</td>
+      <td>₹${stockVal.toFixed(0)}</td>
+      <td>${stockStatus}</td>
+    </tr>`;
+  }).join('');
+}
+
+function filterStockTable() {
+  const q = document.getElementById('stockSearch').value.toLowerCase();
+  renderStockTable(allStockData.filter(p =>
+    p.name.toLowerCase().includes(q) ||
+    (p.generic||'').toLowerCase().includes(q) ||
+    (p.company||'').toLowerCase().includes(q)
+  ));
+}
+
+// ── GST ──
+function renderGST() {
+  const gstCollected = salesData.reduce((a,b)=>a+(b.gstAmount||0),0);
+  let gstPaid = 0;
+  purchasesData.forEach(p => {
+    (p.items||[]).forEach(item => {
+      gstPaid += (item.purchasePrice||0)*(item.qty||0)*((item.gst||0)/100);
+    });
+  });
+  const netGST = gstCollected-gstPaid;
+  document.getElementById('g-collected').textContent = '₹'+gstCollected.toFixed(2);
+  document.getElementById('g-paid').textContent = '₹'+gstPaid.toFixed(2);
+  document.getElementById('g-net').textContent = '₹'+netGST.toFixed(2);
+  document.getElementById('g-net').className = 'value '+(netGST>=0?'loss':'profit');
+
+  const slabs = {};
+  salesData.forEach(sale => {
+    (sale.items||[]).forEach(item => {
+      const key = (item.gst||0)+'%';
+      if (!slabs[key]) slabs[key]={taxable:0,gst:0,bills:new Set()};
+      slabs[key].taxable += item.total||0;
+      slabs[key].gst += (item.total||0)*((item.gst||0)/100);
+      slabs[key].bills.add(sale._id);
+    });
+  });
+
+  const tbody = document.getElementById('gstTable');
+  if (!Object.keys(slabs).length) {
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:20px;color:#aaa;">No GST data.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = Object.entries(slabs).map(([slab,d]) => `
+    <tr>
+      <td><strong>${slab} GST</strong></td>
+      <td>₹${d.taxable.toFixed(2)}</td>
+      <td>₹${d.gst.toFixed(2)}</td>
+      <td>${d.bills.size}</td>
+    </tr>`).join('');
+}
+
+// ── PENDING PAYMENTS ──
+function renderPending() {
+  // Customer pending — ALL sales independent of date filter
+  fetch('/api/sales').then(r => r.json()).then(allSales => {
+    const custMap = {};
+    allSales.forEach(s => {
+      const balance = (s.totalAmount||0)-(s.paidAmount||0);
+      if (s.paymentMode==='credit' || balance>0.01) {
+        const name = s.customer||'Walk-in Customer';
+        if (!custMap[name]) custMap[name]={bills:[],total:0,paid:0,lastDate:null};
+        custMap[name].bills.push(s);
+        custMap[name].total += s.totalAmount||0;
+        custMap[name].paid += s.paidAmount||0;
+        if (!custMap[name].lastDate || new Date(s.date)>new Date(custMap[name].lastDate)) {
+          custMap[name].lastDate = s.date;
+        }
+      }
+    });
+
+    custPendingData = custMap;
+    const totalCustDue = Object.values(custMap).reduce((a,c)=>a+(c.total-c.paid),0);
+    document.getElementById('pd-custdue').textContent = '₹'+totalCustDue.toFixed(0);
+    document.getElementById('pd-custcount').textContent = Object.keys(custMap).length+' customers';
+    renderCustPending(Object.entries(custMap));
+
+    // Update total pending
+    const suppDue = parseFloat(document.getElementById('pd-suppdue').textContent.replace('₹',''))||0;
+    document.getElementById('pd-total').textContent = '₹'+(totalCustDue+suppDue).toFixed(0);
+  }).catch(e => console.log('Pending cust error:', e));
+
+  // Supplier pending — ALL purchases
+  fetch('/api/purchases').then(r => r.json()).then(allPurchases => {
+    const suppMap = {};
+    allPurchases.forEach(p => {
+      if (!suppMap[p.supplier]) suppMap[p.supplier]={count:0,total:0,paid:0};
+      suppMap[p.supplier].count++;
+      suppMap[p.supplier].total += p.totalAmount||0;
+      suppMap[p.supplier].paid += p.paidAmount||0;
+    });
+
+    const totalSuppDue = Object.values(suppMap).reduce((a,c)=>a+(c.total-c.paid),0);
+    document.getElementById('pd-suppdue').textContent = '₹'+totalSuppDue.toFixed(0);
+    document.getElementById('pd-suppcount').textContent = Object.keys(suppMap).length+' suppliers';
+
+    const custDue = parseFloat(document.getElementById('pd-custdue').textContent.replace('₹',''))||0;
+    document.getElementById('pd-total').textContent = '₹'+(custDue+totalSuppDue).toFixed(0);
+
+    renderSuppPending(Object.entries(suppMap));
+  }).catch(e => console.log('Pending supp error:', e));
+}
+
+function renderCustPending(entries) {
+  const tbody = document.getElementById('custPendingTable');
+  const withDue = entries.filter(([,d])=>(d.total-d.paid)>0.01);
+
+  if (!withDue.length) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:20px;color:#2e7d32;font-weight:600;">✅ No pending customer payments!</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = withDue.sort((a,b)=>(b[1].total-b[1].paid)-(a[1].total-a[1].paid)).map(([name,d]) => {
+    const due = d.total-d.paid;
+    const safeName = name.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    return `<tr style="cursor:pointer;" onclick="showCustBills('${safeName}')" title="Click to see all bills">
+      <td>
+        <strong style="color:#1a73e8;font-size:14px;">${name}</strong>
+        <div style="font-size:11px;color:#aaa;">↓ Click to expand bills</div>
+      </td>
+      <td style="text-align:center;">${d.bills.length}</td>
+      <td>₹${d.total.toFixed(2)}</td>
+      <td style="color:#2e7d32;font-weight:600;">₹${d.paid.toFixed(2)}</td>
+      <td style="color:#c62828;font-size:15px;font-weight:700;">₹${due.toFixed(2)}</td>
+      <td>${d.lastDate?new Date(d.lastDate).toLocaleDateString('en-IN'):'-'}</td>
+    </tr>`;
+  }).join('');
+}
+
+function showCustBills(name) {
+  const d = custPendingData[name];
+  if (!d) return;
+  document.getElementById('custBillBreakdown').style.display = 'block';
+  document.getElementById('custBillTitle').textContent = '📋 '+name+' — All Bills';
+
+  document.getElementById('custBillTable').innerHTML = d.bills.map(s => {
+    const due = (s.totalAmount||0)-(s.paidAmount||0);
+    const status = due<=0.01?'✅ Paid':(s.paidAmount||0)>0?'⚡ Partial':'❌ Unpaid';
+    const statusColor = due<=0.01?'#2e7d32':(s.paidAmount||0)>0?'#e65100':'#c62828';
+    return `<tr>
+      <td><strong>${s.billNo||'-'}</strong></td>
+      <td>${new Date(s.date).toLocaleDateString('en-IN')}</td>
+      <td>${s.items?.length||0} items</td>
+      <td>₹${(s.totalAmount||0).toFixed(2)}</td>
+      <td style="color:#2e7d32;font-weight:600;">₹${(s.paidAmount||0).toFixed(2)}</td>
+      <td style="color:${due>0?'#c62828':'#2e7d32'};font-weight:700;">₹${due.toFixed(2)}</td>
+      <td style="color:${statusColor};font-weight:600;">${status}</td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('custBillBreakdown').scrollIntoView({behavior:'smooth'});
+}
+
+function filterCustPending() {
+  const q = document.getElementById('custSearch').value.toLowerCase();
+  renderCustPending(Object.entries(custPendingData).filter(([name])=>name.toLowerCase().includes(q)));
+}
+
+function renderSuppPending(entries) {
+  const tbody = document.getElementById('suppPendingTable');
+  const withDue = entries.filter(([,d])=>(d.total-d.paid)>0.01);
+
+  if (!withDue.length) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:20px;color:#2e7d32;font-weight:600;">✅ No pending supplier payments!</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = withDue.sort((a,b)=>(b[1].total-b[1].paid)-(a[1].total-a[1].paid)).map(([name,d]) => {
+    const due = d.total-d.paid;
+    const status = due<=0.01?'✅ Paid':d.paid>0?'⚡ Partial':'❌ Unpaid';
+    const statusColor = due<=0.01?'#2e7d32':d.paid>0?'#e65100':'#c62828';
+    return `<tr>
+      <td><strong>${name}</strong></td>
+      <td>${d.count}</td>
+      <td>₹${d.total.toFixed(2)}</td>
+      <td style="color:#2e7d32;font-weight:600;">₹${d.paid.toFixed(2)}</td>
+      <td style="color:${due>0?'#c62828':'#2e7d32'};font-size:15px;font-weight:700;">₹${due.toFixed(2)}</td>
+      <td style="color:${statusColor};font-weight:600;">${status}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ── INIT ──
+checkAuth();
+setThisMonth(document.getElementById('btnMonth'));
+</script>
+</body>
+</html>

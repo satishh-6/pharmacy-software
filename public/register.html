@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head><title>Register</title>
+<style>
+  body { font-family: sans-serif; display: flex; justify-content: center; padding: 40px; background: #f0f4f8; }
+  .box { background: white; padding: 30px; border-radius: 12px; width: 340px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+  input { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; }
+  button { width: 100%; padding: 12px; background: #1a73e8; color: white; border: none; border-radius: 6px; font-size: 15px; cursor: pointer; margin-top: 8px; }
+  #msg { margin-top: 12px; text-align: center; font-size: 14px; }
+</style>
+</head>
+<body>
+<div class="box">
+  <h2 style="margin-bottom:16px;">Create User</h2>
+  <input id="name" placeholder="Full Name" />
+  <input id="username" placeholder="Username" />
+  <input id="password" type="password" placeholder="Password" />
+  <select id="role" style="width:100%;padding:10px;margin:8px 0;border:1px solid #ddd;border-radius:6px;font-size:14px;">
+    <option value="admin">Admin</option>
+    <option value="staff">Staff</option>
+  </select>
+  <button onclick="register()">Create User</button>
+  <div id="msg"></div>
+</div>
+<script>
+async function register() {
+  const data = {
+    name: document.getElementById('name').value,
+    username: document.getElementById('username').value,
+    password: document.getElementById('password').value,
+    role: document.getElementById('role').value
+  };
+  const res = await fetch('/api/auth/register', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+  const result = await res.json();
+  const msg = document.getElementById('msg');
+  if (result.success) {
+    msg.style.color = 'green';
+    msg.textContent = '✅ User created! Go to login page.';
+  } else {
+    msg.style.color = 'red';
+    msg.textContent = '❌ ' + result.message;
+  }
+}
+</script>
+</body>
+</html>

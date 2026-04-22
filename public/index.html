@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MedXpert Pharmacy</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', sans-serif; background: #f0f4f8; }
+
+  /* LOGIN */
+  .login-page { display: flex; align-items: center; justify-content: center; min-height: 100vh; background: linear-gradient(135deg, #1a73e8, #0d47a1); }
+  .login-box { background: white; padding: 40px; border-radius: 16px; width: 360px; box-shadow: 0 20px 60px rgba(0,0,0,0.2); }
+  .login-box h1 { text-align: center; color: #1a73e8; font-size: 28px; margin-bottom: 6px; }
+  .login-box p { text-align: center; color: #666; margin-bottom: 28px; font-size: 14px; }
+  .login-box input { width: 100%; padding: 12px 16px; border: 1.5px solid #ddd; border-radius: 8px; font-size: 15px; margin-bottom: 14px; outline: none; transition: border 0.2s; }
+  .login-box input:focus { border-color: #1a73e8; }
+  .login-box button { width: 100%; padding: 13px; background: #1a73e8; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; }
+  .login-box button:hover { background: #1557b0; }
+  .login-error { color: red; font-size: 13px; text-align: center; margin-top: 10px; }
+
+  /* NAVBAR */
+  .navbar { background: #1a73e8; color: white; padding: 0 24px; display: flex; align-items: center; height: 58px; position: fixed; width: 100%; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+  .navbar h1 { font-size: 20px; font-weight: 700; flex: 1; }
+  .navbar span { font-size: 13px; opacity: 0.85; margin-right: 16px; }
+  .navbar button { background: rgba(255,255,255,0.2); border: none; color: white; padding: 7px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; }
+
+  /* SIDEBAR */
+  .sidebar { position: fixed; left: 0; top: 58px; width: 220px; height: calc(100vh - 58px); background: white; border-right: 1px solid #e0e0e0; padding: 16px 0; overflow-y: auto; }
+  .sidebar a { display: flex; align-items: center; gap: 12px; padding: 12px 20px; color: #444; text-decoration: none; font-size: 14.5px; border-left: 3px solid transparent; transition: all 0.2s; }
+  .sidebar a:hover, .sidebar a.active { background: #e8f0fe; color: #1a73e8; border-left-color: #1a73e8; }
+  .sidebar a .icon { font-size: 18px; width: 22px; text-align: center; }
+
+  /* MAIN */
+  .main { margin-left: 220px; margin-top: 58px; padding: 24px; }
+
+  /* CARDS */
+  .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+  .stat-card { background: white; border-radius: 12px; padding: 20px 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); border-left: 4px solid #1a73e8; }
+  .stat-card.green { border-left-color: #2e7d32; }
+  .stat-card.orange { border-left-color: #f57c00; }
+  .stat-card.red { border-left-color: #c62828; }
+  .stat-card .label { font-size: 13px; color: #888; margin-bottom: 6px; }
+  .stat-card .value { font-size: 28px; font-weight: 700; color: #222; }
+  .stat-card .sub { font-size: 12px; color: #aaa; margin-top: 4px; }
+
+  /* ALERTS */
+  .alert-section { background: white; border-radius: 12px; padding: 20px 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); margin-bottom: 20px; }
+  .alert-section h3 { font-size: 15px; margin-bottom: 14px; color: #333; }
+  .alert-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f0f0f0; font-size: 13.5px; }
+  .badge { padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+  .badge.red { background: #ffebee; color: #c62828; }
+  .badge.orange { background: #fff3e0; color: #e65100; }
+
+  #loginPage { display: flex; }
+  #appPage { display: none; }
+</style>
+</head>
+<body>
+
+<!-- LOGIN PAGE -->
+<div id="loginPage" class="login-page">
+  <div class="login-box">
+    <h1>💊 MedXpert</h1>
+    <p>Pharmacy Management System</p>
+    <input type="text" id="loginUser" placeholder="Username" />
+    <input type="password" id="loginPass" placeholder="Password" />
+    <button onclick="doLogin()">Login</button>
+    <div id="loginError" class="login-error"></div>
+  </div>
+</div>
+
+<!-- APP PAGE -->
+<div id="appPage">
+  <!-- Navbar -->
+  <div class="navbar">
+    <h1>💊 MedXpert Pharmacy</h1>
+    <span id="navUser"></span>
+    <button onclick="logout()">Logout</button>
+  </div>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <a href="index.html" class="active"><span class="icon">🏠</span> Dashboard</a>
+    <a href="stock.html"><span class="icon">📦</span> Stock / Inventory</a>
+    <a href="billing.html"><span class="icon">🧾</span> Billing</a>
+    <a href="purchase.html"><span class="icon">🛒</span> Purchase Entry</a>
+    <a href="reports.html"><span class="icon">📊</span> Reports</a>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main">
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="label">Total Products</div>
+        <div class="value" id="totalProducts">0</div>
+        <div class="sub">In inventory</div>
+      </div>
+      <div class="stat-card green">
+        <div class="label">Today's Sales</div>
+        <div class="value" id="todaySales">₹0</div>
+        <div class="sub" id="todayBills">0 bills</div>
+      </div>
+      <div class="stat-card orange">
+        <div class="label">Low Stock Items</div>
+        <div class="value" id="lowStock">0</div>
+        <div class="sub">Below minimum</div>
+      </div>
+      <div class="stat-card red">
+        <div class="label">Expiring Soon</div>
+        <div class="value" id="expiringSoon">0</div>
+        <div class="sub">Within 90 days</div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      <div class="alert-section">
+        <h3>⚠️ Low Stock Alerts</h3>
+        <div id="lowStockList"><p style="color:#aaa;font-size:13px;">Loading...</p></div>
+      </div>
+      <div class="alert-section">
+        <h3>📅 Expiry Alerts</h3>
+        <div id="expiryList"><p style="color:#aaa;font-size:13px;">Loading...</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = '';
+
+function checkAuth() {
+  const token = localStorage.getItem('token');
+  const user = JSON.parse(localStorage.getItem('user') || 'null');
+  if (token && user) {
+    document.getElementById('loginPage').style.display = 'none';
+    document.getElementById('appPage').style.display = 'block';
+    document.getElementById('navUser').textContent = '👤 ' + user.name;
+    loadDashboard();
+  }
+}
+
+async function doLogin() {
+  const username = document.getElementById('loginUser').value;
+  const password = document.getElementById('loginPass').value;
+  try {
+    const res = await fetch('/api/auth/login', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
+    const data = await res.json();
+    if (data.success) {
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      checkAuth();
+    } else {
+      document.getElementById('loginError').textContent = data.message || 'Login failed';
+    }
+  } catch(e) {
+    document.getElementById('loginError').textContent = 'Server error!';
+  }
+}
+
+function logout() {
+  localStorage.removeItem('token');
+  localStorage.removeItem('user');
+  location.reload();
+}
+
+async function loadDashboard() {
+  try {
+    const [products, sales] = await Promise.all([
+      fetch('/api/products').then(r => r.json()),
+      fetch('/api/sales').then(r => r.json())
+    ]);
+
+    document.getElementById('totalProducts').textContent = products.length;
+
+    const today = new Date().toDateString();
+    const todaySalesList = sales.filter(s => new Date(s.date).toDateString() === today);
+    const todayTotal = todaySalesList.reduce((a, b) => a + b.totalAmount, 0);
+    document.getElementById('todaySales').textContent = '₹' + todayTotal.toFixed(0);
+    document.getElementById('todayBills').textContent = todaySalesList.length + ' bills';
+
+    const lowItems = products.filter(p => p.stock <= p.minStock);
+    document.getElementById('lowStock').textContent = lowItems.length;
+
+    const now = new Date();
+    const in90 = new Date(); in90.setDate(now.getDate() + 90);
+    const expiringItems = products.filter(p => {
+      if (!p.expiry) return false;
+      const [m, y] = p.expiry.split('/');
+      const exp = new Date(parseInt('20'+y), parseInt(m)-1, 28);
+      return exp <= in90;
+    });
+    document.getElementById('expiringSoon').textContent = expiringItems.length;
+
+    // Low stock list
+    const llEl = document.getElementById('lowStockList');
+    if (lowItems.length === 0) { llEl.innerHTML = '<p style="color:#aaa;font-size:13px;">All stocks OK ✅</p>'; }
+    else {
+      llEl.innerHTML = lowItems.slice(0,6).map(p =>
+        `<div class="alert-item"><span>${p.name}</span><span class="badge orange">Qty: ${p.stock}</span></div>`
+      ).join('');
+    }
+
+    // Expiry list
+    const elEl = document.getElementById('expiryList');
+    if (expiringItems.length === 0) { elEl.innerHTML = '<p style="color:#aaa;font-size:13px;">No expiring items ✅</p>'; }
+    else {
+      elEl.innerHTML = expiringItems.slice(0,6).map(p =>
+        `<div class="alert-item"><span>${p.name}</span><span class="badge red">${p.expiry}</span></div>`
+      ).join('');
+    }
+  } catch(e) { console.log(e); }
+}
+
+// Enter key login
+document.addEventListener('keypress', e => { if (e.key === 'Enter') doLogin(); });
+checkAuth();
+</script>
+</body>
+</html>
