@@ -4,6 +4,7 @@ const saleSchema = new mongoose.Schema({
   billNo: { type: String },
   customer: { type: String, default: 'Walk-in Customer' },
   customerPhone: { type: String },
+  customerId: { type: mongoose.Schema.Types.ObjectId, ref: 'Customer' },
   items: [{
     product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
     productName: String,

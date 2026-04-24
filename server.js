@@ -67,11 +67,63 @@ app.patch('/api/sales/:id/payment', async (req, res) => {
   }
 });
 
+// Sales edit and delete
+const SaleModel = require('./models/Sale');
+const ProductModel = require('./models/Product');
+
+app.put('/api/sales/:id', async (req, res) => {
+  try {
+    const oldSale = await SaleModel.findById(req.params.id);
+    if (!oldSale) return res.status(404).json({ message: 'Not found' });
+
+    // Reverse old stock
+    for (const item of oldSale.items) {
+      const p = await ProductModel.findById(item.product);
+      if (!p) continue;
+      if (p.sellType === 'loose') await ProductModel.findByIdAndUpdate(item.product, { $inc: { looseStock: item.qty } });
+      else await ProductModel.findByIdAndUpdate(item.product, { $inc: { stock: item.qty } });
+    }
+
+    // Apply new stock
+    for (const item of req.body.items) {
+      const p = await ProductModel.findById(item.product);
+      if (!p) continue;
+      if (p.sellType === 'loose') {
+        let qtr = item.qty, nl = p.looseStock||0, ns = p.stripStock||0, ups = p.unitsPerStrip||10;
+        if (nl >= qtr) { nl -= qtr; }
+        else { qtr -= nl; nl = 0; const sn = Math.ceil(qtr/ups); ns = Math.max(0,ns-sn); nl = (sn*ups)-qtr; }
+        await ProductModel.findByIdAndUpdate(item.product, { stripStock: ns, looseStock: nl });
+      } else {
+        await ProductModel.findByIdAndUpdate(item.product, { $inc: { stock: -item.qty } });
+      }
+    }
+
+    const updated = await SaleModel.findByIdAndUpdate(req.params.id, { ...req.body, billNo: oldSale.billNo }, { new: true });
+    res.json({ success: true, sale: updated });
+  } catch(e) { res.status(400).json({ success: false, message: e.message }); }
+});
+
+app.delete('/api/sales/:id', async (req, res) => {
+  try {
+    const sale = await SaleModel.findById(req.params.id);
+    if (!sale) return res.status(404).json({ message: 'Not found' });
+    for (const item of sale.items) {
+      const p = await ProductModel.findById(item.product);
+      if (!p) continue;
+      if (p.sellType === 'loose') await ProductModel.findByIdAndUpdate(item.product, { $inc: { looseStock: item.qty } });
+      else await ProductModel.findByIdAndUpdate(item.product, { $inc: { stock: item.qty } });
+    }
+    await SaleModel.findByIdAndDelete(req.params.id);
+    res.json({ success: true });
+  } catch(e) { res.status(500).json({ success: false, message: e.message }); }
+});
+
 // Routes BAAD mein
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/products', require('./routes/products'));
 app.use('/api/purchases', require('./routes/purchases'));
 app.use('/api/sales', require('./routes/sales'));
+app.use('/api/customers', require('./routes/customers'));
 
 mongoose.connect(process.env.MONGODB_URI, {
   serverSelectionTimeoutMS: 10000,
@@ -80,5 +132,7 @@ mongoose.connect(process.env.MONGODB_URI, {
 .then(() => console.log('✅ MongoDB Connected!'))
 .catch(err => console.log('❌ Error:', err));
 
+
+
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
+app.listen(PORT, '0.0.0.0', () => console.log(`🚀 Server running on port ${PORT}`));

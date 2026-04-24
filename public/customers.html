@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Customers - MedXpert</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Segoe UI',sans-serif; background:#f0f4f8; }
+  .navbar { background:#1a73e8; color:white; padding:0 24px; display:flex; align-items:center; height:58px; position:fixed; width:100%; top:0; z-index:100; box-shadow:0 2px 8px rgba(0,0,0,0.15); }
+  .navbar h1 { font-size:20px; font-weight:700; flex:1; }
+  .navbar span { font-size:13px; opacity:0.85; margin-right:16px; }
+  .navbar button { background:rgba(255,255,255,0.2); border:none; color:white; padding:7px 16px; border-radius:6px; cursor:pointer; font-size:13px; }
+  .sidebar { position:fixed; left:0; top:58px; width:220px; height:calc(100vh - 58px); background:white; border-right:1px solid #e0e0e0; padding:16px 0; overflow-y:auto; }
+  .sidebar a { display:flex; align-items:center; gap:12px; padding:12px 20px; color:#444; text-decoration:none; font-size:14.5px; border-left:3px solid transparent; transition:all 0.2s; }
+  .sidebar a:hover, .sidebar a.active { background:#e8f0fe; color:#1a73e8; border-left-color:#1a73e8; }
+  .main { margin-left:220px; margin-top:58px; padding:24px; max-width:calc(100vw - 220px); }
+  .top-bar { display:flex; gap:12px; margin-bottom:20px; flex-wrap:wrap; align-items:center; }
+  .top-bar input { padding:10px 14px; border:1.5px solid #ddd; border-radius:8px; font-size:14px; width:300px; outline:none; }
+  .top-bar input:focus { border-color:#1a73e8; }
+  .btn { padding:10px 20px; border:none; border-radius:8px; cursor:pointer; font-size:14px; font-weight:600; transition:all 0.2s; }
+  .btn-primary { background:#1a73e8; color:white; }
+  .btn-primary:hover { background:#1557b0; }
+  .btn-danger { background:#ffebee; color:#c62828; }
+  .btn-edit { background:#e8f0fe; color:#1a73e8; }
+  .stat-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:14px; margin-bottom:24px; }
+  .stat-card { background:white; border-radius:12px; padding:16px 20px; box-shadow:0 2px 8px rgba(0,0,0,0.07); border-left:4px solid #1a73e8; }
+  .stat-card.green { border-left-color:#2e7d32; }
+  .stat-card.orange { border-left-color:#f57c00; }
+  .stat-card.purple { border-left-color:#6a1b9a; }
+  .stat-card .label { font-size:11px; color:#888; margin-bottom:5px; text-transform:uppercase; font-weight:600; }
+  .stat-card .value { font-size:24px; font-weight:700; color:#222; }
+  .card { background:white; border-radius:12px; padding:20px 24px; box-shadow:0 2px 8px rgba(0,0,0,0.07); margin-bottom:20px; }
+  table { width:100%; border-collapse:collapse; }
+  th { background:#f8f9fa; padding:11px 14px; text-align:left; font-size:12px; color:#666; font-weight:600; border-bottom:1px solid #eee; text-transform:uppercase; }
+  td { padding:11px 14px; font-size:13.5px; border-bottom:1px solid #f5f5f5; }
+  tr:hover td { background:#fafafa; }
+  .badge { padding:3px 10px; border-radius:20px; font-size:12px; font-weight:600; }
+  .badge-gold { background:#fff8e1; color:#f57f17; }
+  .badge-silver { background:#f5f5f5; color:#555; }
+  .badge-green { background:#e8f5e9; color:#2e7d32; }
+  .modal-bg { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:200; align-items:center; justify-content:center; }
+  .modal-bg.show { display:flex; }
+  .modal { background:white; border-radius:16px; padding:28px; width:560px; max-height:90vh; overflow-y:auto; }
+  .modal h2 { margin-bottom:20px; font-size:18px; color:#333; }
+  .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .form-group { display:flex; flex-direction:column; gap:5px; }
+  .form-group.full { grid-column:1/-1; }
+  .form-group label { font-size:11px; color:#666; font-weight:600; text-transform:uppercase; }
+  .form-group input, .form-group select, .form-group textarea { padding:9px 12px; border:1.5px solid #ddd; border-radius:7px; font-size:14px; outline:none; font-family:inherit; }
+  .form-group input:focus, .form-group select:focus { border-color:#1a73e8; }
+  .form-group textarea { resize:vertical; min-height:70px; }
+  .section-label { grid-column:1/-1; font-size:12px; font-weight:700; color:#1a73e8; text-transform:uppercase; border-bottom:1.5px solid #e8f0fe; padding-bottom:6px; margin-top:6px; }
+  .modal-actions { display:flex; gap:10px; margin-top:20px; justify-content:flex-end; }
+
+  /* Profile Modal */
+  .profile-modal { background:white; border-radius:16px; padding:0; width:700px; max-height:90vh; overflow-y:auto; }
+  .profile-header { background:linear-gradient(135deg,#1a73e8,#0d47a1); color:white; padding:24px 28px; border-radius:16px 16px 0 0; }
+  .profile-body { padding:24px 28px; }
+  .profile-stat { background:#f8f9fa; border-radius:10px; padding:14px; text-align:center; }
+  .profile-stat .ps-val { font-size:20px; font-weight:700; color:#1a73e8; }
+  .profile-stat .ps-label { font-size:11px; color:#888; margin-top:3px; text-transform:uppercase; }
+  .history-item { padding:10px 0; border-bottom:1px solid #f5f5f5; font-size:13px; }
+</style>
+</head>
+<body>
+
+<div class="navbar">
+  <h1>💊 MedXpert Pharmacy</h1>
+  <span id="navUser"></span>
+  <button onclick="logout()">Logout</button>
+</div>
+
+<div class="sidebar">
+  <a href="index.html">🏠 Dashboard</a>
+  <a href="stock.html">📦 Stock / Inventory</a>
+  <a href="billing.html">🧾 Billing</a>
+  <a href="purchase.html">🛒 Purchase Entry</a>
+  <a href="customers.html" class="active">👥 Customers</a>
+  <a href="reports.html">📊 Reports</a>
+</div>
+
+<div class="main">
+
+  <!-- Stats -->
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="label">Total Customers</div>
+      <div class="value" id="st-total">0</div>
+    </div>
+    <div class="stat-card green">
+      <div class="label">Active This Month</div>
+      <div class="value" id="st-active">0</div>
+    </div>
+    <div class="stat-card orange">
+      <div class="label">Total Loyalty Points</div>
+      <div class="value" id="st-points">0</div>
+    </div>
+    <div class="stat-card purple">
+      <div class="label">Total Revenue</div>
+      <div class="value" id="st-revenue">₹0</div>
+    </div>
+  </div>
+
+  <!-- Search + Add -->
+  <div class="top-bar">
+    <input type="text" id="searchInput" placeholder="🔍 Search by name or phone..." oninput="filterCustomers()" />
+    <button class="btn btn-primary" onclick="openModal()">+ Add Customer</button>
+  </div>
+
+  <!-- Table -->
+  <div class="card">
+    <table>
+      <thead>
+        <tr>
+          <th>Customer</th><th>Phone</th><th>Blood Group</th>
+          <th>Total Visits</th><th>Total Spent</th><th>Loyalty Points</th>
+          <th>Last Visit</th><th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="customerTable"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Add/Edit Modal -->
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <h2 id="modalTitle">Add Customer</h2>
+    <div class="form-grid">
+      <div class="section-label">Basic Information</div>
+      <div class="form-group full"><label>Full Name *</label><input id="f_name" placeholder="e.g. Rahul Sharma" /></div>
+      <div class="form-group"><label>Phone *</label><input id="f_phone" placeholder="e.g. 9876543210" /></div>
+      <div class="form-group"><label>Email</label><input id="f_email" placeholder="optional" /></div>
+      <div class="form-group"><label>Date of Birth</label><input id="f_dob" type="date" /></div>
+      <div class="form-group"><label>Gender</label>
+        <select id="f_gender">
+          <option value="">Select</option>
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="form-group full"><label>Address</label><input id="f_address" placeholder="optional" /></div>
+
+      <div class="section-label">Medical Information</div>
+      <div class="form-group"><label>Blood Group</label>
+        <select id="f_blood">
+          <option value="">Unknown</option>
+          <option value="A+">A+</option><option value="A-">A-</option>
+          <option value="B+">B+</option><option value="B-">B-</option>
+          <option value="O+">O+</option><option value="O-">O-</option>
+          <option value="AB+">AB+</option><option value="AB-">AB-</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Doctor Name</label><input id="f_doctor" placeholder="e.g. Dr. Mehta" /></div>
+      <div class="form-group full"><label>Allergies</label><input id="f_allergies" placeholder="e.g. Penicillin, Aspirin" /></div>
+      <div class="form-group full"><label>Chronic Conditions</label><input id="f_chronic" placeholder="e.g. Diabetes, Hypertension" /></div>
+      <div class="form-group full"><label>Notes</label><textarea id="f_notes" placeholder="Any additional notes..."></textarea></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" style="background:#f5f5f5;color:#333;" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveCustomer()">Save Customer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Profile Modal -->
+<div class="modal-bg" id="profileBg">
+  <div class="profile-modal">
+    <div class="profile-header">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div>
+          <div style="font-size:32px;margin-bottom:8px;" id="p-avatar">👤</div>
+          <div style="font-size:22px;font-weight:700;" id="p-name">-</div>
+          <div style="opacity:0.85;font-size:14px;margin-top:4px;" id="p-phone">-</div>
+          <div style="opacity:0.75;font-size:13px;margin-top:2px;" id="p-info">-</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end;">
+          <button onclick="closeProfile()" style="background:rgba(255,255,255,0.2);border:none;color:white;padding:7px 14px;border-radius:6px;cursor:pointer;font-size:13px;">✕ Close</button>
+          <button onclick="editCurrentCustomer()" style="background:rgba(255,255,255,0.2);border:none;color:white;padding:7px 14px;border-radius:6px;cursor:pointer;font-size:13px;">✏️ Edit</button>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:20px;">
+        <div class="profile-stat" style="background:rgba(255,255,255,0.15);">
+          <div class="ps-val" style="color:white;" id="p-visits">0</div>
+          <div class="ps-label" style="color:rgba(255,255,255,0.8);">Visits</div>
+        </div>
+        <div class="profile-stat" style="background:rgba(255,255,255,0.15);">
+          <div class="ps-val" style="color:white;" id="p-spent">₹0</div>
+          <div class="ps-label" style="color:rgba(255,255,255,0.8);">Total Spent</div>
+        </div>
+        <div class="profile-stat" style="background:rgba(255,255,255,0.15);">
+          <div class="ps-val" style="color:white;" id="p-points">0</div>
+          <div class="ps-label" style="color:rgba(255,255,255,0.8);">Points</div>
+        </div>
+        <div class="profile-stat" style="background:rgba(255,255,255,0.15);">
+          <div class="ps-val" style="color:white;" id="p-lastvisit">-</div>
+          <div class="ps-label" style="color:rgba(255,255,255,0.8);">Last Visit</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="profile-body">
+      <!-- Medical Info -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
+        <div class="card" style="margin:0;padding:16px;">
+          <h3 style="font-size:14px;margin-bottom:12px;">🏥 Medical Info</h3>
+          <div style="font-size:13px;display:flex;flex-direction:column;gap:8px;">
+            <div><span style="color:#888;">Blood Group:</span> <strong id="p-blood">-</strong></div>
+            <div><span style="color:#888;">Doctor:</span> <strong id="p-doctor">-</strong></div>
+            <div><span style="color:#888;">Allergies:</span> <span id="p-allergies" style="color:#c62828;">-</span></div>
+            <div><span style="color:#888;">Conditions:</span> <span id="p-chronic">-</span></div>
+          </div>
+        </div>
+        <div class="card" style="margin:0;padding:16px;">
+          <h3 style="font-size:14px;margin-bottom:12px;">⭐ Loyalty Points</h3>
+          <div style="font-size:28px;font-weight:700;color:#f57f17;" id="p-loyalty-pts">0</div>
+          <div style="font-size:12px;color:#888;margin-top:4px;">= ₹<span id="p-loyalty-val">0</span> discount value</div>
+          <div style="margin-top:12px;display:flex;gap:8px;">
+            <button onclick="redeemPoints()" style="flex:1;padding:8px;background:#fff8e1;color:#f57f17;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;">🎁 Redeem</button>
+            <button onclick="addManualPoints()" style="flex:1;padding:8px;background:#e8f0fe;color:#1a73e8;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;">+ Add Points</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notes -->
+      <div id="p-notes-section" style="display:none;margin-bottom:20px;">
+        <div class="card" style="margin:0;padding:16px;">
+          <h3 style="font-size:14px;margin-bottom:8px;">📝 Notes</h3>
+          <p id="p-notes" style="font-size:13px;color:#555;"></p>
+        </div>
+      </div>
+
+      <!-- Purchase History -->
+      <div class="card" style="margin:0;padding:16px;">
+        <h3 style="font-size:14px;margin-bottom:14px;">🧾 Purchase History</h3>
+        <div id="p-history"><p style="color:#aaa;font-size:13px;">Loading...</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let allCustomers = [];
+let editingId = null;
+let currentCustomer = null;
+
+function checkAuth() {
+  const user = JSON.parse(localStorage.getItem('user') || 'null');
+  if (!localStorage.getItem('token')) { location.href='index.html'; return; }
+  document.getElementById('navUser').textContent = '👤 ' + (user?.name || '');
+}
+
+function logout() { localStorage.clear(); location.href='index.html'; }
+
+async function loadCustomers() {
+  const res = await fetch('/api/customers');
+  allCustomers = await res.json();
+  renderStats();
+  renderTable(allCustomers);
+}
+
+function renderStats() {
+  const now = new Date();
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const active = allCustomers.filter(c => c.lastVisit && new Date(c.lastVisit) >= monthStart);
+  const totalPoints = allCustomers.reduce((a,c) => a+(c.loyaltyPoints||0), 0);
+  const totalRevenue = allCustomers.reduce((a,c) => a+(c.totalSpent||0), 0);
+
+  document.getElementById('st-total').textContent = allCustomers.length;
+  document.getElementById('st-active').textContent = active.length;
+  document.getElementById('st-points').textContent = totalPoints.toLocaleString();
+  document.getElementById('st-revenue').textContent = '₹' + totalRevenue.toFixed(0);
+}
+
+function renderTable(customers) {
+  const tbody = document.getElementById('customerTable');
+  if (!customers.length) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:30px;color:#aaa;">No customers yet. Add your first customer!</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = customers.map(c => {
+    const tier = c.loyaltyPoints >= 500 ? '🥇 Gold' : c.loyaltyPoints >= 200 ? '🥈 Silver' : '🥉 Bronze';
+    const tierClass = c.loyaltyPoints >= 500 ? 'badge-gold' : c.loyaltyPoints >= 200 ? 'badge-silver' : 'badge-green';
+
+    return `<tr>
+      <td>
+        <div style="font-weight:600;">${c.name}</div>
+        ${c.chronicConditions ? `<div style="font-size:11px;color:#e65100;">${c.chronicConditions}</div>` : ''}
+      </td>
+      <td>${c.phone||'-'}</td>
+      <td>${c.bloodGroup ? `<span style="background:#ffebee;color:#c62828;padding:2px 8px;border-radius:10px;font-size:12px;font-weight:600;">${c.bloodGroup}</span>` : '-'}</td>
+      <td style="text-align:center;">${c.totalPurchases||0}</td>
+      <td>₹${(c.totalSpent||0).toFixed(0)}</td>
+      <td><span class="badge ${tierClass}">${c.loyaltyPoints||0} pts · ${tier}</span></td>
+      <td>${c.lastVisit ? new Date(c.lastVisit).toLocaleDateString('en-IN') : 'Never'}</td>
+      <td>
+        <button class="btn btn-edit" style="padding:5px 12px;font-size:12px;margin-right:5px;" onclick="viewProfile('${c._id}')">👁️ View</button>
+        <button class="btn btn-edit" style="padding:5px 12px;font-size:12px;margin-right:5px;" onclick="editCustomer('${c._id}')">✏️ Edit</button>
+        <button class="btn btn-danger" style="padding:5px 12px;font-size:12px;" onclick="deleteCustomer('${c._id}')">Delete</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function filterCustomers() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  renderTable(allCustomers.filter(c =>
+    c.name.toLowerCase().includes(q) ||
+    (c.phone||'').includes(q)
+  ));
+}
+
+// ── ADD/EDIT MODAL ──
+function openModal(reset=true) {
+  if (reset) {
+    editingId = null;
+    document.getElementById('modalTitle').textContent = 'Add Customer';
+    ['f_name','f_phone','f_email','f_address','f_doctor','f_allergies','f_chronic','f_notes'].forEach(id => document.getElementById(id).value='');
+    document.getElementById('f_gender').value='';
+    document.getElementById('f_blood').value='';
+    document.getElementById('f_dob').value='';
+  }
+  document.getElementById('modalBg').classList.add('show');
+}
+
+function closeModal() { document.getElementById('modalBg').classList.remove('show'); }
+
+function editCustomer(id) {
+  const c = allCustomers.find(x => x._id === id);
+  if (!c) return;
+  editingId = id;
+  document.getElementById('modalTitle').textContent = 'Edit Customer';
+  document.getElementById('f_name').value = c.name;
+  document.getElementById('f_phone').value = c.phone||'';
+  document.getElementById('f_email').value = c.email||'';
+  document.getElementById('f_dob').value = c.dob||'';
+  document.getElementById('f_gender').value = c.gender||'';
+  document.getElementById('f_address').value = c.address||'';
+  document.getElementById('f_blood').value = c.bloodGroup||'';
+  document.getElementById('f_doctor').value = c.doctor||'';
+  document.getElementById('f_allergies').value = c.allergies||'';
+  document.getElementById('f_chronic').value = c.chronicConditions||'';
+  document.getElementById('f_notes').value = c.notes||'';
+  openModal(false);
+}
+
+async function saveCustomer() {
+  const name = document.getElementById('f_name').value.trim();
+  const phone = document.getElementById('f_phone').value.trim();
+  if (!name) { alert('Name zaroori hai!'); return; }
+
+  const data = {
+    name, phone,
+    email: document.getElementById('f_email').value,
+    dob: document.getElementById('f_dob').value,
+    gender: document.getElementById('f_gender').value,
+    address: document.getElementById('f_address').value,
+    bloodGroup: document.getElementById('f_blood').value,
+    doctor: document.getElementById('f_doctor').value,
+    allergies: document.getElementById('f_allergies').value,
+    chronicConditions: document.getElementById('f_chronic').value,
+    notes: document.getElementById('f_notes').value
+  };
+
+  const url = editingId ? `/api/customers/${editingId}` : '/api/customers';
+  const method = editingId ? 'PUT' : 'POST';
+
+  try {
+    const res = await fetch(url, { method, headers:{'Content-Type':'application/json'}, body:JSON.stringify(data) });
+    const result = await res.json();
+    if (result.success) { closeModal(); loadCustomers(); }
+    else alert('Error: ' + result.message);
+  } catch(e) { alert('Server error!'); }
+}
+
+async function deleteCustomer(id) {
+  if (!confirm('Customer delete karna chahte ho?')) return;
+  await fetch(`/api/customers/${id}`, { method:'DELETE' });
+  loadCustomers();
+}
+
+// ── PROFILE ──
+async function viewProfile(id) {
+  try {
+    const res = await fetch(`/api/customers/${id}`);
+    const { customer: c, sales } = await res.json();
+    currentCustomer = c;
+
+    document.getElementById('p-name').textContent = c.name;
+    document.getElementById('p-phone').textContent = c.phone||'No phone';
+    document.getElementById('p-info').textContent = [c.gender, c.dob?'DOB: '+c.dob:'', c.address].filter(Boolean).join(' · ');
+    document.getElementById('p-visits').textContent = c.totalPurchases||sales.length||0;
+    document.getElementById('p-spent').textContent = '₹'+(c.totalSpent||0).toFixed(0);
+    document.getElementById('p-points').textContent = c.loyaltyPoints||0;
+    document.getElementById('p-lastvisit').textContent = c.lastVisit ? new Date(c.lastVisit).toLocaleDateString('en-IN') : 'Never';
+    document.getElementById('p-blood').textContent = c.bloodGroup||'-';
+    document.getElementById('p-doctor').textContent = c.doctor||'-';
+    document.getElementById('p-allergies').textContent = c.allergies||'None';
+    document.getElementById('p-chronic').textContent = c.chronicConditions||'None';
+    document.getElementById('p-loyalty-pts').textContent = c.loyaltyPoints||0;
+    document.getElementById('p-loyalty-val').textContent = Math.floor((c.loyaltyPoints||0)/10);
+
+    if (c.notes) {
+      document.getElementById('p-notes-section').style.display='block';
+      document.getElementById('p-notes').textContent = c.notes;
+    }
+
+    // Purchase History
+    const histEl = document.getElementById('p-history');
+    if (!sales.length) {
+      histEl.innerHTML = '<p style="color:#aaa;font-size:13px;">No purchase history yet.</p>';
+    } else {
+      histEl.innerHTML = sales.map(s => `
+        <div class="history-item">
+          <div style="display:flex;justify-content:space-between;">
+            <div>
+              <strong>${s.billNo||'-'}</strong>
+              <span style="color:#888;font-size:12px;margin-left:8px;">${new Date(s.date).toLocaleDateString('en-IN')}</span>
+            </div>
+            <strong style="color:#1a73e8;">₹${(s.totalAmount||0).toFixed(0)}</strong>
+          </div>
+          <div style="color:#888;font-size:12px;margin-top:3px;">
+            ${s.items?.length||0} items · ${s.paymentMode||'cash'}
+            ${(s.totalAmount-s.paidAmount)>0.01?`<span style="color:#c62828;"> · Due: ₹${((s.totalAmount||0)-(s.paidAmount||0)).toFixed(0)}</span>`:''}
+          </div>
+        </div>`).join('');
+    }
+
+    document.getElementById('profileBg').classList.add('show');
+  } catch(e) { alert('Error loading profile!'); }
+}
+
+function closeProfile() { document.getElementById('profileBg').classList.remove('show'); currentCustomer=null; }
+
+function editCurrentCustomer() { closeProfile(); editCustomer(currentCustomer._id); }
+
+async function redeemPoints() {
+  if (!currentCustomer) return;
+  const pts = parseInt(prompt(`Kitne points redeem karne hain?\nAvailable: ${currentCustomer.loyaltyPoints} points\n(10 points = ₹1 discount)`));
+  if (!pts || pts <= 0) return;
+  if (pts > currentCustomer.loyaltyPoints) { alert('Insufficient points!'); return; }
+
+  const res = await fetch(`/api/customers/${currentCustomer._id}/redeem`, {
+    method:'PATCH', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ points: pts })
+  });
+  const data = await res.json();
+  if (data.success) { alert(`✅ ${pts} points redeemed! ₹${Math.floor(pts/10)} discount milega.`); closeProfile(); loadCustomers(); }
+}
+
+async function addManualPoints() {
+  if (!currentCustomer) return;
+  const pts = parseInt(prompt('Kitne points add karne hain?'));
+  if (!pts || pts <= 0) return;
+
+  const res = await fetch(`/api/customers/${currentCustomer._id}/loyalty`, {
+    method:'PATCH', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ points: pts, spent: 0 })
+  });
+  const data = await res.json();
+  if (data.success) { alert(`✅ ${pts} points added!`); closeProfile(); loadCustomers(); }
+}
+
+// Close modals on outside click
+document.getElementById('modalBg').addEventListener('click', e => { if(e.target===document.getElementById('modalBg')) closeModal(); });
+document.getElementById('profileBg').addEventListener('click', e => { if(e.target===document.getElementById('profileBg')) closeProfile(); });
+
+checkAuth();
+loadCustomers();
+</script>
+</body>
+</html>
