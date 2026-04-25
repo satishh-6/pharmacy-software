@@ -124,6 +124,7 @@ app.use('/api/products', require('./routes/products'));
 app.use('/api/purchases', require('./routes/purchases'));
 app.use('/api/sales', require('./routes/sales'));
 app.use('/api/customers', require('./routes/customers'));
+app.use('/api/prescriptions', require('./routes/prescriptions'));
 
 mongoose.connect(process.env.MONGODB_URI, {
   serverSelectionTimeoutMS: 10000,

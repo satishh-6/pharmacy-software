@@ -68,6 +68,7 @@
   <a href="purchase.html">🛒 Purchase Entry</a>
   <a href="customers.html">👥 Customers</a>
   <a href="reports.html">📊 Reports</a>
+  <a href="prescriptions.html">📋 Prescriptions</a>
 </div>
 
 <div class="main">
@@ -338,6 +339,16 @@ function setCurrentDateTime() {
   document.getElementById('billDate').value = now.toISOString().split('T')[0];
   document.getElementById('billTime').value = now.toTimeString().slice(0,5);
 }
+
+// Prescription se auto-fill
+function checkRxParams() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('patient')) {
+    document.getElementById('custName').value = params.get('patient');
+    document.getElementById('custPhone').value = params.get('phone') || '';
+  }
+}
+checkRxParams();
 
 // ── CUSTOMER SEARCH ──
 async function searchCustomers() {

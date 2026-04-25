@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prescriptions - MedXpert</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Segoe UI',sans-serif; background:#f0f4f8; }
+  .navbar { background:#1a73e8; color:white; padding:0 24px; display:flex; align-items:center; height:58px; position:fixed; width:100%; top:0; z-index:100; box-shadow:0 2px 8px rgba(0,0,0,0.15); }
+  .navbar h1 { font-size:20px; font-weight:700; flex:1; }
+  .navbar span { font-size:13px; opacity:0.85; margin-right:16px; }
+  .navbar button { background:rgba(255,255,255,0.2); border:none; color:white; padding:7px 16px; border-radius:6px; cursor:pointer; font-size:13px; }
+  .sidebar { position:fixed; left:0; top:58px; width:220px; height:calc(100vh - 58px); background:white; border-right:1px solid #e0e0e0; padding:16px 0; overflow-y:auto; }
+  .sidebar a { display:flex; align-items:center; gap:12px; padding:12px 20px; color:#444; text-decoration:none; font-size:14.5px; border-left:3px solid transparent; transition:all 0.2s; }
+  .sidebar a:hover, .sidebar a.active { background:#e8f0fe; color:#1a73e8; border-left-color:#1a73e8; }
+  .main { margin-left:220px; margin-top:58px; padding:24px; max-width:calc(100vw - 220px); }
+  .top-bar { display:flex; gap:12px; margin-bottom:20px; flex-wrap:wrap; align-items:center; }
+  .top-bar input, .top-bar select { padding:10px 14px; border:1.5px solid #ddd; border-radius:8px; font-size:14px; outline:none; }
+  .top-bar input:focus, .top-bar select:focus { border-color:#1a73e8; }
+  .btn { padding:10px 20px; border:none; border-radius:8px; cursor:pointer; font-size:14px; font-weight:600; transition:all 0.2s; }
+  .btn-primary { background:#1a73e8; color:white; }
+  .stat-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:14px; margin-bottom:24px; }
+  .stat-card { background:white; border-radius:12px; padding:16px 20px; box-shadow:0 2px 8px rgba(0,0,0,0.07); border-left:4px solid #1a73e8; }
+  .stat-card.green { border-left-color:#2e7d32; }
+  .stat-card.orange { border-left-color:#f57c00; }
+  .stat-card.red { border-left-color:#c62828; }
+  .stat-card .label { font-size:11px; color:#888; margin-bottom:5px; text-transform:uppercase; font-weight:600; }
+  .stat-card .value { font-size:24px; font-weight:700; color:#222; }
+  .rx-card { background:white; border-radius:12px; padding:18px 20px; box-shadow:0 2px 8px rgba(0,0,0,0.07); margin-bottom:12px; border-left:4px solid #1a73e8; cursor:pointer; transition:all 0.2s; }
+  .rx-card:hover { box-shadow:0 4px 16px rgba(0,0,0,0.12); transform:translateY(-1px); }
+  .rx-card.pending { border-left-color:#f57c00; }
+  .rx-card.dispensed { border-left-color:#2e7d32; }
+  .rx-card.partial { border-left-color:#1a73e8; }
+  .rx-card.cancelled { border-left-color:#aaa; opacity:0.7; }
+  .badge { padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600; }
+  .badge-pending { background:#fff3e0; color:#e65100; }
+  .badge-dispensed { background:#e8f5e9; color:#2e7d32; }
+  .badge-partial { background:#e8f0fe; color:#1a73e8; }
+  .badge-cancelled { background:#f5f5f5; color:#888; }
+  .modal-bg { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:200; align-items:flex-start; justify-content:center; overflow-y:auto; padding:20px 0; }
+  .modal-bg.show { display:flex; }
+  .modal { background:white; border-radius:16px; padding:28px; width:680px; max-width:95vw; margin:0 auto; }
+  .modal h2 { margin-bottom:20px; font-size:18px; color:#333; }
+  .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .form-group { display:flex; flex-direction:column; gap:5px; }
+  .form-group.full { grid-column:1/-1; }
+  .form-group label { font-size:11px; color:#666; font-weight:600; text-transform:uppercase; }
+  .form-group input, .form-group select, .form-group textarea { padding:9px 12px; border:1.5px solid #ddd; border-radius:7px; font-size:14px; outline:none; font-family:inherit; }
+  .form-group input:focus, .form-group select:focus { border-color:#1a73e8; }
+  .form-group textarea { resize:vertical; min-height:60px; }
+  .section-label { grid-column:1/-1; font-size:12px; font-weight:700; color:#1a73e8; text-transform:uppercase; border-bottom:1.5px solid #e8f0fe; padding-bottom:6px; margin-top:8px; }
+  .modal-actions { display:flex; gap:10px; margin-top:20px; justify-content:flex-end; }
+</style>
+</head>
+<body>
+
+<div class="navbar">
+  <h1>💊 MedXpert Pharmacy</h1>
+  <span id="navUser"></span>
+  <button onclick="logout()">Logout</button>
+</div>
+
+<div class="sidebar">
+  <a href="index.html">🏠 Dashboard</a>
+  <a href="stock.html">📦 Stock / Inventory</a>
+  <a href="billing.html">🧾 Billing</a>
+  <a href="purchase.html">🛒 Purchase Entry</a>
+  <a href="customers.html">👥 Customers</a>
+  <a href="prescriptions.html" class="active">📋 Prescriptions</a>
+  <a href="reports.html">📊 Reports</a>
+</div>
+
+<div class="main">
+
+  <div class="stat-grid">
+    <div class="stat-card orange">
+      <div class="label">Pending</div>
+      <div class="value" id="st-pending">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Partial</div>
+      <div class="value" id="st-partial">0</div>
+    </div>
+    <div class="stat-card green">
+      <div class="label">Dispensed Today</div>
+      <div class="value" id="st-dispensed">0</div>
+    </div>
+    <div class="stat-card red">
+      <div class="label">Expiring Soon</div>
+      <div class="value" id="st-expiring">0</div>
+    </div>
+  </div>
+
+  <div class="top-bar">
+    <input type="text" id="searchInput" placeholder="🔍 Search patient/doctor..." oninput="filterRx()" style="width:260px;" />
+    <select id="statusFilter" onchange="filterRx()">
+      <option value="">All Status</option>
+      <option value="pending">⏳ Pending</option>
+      <option value="partial">⚡ Partial</option>
+      <option value="dispensed">✅ Dispensed</option>
+      <option value="cancelled">❌ Cancelled</option>
+    </select>
+    <button class="btn btn-primary" onclick="openModal()">+ New Prescription</button>
+  </div>
+
+  <div id="rxList"><p style="color:#aaa;font-size:14px;text-align:center;padding:30px;">Loading...</p></div>
+</div>
+
+<!-- ADD/EDIT MODAL -->
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <h2 id="modalTitle">📋 New Prescription</h2>
+    <div class="form-grid">
+
+      <div class="section-label">Patient Details</div>
+      <div class="form-group full" style="position:relative;">
+        <label>Patient Name *</label>
+        <input id="f_patient" placeholder="Type to search existing customer..." oninput="searchPatients()" autocomplete="off" />
+        <div id="patientSuggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:white;border:1px solid #ddd;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.1);z-index:50;max-height:180px;overflow-y:auto;margin-top:2px;"></div>
+      </div>
+      <div class="form-group"><label>Phone</label><input id="f_phone" placeholder="Patient phone" /></div>
+      <div class="form-group"><label>Age</label><input id="f_age" placeholder="e.g. 35" /></div>
+      <div class="form-group"><label>Gender</label>
+        <select id="f_gender">
+          <option value="">Select</option>
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+
+      <div class="section-label">Doctor Details</div>
+      <div class="form-group"><label>Doctor Name *</label><input id="f_doctor" placeholder="e.g. Dr. Mehta" list="doctorList" /><datalist id="doctorList"></datalist></div>
+      <div class="form-group"><label>Clinic / Hospital</label><input id="f_clinic" placeholder="e.g. City Hospital" /></div>
+      <div class="form-group"><label>Doctor Phone</label><input id="f_doctorPhone" placeholder="Optional" /></div>
+      <div class="form-group"><label>Diagnosis</label><input id="f_diagnosis" placeholder="e.g. Fever, Diabetes" /></div>
+      <div class="form-group"><label>Prescription Date</label><input type="date" id="f_date" /></div>
+      <div class="form-group"><label>Valid Till</label><input type="date" id="f_valid" /></div>
+
+      <div class="section-label">Medicines Prescribed</div>
+      <div class="form-group full">
+        <div id="medRows"></div>
+        <button onclick="addMedRow()" style="width:100%;padding:10px;background:#e8f0fe;color:#1a73e8;border:none;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600;margin-top:8px;">+ Add Medicine</button>
+      </div>
+
+      <div class="form-group full"><label>Notes</label>
+        <textarea id="f_notes" placeholder="Additional instructions..."></textarea>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" style="background:#f5f5f5;color:#333;" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveRx()">💾 Save Prescription</button>
+    </div>
+  </div>
+</div>
+
+<!-- VIEW MODAL -->
+<div class="modal-bg" id="viewBg">
+  <div class="modal" style="width:720px;max-width:95vw;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+      <h2 style="margin:0;font-size:18px;">📋 Prescription Details</h2>
+      <button onclick="closeView()" style="background:#f5f5f5;border:none;padding:7px 14px;border-radius:6px;cursor:pointer;font-size:13px;">✕ Close</button>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+      <div style="background:#e8f0fe;border-radius:10px;padding:14px;">
+        <div style="font-size:11px;color:#666;font-weight:600;text-transform:uppercase;margin-bottom:6px;">Patient</div>
+        <div style="font-size:16px;font-weight:700;" id="v-patient">-</div>
+        <div style="font-size:13px;color:#666;margin-top:4px;" id="v-patientInfo">-</div>
+      </div>
+      <div style="background:#f8f9fa;border-radius:10px;padding:14px;">
+        <div style="font-size:11px;color:#666;font-weight:600;text-transform:uppercase;margin-bottom:6px;">Doctor</div>
+        <div style="font-size:16px;font-weight:700;" id="v-doctor">-</div>
+        <div style="font-size:13px;color:#666;margin-top:4px;" id="v-clinic">-</div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;">
+      <div style="background:#f8f9fa;border-radius:8px;padding:10px;text-align:center;">
+        <div style="font-size:11px;color:#888;text-transform:uppercase;font-weight:600;">Date</div>
+        <div style="font-size:13px;font-weight:600;margin-top:4px;" id="v-date">-</div>
+      </div>
+      <div style="background:#f8f9fa;border-radius:8px;padding:10px;text-align:center;">
+        <div style="font-size:11px;color:#888;text-transform:uppercase;font-weight:600;">Valid Till</div>
+        <div style="font-size:13px;font-weight:600;margin-top:4px;" id="v-valid">-</div>
+      </div>
+      <div style="background:#f8f9fa;border-radius:8px;padding:10px;text-align:center;">
+        <div style="font-size:11px;color:#888;text-transform:uppercase;font-weight:600;">Diagnosis</div>
+        <div style="font-size:13px;font-weight:600;margin-top:4px;" id="v-diagnosis">-</div>
+      </div>
+      <div style="background:#f8f9fa;border-radius:8px;padding:10px;text-align:center;">
+        <div style="font-size:11px;color:#888;text-transform:uppercase;font-weight:600;">Status</div>
+        <div style="font-size:13px;font-weight:600;margin-top:4px;" id="v-status">-</div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:16px;">
+      <h3 style="font-size:14px;margin-bottom:10px;color:#333;">💊 Prescribed Medicines</h3>
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;">
+          <thead>
+            <tr style="background:#f8f9fa;">
+              <th style="padding:10px;text-align:left;font-size:12px;color:#666;border-bottom:1px solid #eee;">Medicine</th>
+              <th style="padding:10px;text-align:center;font-size:12px;color:#666;border-bottom:1px solid #eee;">Dosage</th>
+              <th style="padding:10px;text-align:center;font-size:12px;color:#666;border-bottom:1px solid #eee;">Duration</th>
+              <th style="padding:10px;text-align:center;font-size:12px;color:#666;border-bottom:1px solid #eee;">Timing</th>
+              <th style="padding:10px;text-align:center;font-size:12px;color:#666;border-bottom:1px solid #eee;">Qty</th>
+              <th style="padding:10px;text-align:center;font-size:12px;color:#666;border-bottom:1px solid #eee;">Status</th>
+            </tr>
+          </thead>
+          <tbody id="v-medicines"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="v-notes-section" style="display:none;margin-bottom:16px;">
+      <div style="background:#fff8e1;border-radius:8px;padding:12px;">
+        <strong style="font-size:13px;">📝 Notes:</strong>
+        <span id="v-notes" style="font-size:13px;color:#555;margin-left:8px;"></span>
+      </div>
+    </div>
+
+    <!-- ACTION BUTTONS -->
+    <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;gap:8px;">
+      <button onclick="dispenseRx()" id="dispenseBtn"
+        style="padding:12px;background:#2e7d32;color:white;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;">
+        ✅ Dispense & Bill
+      </button>
+      <button onclick="printRx()"
+        style="padding:12px;background:#e8f0fe;color:#1a73e8;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;">
+        🖨️ Print
+      </button>
+      <button onclick="editRx()"
+        style="padding:12px;background:#f0f4f8;color:#333;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;">
+        ✏️ Edit
+      </button>
+      <button onclick="cancelRx()"
+        style="padding:12px;background:#fff3e0;color:#e65100;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;">
+        ❌ Cancel
+      </button>
+      <button onclick="deleteRx()"
+        style="padding:12px;background:#ffebee;color:#c62828;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;">
+        🗑️ Delete
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+let allRx = [];
+let editingId = null;
+let viewingRx = null;
+let medCount = 0;
+let products = [];
+
+function checkAuth() {
+  const user = JSON.parse(localStorage.getItem('user') || 'null');
+  if (!localStorage.getItem('token')) { location.href='index.html'; return; }
+  document.getElementById('navUser').textContent = '👤 ' + (user?.name || '');
+}
+
+function logout() { localStorage.clear(); location.href='index.html'; }
+
+async function loadProducts() {
+  try {
+    const res = await fetch('/api/products');
+    products = await res.json();
+    // Doctor suggestions from existing prescriptions
+    const doctors = [...new Set(allRx.map(r => r.doctorName).filter(Boolean))];
+    const dl = document.getElementById('doctorList');
+    if (dl) dl.innerHTML = doctors.map(d => `<option value="${d}">`).join('');
+  } catch(e) { console.log('Products error:', e); }
+}
+
+async function loadRx() {
+  try {
+    const res = await fetch('/api/prescriptions');
+    allRx = await res.json();
+    renderStats();
+    renderList(allRx);
+  } catch(e) { console.log('Rx error:', e); }
+}
+
+function renderStats() {
+  const today = new Date().toDateString();
+  const now = new Date();
+  const in7 = new Date(); in7.setDate(now.getDate()+7);
+  document.getElementById('st-pending').textContent = allRx.filter(r=>r.status==='pending').length;
+  document.getElementById('st-partial').textContent = allRx.filter(r=>r.status==='partial').length;
+  document.getElementById('st-dispensed').textContent = allRx.filter(r=>r.status==='dispensed'&&new Date(r.updatedAt).toDateString()===today).length;
+  document.getElementById('st-expiring').textContent = allRx.filter(r=>{
+    if (!r.validTill||r.status==='dispensed'||r.status==='cancelled') return false;
+    const v=new Date(r.validTill);
+    return v>=now&&v<=in7;
+  }).length;
+}
+
+function renderList(rxList) {
+  const el = document.getElementById('rxList');
+  if (!rxList.length) {
+    el.innerHTML = '<p style="color:#aaa;font-size:14px;text-align:center;padding:40px;">No prescriptions found.</p>';
+    return;
+  }
+  el.innerHTML = rxList.map(rx => {
+    const now = new Date();
+    const validTill = rx.validTill ? new Date(rx.validTill) : null;
+    const isExpired = validTill && validTill < now && rx.status !== 'dispensed' && rx.status !== 'cancelled';
+    const expiringSoon = validTill && validTill >= now && (validTill-now) < 7*24*60*60*1000 && rx.status !== 'dispensed';
+    return `<div class="rx-card ${rx.status}" onclick="viewRx('${rx._id}')">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div style="flex:1;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap;">
+            <strong style="font-size:15px;">${rx.patient}</strong>
+            <span class="badge badge-${rx.status}">${rx.status==='pending'?'⏳ Pending':rx.status==='dispensed'?'✅ Dispensed':rx.status==='partial'?'⚡ Partial':'❌ Cancelled'}</span>
+            ${isExpired?'<span style="background:#ffebee;color:#c62828;font-size:11px;padding:2px 8px;border-radius:10px;font-weight:600;">⚠️ Expired</span>':''}
+            ${expiringSoon?'<span style="background:#fff3e0;color:#e65100;font-size:11px;padding:2px 8px;border-radius:10px;font-weight:600;">⚡ Expiring Soon</span>':''}
+          </div>
+          <div style="font-size:13px;color:#555;">👨‍⚕️ <strong>${rx.doctorName}</strong>${rx.clinic?` · <span style="color:#888;">${rx.clinic}</span>`:''}</div>
+          <div style="font-size:12px;color:#888;margin-top:3px;">
+            📅 ${new Date(rx.prescriptionDate).toLocaleDateString('en-IN')}
+            ${rx.diagnosis?`· 🔍 ${rx.diagnosis}`:''}
+            ${rx.patientPhone?`· 📞 ${rx.patientPhone}`:''}
+          </div>
+        </div>
+        <div style="text-align:right;flex-shrink:0;margin-left:12px;">
+          <div style="font-size:13px;color:#1a73e8;font-weight:600;">${rx.medicines?.length||0} medicines</div>
+          ${validTill?`<div style="font-size:11px;color:${isExpired?'#c62828':'#888'};">Valid: ${validTill.toLocaleDateString('en-IN')}</div>`:''}
+          ${rx.billNo?`<div style="font-size:11px;color:#2e7d32;">Bill: ${rx.billNo}</div>`:''}
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;">
+        ${(rx.medicines||[]).slice(0,4).map(m=>`
+          <span style="background:${m.dispensed?'#e8f5e9':'#f0f4f8'};color:${m.dispensed?'#2e7d32':'#555'};padding:3px 10px;border-radius:12px;font-size:12px;">
+            ${m.dispensed?'✓ ':''} ${m.name}
+          </span>`).join('')}
+        ${(rx.medicines||[]).length>4?`<span style="background:#f0f4f8;color:#888;padding:3px 10px;border-radius:12px;font-size:12px;">+${rx.medicines.length-4} more</span>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function filterRx() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  const status = document.getElementById('statusFilter').value;
+  let filtered = allRx;
+  if (q) filtered = filtered.filter(r =>
+    r.patient.toLowerCase().includes(q) ||
+    r.doctorName.toLowerCase().includes(q) ||
+    (r.patientPhone||'').includes(q) ||
+    (r.diagnosis||'').toLowerCase().includes(q)
+  );
+  if (status) filtered = filtered.filter(r => r.status===status);
+  renderList(filtered);
+}
+
+// ── ADD/EDIT MODAL ──
+function openModal(reset=true) {
+  if (reset) {
+    editingId = null;
+    document.getElementById('modalTitle').textContent = '📋 New Prescription';
+    ['f_patient','f_phone','f_age','f_doctor','f_clinic','f_doctorPhone','f_diagnosis','f_notes'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+    document.getElementById('f_gender').value = '';
+    const now = new Date();
+    document.getElementById('f_date').value = now.toISOString().split('T')[0];
+    const valid = new Date(); valid.setDate(valid.getDate()+30);
+    document.getElementById('f_valid').value = valid.toISOString().split('T')[0];
+    medCount = 0;
+    document.getElementById('medRows').innerHTML = '';
+    addMedRow();
+  }
+  document.getElementById('modalBg').classList.add('show');
+}
+
+function closeModal() {
+  document.getElementById('modalBg').classList.remove('show');
+  editingId = null;
+}
+
+function addMedRow(data={}) {
+  const i = medCount++;
+  const row = document.createElement('div');
+  row.id = `medRow_${i}`;
+  row.style.cssText = 'background:#f8f9fa;border-radius:10px;padding:14px;margin-bottom:10px;border:1.5px solid #eee;';
+  row.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+      <strong style="font-size:13px;color:#1a73e8;">Medicine ${i+1}</strong>
+      <button onclick="removeMedRow(${i})" style="background:#ffebee;color:#c62828;border:none;padding:4px 12px;border-radius:6px;cursor:pointer;font-size:12px;">✕ Remove</button>
+    </div>
+    <div style="margin-bottom:10px;">
+      <label style="font-size:11px;color:#888;font-weight:600;text-transform:uppercase;display:block;margin-bottom:5px;">Medicine Name *</label>
+      <input id="med_name_${i}" list="productList_${i}" placeholder="Type medicine name..."
+        value="${data.name||''}" oninput="filterMedList(${i},this.value)"
+        style="width:100%;padding:10px 12px;border:1.5px solid #ddd;border-radius:7px;font-size:14px;outline:none;background:white;"
+        onfocus="this.style.borderColor='#1a73e8'" onblur="this.style.borderColor='#ddd'" />
+      <datalist id="productList_${i}"></datalist>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1.5fr 80px;gap:10px;">
+      <div>
+        <label style="font-size:11px;color:#888;font-weight:600;text-transform:uppercase;display:block;margin-bottom:5px;">Dosage</label>
+        <input id="med_dosage_${i}" placeholder="1-0-1" value="${data.dosage||''}"
+          title="Morning-Afternoon-Night"
+          style="width:100%;padding:9px 10px;border:1.5px solid #ddd;border-radius:7px;font-size:13px;outline:none;background:white;"
+          onfocus="this.style.borderColor='#1a73e8'" onblur="this.style.borderColor='#ddd'" />
+      </div>
+      <div>
+        <label style="font-size:11px;color:#888;font-weight:600;text-transform:uppercase;display:block;margin-bottom:5px;">Duration</label>
+        <input id="med_duration_${i}" placeholder="7 days" value="${data.duration||''}"
+          style="width:100%;padding:9px 10px;border:1.5px solid #ddd;border-radius:7px;font-size:13px;outline:none;background:white;"
+          onfocus="this.style.borderColor='#1a73e8'" onblur="this.style.borderColor='#ddd'" />
+      </div>
+      <div>
+        <label style="font-size:11px;color:#888;font-weight:600;text-transform:uppercase;display:block;margin-bottom:5px;">Timing</label>
+        <select id="med_timing_${i}"
+          style="width:100%;padding:9px 10px;border:1.5px solid #ddd;border-radius:7px;font-size:13px;outline:none;background:white;"
+          onfocus="this.style.borderColor='#1a73e8'" onblur="this.style.borderColor='#ddd'">
+          <option value="After food" ${(data.timing||'')==='After food'?'selected':''}>After food</option>
+          <option value="Before food" ${data.timing==='Before food'?'selected':''}>Before food</option>
+          <option value="Empty stomach" ${data.timing==='Empty stomach'?'selected':''}>Empty stomach</option>
+          <option value="At bedtime" ${data.timing==='At bedtime'?'selected':''}>At bedtime</option>
+          <option value="Morning only" ${data.timing==='Morning only'?'selected':''}>Morning only</option>
+          <option value="Twice daily" ${data.timing==='Twice daily'?'selected':''}>Twice daily</option>
+          <option value="SOS" ${data.timing==='SOS'?'selected':''}>SOS</option>
+        </select>
+      </div>
+      <div>
+        <label style="font-size:11px;color:#888;font-weight:600;text-transform:uppercase;display:block;margin-bottom:5px;">Qty</label>
+        <input id="med_qty_${i}" type="number" placeholder="0" value="${data.qty||''}" min="1"
+          style="width:100%;padding:9px 10px;border:1.5px solid #ddd;border-radius:7px;font-size:13px;outline:none;background:white;"
+          onfocus="this.style.borderColor='#1a73e8'" onblur="this.style.borderColor='#ddd'" />
+      </div>
+    </div>`;
+  document.getElementById('medRows').appendChild(row);
+  // Populate product list
+  if (products.length) {
+    const dl = document.getElementById(`productList_${i}`);
+    if (dl) dl.innerHTML = products.map(p => `<option value="${p.name}">`).join('');
+  }
+}
+
+function filterMedList(i, q) {
+  const dl = document.getElementById(`productList_${i}`);
+  if (!dl) return;
+  const matches = products.filter(p =>
+    p.name.toLowerCase().includes(q.toLowerCase()) ||
+    (p.generic||'').toLowerCase().includes(q.toLowerCase())
+  ).slice(0,10);
+  dl.innerHTML = matches.map(p => `<option value="${p.name}">`).join('');
+}
+
+function removeMedRow(i) {
+  const row = document.getElementById(`medRow_${i}`);
+  if (row) row.remove();
+}
+
+function getMedRows() {
+  const medicines = [];
+  for (let i = 0; i < medCount; i++) {
+    const nameEl = document.getElementById(`med_name_${i}`);
+    if (!nameEl) continue;
+    const name = nameEl.value.trim();
+    if (!name) continue;
+    medicines.push({
+      name,
+      dosage: document.getElementById(`med_dosage_${i}`)?.value.trim() || '',
+      duration: document.getElementById(`med_duration_${i}`)?.value.trim() || '',
+      timing: document.getElementById(`med_timing_${i}`)?.value || 'After food',
+      qty: parseInt(document.getElementById(`med_qty_${i}`)?.value) || 0,
+      dispensed: false,
+      dispensedQty: 0
+    });
+  }
+  return medicines;
+}
+
+async function searchPatients() {
+  const q = document.getElementById('f_patient').value.trim();
+  const box = document.getElementById('patientSuggestions');
+  if (q.length < 2) { box.style.display='none'; return; }
+  try {
+    const res = await fetch(`/api/customers/search?q=${encodeURIComponent(q)}`);
+    const customers = await res.json();
+    if (!customers.length) { box.style.display='none'; return; }
+    box.innerHTML = customers.map(c => `
+      <div onclick="selectPatient('${c.name}','${c.phone||''}','${c._id}')"
+        style="padding:10px 14px;cursor:pointer;border-bottom:1px solid #f5f5f5;font-size:13px;">
+        <strong>${c.name}</strong>
+        <span style="color:#888;font-size:12px;margin-left:8px;">${c.phone||''}</span>
+        ${c.chronicConditions?`<span style="color:#e65100;font-size:11px;margin-left:6px;">⚠️${c.chronicConditions}</span>`:''}
+      </div>`).join('');
+    box.style.display='block';
+  } catch(e) {}
+}
+
+function selectPatient(name, phone) {
+  document.getElementById('f_patient').value = name;
+  document.getElementById('f_phone').value = phone;
+  document.getElementById('patientSuggestions').style.display='none';
+}
+
+async function saveRx() {
+  const patient = document.getElementById('f_patient').value.trim();
+  const doctor = document.getElementById('f_doctor').value.trim();
+  if (!patient || !doctor) { alert('Patient aur Doctor name zaroori hai!'); return; }
+  const medicines = getMedRows();
+  if (!medicines.length) { alert('Kam se kam ek medicine add karo!'); return; }
+
+  const data = {
+    patient, doctorName: doctor,
+    patientPhone: document.getElementById('f_phone').value,
+    patientAge: document.getElementById('f_age').value,
+    patientGender: document.getElementById('f_gender').value,
+    clinic: document.getElementById('f_clinic').value,
+    doctorPhone: document.getElementById('f_doctorPhone').value,
+    diagnosis: document.getElementById('f_diagnosis').value,
+    prescriptionDate: document.getElementById('f_date').value,
+    validTill: document.getElementById('f_valid').value,
+    notes: document.getElementById('f_notes').value,
+    medicines
+  };
+
+  const url = editingId ? `/api/prescriptions/${editingId}` : '/api/prescriptions';
+  const method = editingId ? 'PUT' : 'POST';
+
+  try {
+    const res = await fetch(url, { method, headers:{'Content-Type':'application/json'}, body:JSON.stringify(data) });
+    const result = await res.json();
+    if (result.success) { closeModal(); loadRx(); alert(editingId ? '✅ Prescription updated!' : '✅ Prescription saved!'); }
+    else alert('Error: ' + result.message);
+  } catch(e) { alert('Server error!'); }
+}
+
+// ── VIEW MODAL ──
+async function viewRx(id) {
+  try {
+    const res = await fetch('/api/prescriptions/'+id);
+    const rx = await res.json();
+    viewingRx = rx;
+
+    document.getElementById('v-patient').textContent = rx.patient;
+    document.getElementById('v-patientInfo').textContent = [
+      rx.patientAge ? 'Age: '+rx.patientAge : '',
+      rx.patientGender || '',
+      rx.patientPhone || ''
+    ].filter(Boolean).join(' · ') || '-';
+    document.getElementById('v-doctor').textContent = rx.doctorName;
+    document.getElementById('v-clinic').textContent = [rx.clinic, rx.doctorPhone].filter(Boolean).join(' · ') || '-';
+    document.getElementById('v-date').textContent = new Date(rx.prescriptionDate).toLocaleDateString('en-IN');
+    document.getElementById('v-valid').textContent = rx.validTill ? new Date(rx.validTill).toLocaleDateString('en-IN') : '-';
+    document.getElementById('v-diagnosis').textContent = rx.diagnosis || '-';
+
+    const statusMap = { pending:'⏳ Pending', partial:'⚡ Partial', dispensed:'✅ Dispensed', cancelled:'❌ Cancelled' };
+    document.getElementById('v-status').textContent = statusMap[rx.status] || rx.status;
+
+    document.getElementById('v-medicines').innerHTML = (rx.medicines||[]).map(m => `
+      <tr style="border-bottom:1px solid #f5f5f5;">
+        <td style="padding:10px;font-weight:600;">${m.name}</td>
+        <td style="padding:10px;text-align:center;color:#1a73e8;font-weight:600;">${m.dosage||'-'}</td>
+        <td style="padding:10px;text-align:center;">${m.duration||'-'}</td>
+        <td style="padding:10px;text-align:center;color:#888;">${m.timing||'-'}</td>
+        <td style="padding:10px;text-align:center;">${m.qty||'-'}</td>
+        <td style="padding:10px;text-align:center;">
+          ${m.dispensed
+            ? '<span style="background:#e8f5e9;color:#2e7d32;padding:3px 10px;border-radius:10px;font-size:12px;font-weight:600;">✓ Dispensed</span>'
+            : '<span style="background:#fff3e0;color:#e65100;padding:3px 10px;border-radius:10px;font-size:12px;font-weight:600;">Pending</span>'}
+        </td>
+      </tr>`).join('');
+
+    if (rx.notes) {
+      document.getElementById('v-notes-section').style.display='block';
+      document.getElementById('v-notes').textContent = rx.notes;
+    } else {
+      document.getElementById('v-notes-section').style.display='none';
+    }
+
+    document.getElementById('dispenseBtn').style.display =
+      (rx.status==='dispensed'||rx.status==='cancelled') ? 'none' : 'block';
+
+    document.getElementById('viewBg').classList.add('show');
+  } catch(e) { alert('Error loading prescription!'); }
+}
+
+function closeView() {
+  document.getElementById('viewBg').classList.remove('show');
+  viewingRx = null;
+}
+
+async function dispenseRx() {
+  if (!viewingRx) return;
+  if (!confirm(`${viewingRx.patient} ko medicines dispense karke bill banana chahte ho?`)) return;
+  const medicines = viewingRx.medicines.map((m,i) => ({ index:i, qty:m.qty||1 }));
+  await fetch(`/api/prescriptions/${viewingRx._id}/dispense`, {
+    method:'PATCH', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ medicines })
+  });
+  closeView();
+  const params = new URLSearchParams({
+    patient: viewingRx.patient,
+    phone: viewingRx.patientPhone || ''
+  });
+  location.href = 'billing.html?' + params.toString();
+}
+
+function editRx() {
+  if (!viewingRx) return;
+  const rx = viewingRx;
+  closeView();
+
+  setTimeout(() => {
+    editingId = rx._id;
+    document.getElementById('modalTitle').textContent = '✏️ Edit Prescription';
+
+    document.getElementById('f_patient').value = rx.patient || '';
+    document.getElementById('f_phone').value = rx.patientPhone || '';
+    document.getElementById('f_age').value = rx.patientAge || '';
+    document.getElementById('f_gender').value = rx.patientGender || '';
+    document.getElementById('f_doctor').value = rx.doctorName || '';
+    document.getElementById('f_clinic').value = rx.clinic || '';
+    document.getElementById('f_doctorPhone').value = rx.doctorPhone || '';
+    document.getElementById('f_diagnosis').value = rx.diagnosis || '';
+    document.getElementById('f_notes').value = rx.notes || '';
+
+    if (rx.prescriptionDate) {
+      document.getElementById('f_date').value = new Date(rx.prescriptionDate).toISOString().split('T')[0];
+    }
+    if (rx.validTill) {
+      document.getElementById('f_valid').value = new Date(rx.validTill).toISOString().split('T')[0];
+    }
+
+    medCount = 0;
+    document.getElementById('medRows').innerHTML = '';
+    (rx.medicines||[]).forEach(m => addMedRow(m));
+
+    document.getElementById('modalBg').classList.add('show');
+  }, 300);
+}
+
+async function cancelRx() {
+  if (!viewingRx) return;
+  if (!confirm('Prescription cancel karna chahte ho? Data rahega lekin status cancelled ho jaayega.')) return;
+  try {
+    const res = await fetch(`/api/prescriptions/${viewingRx._id}`, {
+      method:'PUT', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ status:'cancelled' })
+    });
+    const data = await res.json();
+    if (data.success) { alert('✅ Prescription cancelled!'); closeView(); loadRx(); }
+    else alert('Error: ' + data.message);
+  } catch(e) { alert('Server error!'); }
+}
+
+async function deleteRx() {
+  if (!viewingRx) return;
+  if (!confirm(`"${viewingRx.patient}" ki prescription permanently delete karna chahte ho?\n\nYeh undo nahi ho sakta!`)) return;
+  try {
+    const res = await fetch(`/api/prescriptions/${viewingRx._id}`, { method:'DELETE' });
+    const data = await res.json();
+    if (data.success) { alert('✅ Prescription deleted!'); closeView(); loadRx(); }
+    else alert('Error: ' + data.message);
+  } catch(e) { alert('Server error!'); }
+}
+
+function printRx() {
+  if (!viewingRx) return;
+  const rx = viewingRx;
+  const win = window.open('','_blank','width=500,height=700');
+  win.document.write(`<html><head><title>Prescription - ${rx.patient}</title>
+  <style>
+    body{font-family:'Segoe UI',sans-serif;margin:0;padding:20px;font-size:13px;}
+    h2{text-align:center;color:#1a73e8;margin-bottom:4px;}
+    .center{text-align:center;}hr{border:none;border-top:1px solid #ddd;margin:12px 0;}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+    .box{background:#f8f9fa;border-radius:8px;padding:12px;}
+    .lbl{font-size:11px;color:#888;font-weight:600;text-transform:uppercase;margin-bottom:4px;}
+    table{width:100%;border-collapse:collapse;}
+    th{background:#f0f4f8;padding:8px 10px;text-align:left;font-size:12px;color:#666;}
+    td{padding:8px 10px;border-bottom:1px solid #f5f5f5;font-size:13px;}
+    .footer{text-align:center;margin-top:20px;font-size:11px;color:#aaa;}
+  </style></head><body>
+  <h2>💊 MedXpert Pharmacy</h2>
+  <p class="center" style="color:#888;font-size:12px;margin:0 0 8px;">Prescription</p>
+  <hr/>
+  <div class="grid">
+    <div class="box">
+      <div class="lbl">Patient</div>
+      <strong>${rx.patient}</strong><br>
+      <span style="color:#666;font-size:12px;">${[rx.patientAge?'Age:'+rx.patientAge:'',rx.patientGender||'',rx.patientPhone||''].filter(Boolean).join(' · ')}</span>
+    </div>
+    <div class="box">
+      <div class="lbl">Doctor</div>
+      <strong>${rx.doctorName}</strong><br>
+      <span style="color:#666;font-size:12px;">${rx.clinic||''}</span>
+    </div>
+  </div>
+  <div style="display:flex;gap:16px;margin-bottom:12px;font-size:12px;color:#555;">
+    <span>📅 <strong>${new Date(rx.prescriptionDate).toLocaleDateString('en-IN')}</strong></span>
+    <span>⏳ Valid: <strong>${rx.validTill?new Date(rx.validTill).toLocaleDateString('en-IN'):'-'}</strong></span>
+    ${rx.diagnosis?`<span>🔍 <strong>${rx.diagnosis}</strong></span>`:''}
+  </div>
+  <hr/>
+  <div style="font-size:36px;color:#1a73e8;font-weight:700;margin-bottom:10px;">℞</div>
+  <table>
+    <tr><th>#</th><th>Medicine</th><th>Dosage</th><th>Duration</th><th>Timing</th><th>Qty</th></tr>
+    ${(rx.medicines||[]).map((m,i)=>`
+    <tr>
+      <td>${i+1}</td>
+      <td><strong>${m.name}</strong></td>
+      <td style="color:#1a73e8;font-weight:600;">${m.dosage||'-'}</td>
+      <td>${m.duration||'-'}</td>
+      <td>${m.timing||'-'}</td>
+      <td>${m.qty||'-'}</td>
+    </tr>`).join('')}
+  </table>
+  ${rx.notes?`<hr/><p><strong>Notes:</strong> ${rx.notes}</p>`:''}
+  <div class="footer">MedXpert Pharmacy · ${new Date().toLocaleString('en-IN')}</div>
+  <script>window.print();window.onafterprint=()=>window.close();<\/script>
+  </body></html>`);
+  win.document.close();
+}
+
+// Close on outside click
+document.getElementById('modalBg').addEventListener('click', e => { if(e.target===document.getElementById('modalBg')) closeModal(); });
+document.getElementById('viewBg').addEventListener('click', e => { if(e.target===document.getElementById('viewBg')) closeView(); });
+document.addEventListener('click', e => {
+  if(!e.target.closest('#f_patient')&&!e.target.closest('#patientSuggestions'))
+    document.getElementById('patientSuggestions').style.display='none';
+});
+
+checkAuth();
+loadProducts();
+loadRx();
+</script>
+</body>
+</html>
