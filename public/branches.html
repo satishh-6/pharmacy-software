@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Branches - MedXpert</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Segoe UI',sans-serif; background:#f0f4f8; }
+  .navbar { background:#1a73e8; color:white; padding:0 24px; display:flex; align-items:center; height:58px; position:fixed; width:100%; top:0; z-index:100; box-shadow:0 2px 8px rgba(0,0,0,0.15); }
+  .navbar h1 { font-size:20px; font-weight:700; flex:1; }
+  .navbar span { font-size:13px; opacity:0.85; margin-right:16px; }
+  .navbar button { background:rgba(255,255,255,0.2); border:none; color:white; padding:7px 16px; border-radius:6px; cursor:pointer; font-size:13px; }
+  .sidebar { position:fixed; left:0; top:58px; width:220px; height:calc(100vh - 58px); background:white; border-right:1px solid #e0e0e0; padding:16px 0; overflow-y:auto; }
+  .sidebar a { display:flex; align-items:center; gap:12px; padding:12px 20px; color:#444; text-decoration:none; font-size:14.5px; border-left:3px solid transparent; transition:all 0.2s; }
+  .sidebar a:hover, .sidebar a.active { background:#e8f0fe; color:#1a73e8; border-left-color:#1a73e8; }
+  .main { margin-left:220px; margin-top:58px; padding:24px; max-width:calc(100vw - 220px); }
+  .card { background:white; border-radius:12px; padding:24px; box-shadow:0 2px 8px rgba(0,0,0,0.07); margin-bottom:20px; }
+  .btn { padding:10px 20px; border:none; border-radius:8px; cursor:pointer; font-size:14px; font-weight:600; transition:all 0.2s; }
+  .btn-primary { background:#1a73e8; color:white; }
+  .btn-danger { background:#ffebee; color:#c62828; }
+  .btn-edit { background:#e8f0fe; color:#1a73e8; }
+  .form-group { display:flex; flex-direction:column; gap:5px; margin-bottom:14px; }
+  .form-group label { font-size:11px; color:#666; font-weight:600; text-transform:uppercase; }
+  .form-group input { padding:9px 12px; border:1.5px solid #ddd; border-radius:7px; font-size:14px; outline:none; }
+  .form-group input:focus { border-color:#1a73e8; }
+  .modal-bg { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:200; align-items:center; justify-content:center; }
+  .modal-bg.show { display:flex; }
+  .modal { background:white; border-radius:16px; padding:28px; width:500px; max-width:95vw; }
+  .branch-card { background:white; border-radius:12px; padding:20px; box-shadow:0 2px 8px rgba(0,0,0,0.07); margin-bottom:14px; border-left:4px solid #1a73e8; display:flex; justify-content:space-between; align-items:flex-start; }
+  .branch-card.main { border-left-color:#2e7d32; }
+</style>
+</head>
+<body>
+
+<div class="navbar">
+  <h1>💊 MedXpert Pharmacy</h1>
+  <span id="navUser"></span>
+  <button onclick="logout()">Logout</button>
+</div>
+
+<div class="sidebar">
+  <a href="index.html">🏠 Dashboard</a>
+  <a href="stock.html">📦 Stock / Inventory</a>
+  <a href="billing.html">🧾 Billing</a>
+  <a href="purchase.html">🛒 Purchase Entry</a>
+  <a href="customers.html">👥 Customers</a>
+  <a href="prescriptions.html">📋 Prescriptions</a>
+  <a href="branches.html" class="active">🏪 Branches</a>
+  <a href="reports.html">📊 Reports</a>
+  
+</div>
+
+<div class="main">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+    <div>
+      <h2 style="font-size:22px;color:#333;">🏪 Branch Management</h2>
+      <p style="color:#888;font-size:14px;margin-top:4px;">Apni pharmacy ki saari branches manage karo</p>
+    </div>
+    <button class="btn btn-primary" onclick="openModal()">+ Add Branch</button>
+  </div>
+
+  <!-- Current Branch Indicator -->
+  <div id="currentBranchBar" style="background:#e8f5e9;border-radius:10px;padding:14px 18px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;">
+    <div>
+      <span style="font-size:13px;color:#666;">Currently working on: </span>
+      <strong id="currentBranchName" style="color:#2e7d32;font-size:15px;">Main Branch</strong>
+    </div>
+    <button onclick="showBranchSwitcher()" style="background:#2e7d32;color:white;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600;">
+      🔄 Switch Branch
+    </button>
+  </div>
+
+  <div id="branchList"><p style="color:#aaa;text-align:center;padding:30px;">Loading...</p></div>
+</div>
+
+<!-- Add/Edit Modal -->
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <h2 id="modalTitle" style="margin-bottom:20px;font-size:18px;">Add Branch</h2>
+    <div class="form-group">
+      <label>Branch Name *</label>
+      <input id="f_name" placeholder="e.g. Main Branch, Station Road Branch" />
+    </div>
+    <div class="form-group">
+      <label>Address</label>
+      <input id="f_address" placeholder="e.g. 123, MG Road, Indore" />
+    </div>
+    <div class="form-group">
+      <label>Phone</label>
+      <input id="f_phone" placeholder="e.g. 9876543210" />
+    </div>
+    <div class="form-group">
+      <label>GST Number</label>
+      <input id="f_gst" placeholder="e.g. 23XXXXX" />
+    </div>
+    <div class="form-group">
+      <label>Manager Name</label>
+      <input id="f_manager" placeholder="e.g. Ramesh Kumar" />
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div class="form-group">
+        <label>Opening Time</label>
+        <input type="time" id="f_open" value="09:00" />
+      </div>
+      <div class="form-group">
+        <label>Closing Time</label>
+        <input type="time" id="f_close" value="21:00" />
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:6px;">
+      <button class="btn" style="background:#f5f5f5;color:#333;flex:1;" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" style="flex:2;" onclick="saveBranch()">Save Branch</button>
+    </div>
+  </div>
+</div>
+
+<!-- Branch Switcher Modal -->
+<div class="modal-bg" id="switcherBg">
+  <div class="modal">
+    <h2 style="margin-bottom:16px;font-size:18px;">🔄 Switch Branch</h2>
+    <p style="color:#888;font-size:13px;margin-bottom:16px;">Kaunsi branch pe kaam karna hai select karo:</p>
+    <div id="switcherList"></div>
+    <button onclick="closeSwitcher()" style="width:100%;padding:11px;background:#f5f5f5;color:#333;border:none;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600;margin-top:12px;">Cancel</button>
+  </div>
+</div>
+
+<script>
+let allBranches = [];
+let editingId = null;
+
+function checkAuth() {
+  const user = JSON.parse(localStorage.getItem('user') || 'null');
+  if (!localStorage.getItem('token')) { location.href='index.html'; return; }
+  document.getElementById('navUser').textContent = '👤 ' + (user?.name || '');
+}
+function logout() { localStorage.clear(); location.href='index.html'; }
+
+async function loadBranches() {
+  const res = await fetch('/api/branches');
+  allBranches = await res.json();
+
+  // Current branch
+  const current = JSON.parse(localStorage.getItem('currentBranch') || 'null');
+  if (current) {
+    document.getElementById('currentBranchName').textContent = current.name;
+  } else if (allBranches.length) {
+    const main = allBranches.find(b => b.isMain) || allBranches[0];
+    localStorage.setItem('currentBranch', JSON.stringify(main));
+    document.getElementById('currentBranchName').textContent = main.name;
+  }
+
+  renderBranches();
+}
+
+function renderBranches() {
+  const el = document.getElementById('branchList');
+  if (!allBranches.length) {
+    el.innerHTML = `<div style="text-align:center;padding:40px;color:#aaa;">
+      <div style="font-size:48px;margin-bottom:12px;">🏪</div>
+      <p>Abhi koi branch nahi hai. Pehli branch add karo!</p>
+    </div>`;
+    return;
+  }
+
+  el.innerHTML = allBranches.map(b => {
+    const current = JSON.parse(localStorage.getItem('currentBranch') || 'null');
+    const isActive = current?._id === b._id;
+    return `<div class="branch-card ${b.isMain?'main':''}" style="${isActive?'background:#f0fff4;':''}">
+      <div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+          <strong style="font-size:16px;">${b.name}</strong>
+          ${b.isMain ? '<span style="background:#e8f5e9;color:#2e7d32;font-size:11px;padding:2px 8px;border-radius:10px;font-weight:600;">⭐ Main</span>' : ''}
+          ${isActive ? '<span style="background:#1a73e8;color:white;font-size:11px;padding:2px 8px;border-radius:10px;font-weight:600;">✓ Active</span>' : ''}
+        </div>
+        ${b.address ? `<div style="font-size:13px;color:#555;margin-bottom:3px;">📍 ${b.address}</div>` : ''}
+        ${b.phone ? `<div style="font-size:13px;color:#555;margin-bottom:3px;">📞 ${b.phone}</div>` : ''}
+        ${b.managerName ? `<div style="font-size:13px;color:#555;margin-bottom:3px;">👤 Manager: ${b.managerName}</div>` : ''}
+        ${b.gstNo ? `<div style="font-size:12px;color:#888;">GST: ${b.gstNo}</div>` : ''}
+        <div style="font-size:12px;color:#888;margin-top:4px;">🕐 ${b.openTime} - ${b.closeTime}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;flex-shrink:0;margin-left:16px;">
+        <button class="btn btn-edit" style="padding:6px 14px;font-size:12px;" onclick="editBranch('${b._id}')">✏️ Edit</button>
+        ${!isActive ? `<button class="btn btn-primary" style="padding:6px 14px;font-size:12px;" onclick="switchToBranch('${b._id}')">🔄 Switch</button>` : ''}
+        ${!b.isMain ? `<button class="btn btn-danger" style="padding:6px 14px;font-size:12px;" onclick="deleteBranch('${b._id}')">Delete</button>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openModal(reset=true) {
+  if (reset) {
+    editingId = null;
+    document.getElementById('modalTitle').textContent = 'Add Branch';
+    ['f_name','f_address','f_phone','f_gst','f_manager'].forEach(id => document.getElementById(id).value='');
+    document.getElementById('f_open').value = '09:00';
+    document.getElementById('f_close').value = '21:00';
+  }
+  document.getElementById('modalBg').classList.add('show');
+}
+function closeModal() { document.getElementById('modalBg').classList.remove('show'); }
+
+function editBranch(id) {
+  const b = allBranches.find(x => x._id === id);
+  if (!b) return;
+  editingId = id;
+  document.getElementById('modalTitle').textContent = 'Edit Branch';
+  document.getElementById('f_name').value = b.name || '';
+  document.getElementById('f_address').value = b.address || '';
+  document.getElementById('f_phone').value = b.phone || '';
+  document.getElementById('f_gst').value = b.gstNo || '';
+  document.getElementById('f_manager').value = b.managerName || '';
+  document.getElementById('f_open').value = b.openTime || '09:00';
+  document.getElementById('f_close').value = b.closeTime || '21:00';
+  openModal(false);
+}
+
+async function saveBranch() {
+  const name = document.getElementById('f_name').value.trim();
+  if (!name) { alert('Branch name zaroori hai!'); return; }
+  const data = {
+    name,
+    address: document.getElementById('f_address').value,
+    phone: document.getElementById('f_phone').value,
+    gstNo: document.getElementById('f_gst').value,
+    managerName: document.getElementById('f_manager').value,
+    openTime: document.getElementById('f_open').value,
+    closeTime: document.getElementById('f_close').value
+  };
+  const url = editingId ? `/api/branches/${editingId}` : '/api/branches';
+  const method = editingId ? 'PUT' : 'POST';
+  try {
+    const res = await fetch(url, { method, headers:{'Content-Type':'application/json'}, body:JSON.stringify(data) });
+    const result = await res.json();
+    if (result.success) {
+      closeModal();
+      loadBranches();
+      alert(editingId ? '✅ Branch updated!' : '✅ Branch added!');
+    } else alert('Error: ' + result.message);
+  } catch(e) { alert('Server error!'); }
+}
+
+function switchToBranch(id) {
+  const branch = allBranches.find(b => b._id === id);
+  if (!branch) return;
+  localStorage.setItem('currentBranch', JSON.stringify(branch));
+  document.getElementById('currentBranchName').textContent = branch.name;
+  alert(`✅ Branch switched to: ${branch.name}`);
+  renderBranches();
+}
+
+async function deleteBranch(id) {
+  if (!confirm('Branch delete karna chahte ho?')) return;
+  const res = await fetch(`/api/branches/${id}`, { method:'DELETE' });
+  const data = await res.json();
+  if (data.success) { loadBranches(); }
+  else alert('Error: ' + data.message);
+}
+
+function showBranchSwitcher() {
+  const el = document.getElementById('switcherList');
+  const current = JSON.parse(localStorage.getItem('currentBranch') || 'null');
+  el.innerHTML = allBranches.map(b => `
+    <div onclick="switchToBranch('${b._id}');closeSwitcher();"
+      style="padding:14px 16px;border-radius:10px;cursor:pointer;margin-bottom:8px;border:2px solid ${current?._id===b._id?'#1a73e8':'#eee'};background:${current?._id===b._id?'#e8f0fe':'white'};transition:all 0.2s;">
+      <div style="font-weight:600;font-size:14px;">${b.name} ${b.isMain?'⭐':''}</div>
+      ${b.address?`<div style="font-size:12px;color:#888;margin-top:3px;">📍 ${b.address}</div>`:''}
+      ${b.managerName?`<div style="font-size:12px;color:#888;">👤 ${b.managerName}</div>`:''}
+    </div>`).join('');
+  document.getElementById('switcherBg').classList.add('show');
+}
+function closeSwitcher() { document.getElementById('switcherBg').classList.remove('show'); }
+
+document.getElementById('modalBg').addEventListener('click', e => { if(e.target===document.getElementById('modalBg')) closeModal(); });
+document.getElementById('switcherBg').addEventListener('click', e => { if(e.target===document.getElementById('switcherBg')) closeSwitcher(); });
+
+checkAuth();
+loadBranches();
+</script>
+</body>
+</html>

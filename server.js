@@ -9,6 +9,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
+app.use('/api/branches', require('./routes/branches'));
 
 // ⚠️ PATCH route PEHLE register karo
 const Purchase = require('./models/Purchase');

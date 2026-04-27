@@ -21,7 +21,7 @@
   .form-group { display:flex; flex-direction:column; gap:5px; }
   .form-group label { font-size:11px; color:#888; font-weight:600; text-transform:uppercase; }
   .form-group input, .form-group select { padding:9px 12px; border:1.5px solid #ddd; border-radius:7px; font-size:14px; outline:none; }
-  .form-group input:focus, .form-group select:focus { border-color:#1a73e8; }
+  .form-group input:focus { border-color:#1a73e8; }
   .search-box { position:relative; }
   .search-box input { width:100%; padding:11px 16px; border:2px solid #1a73e8; border-radius:8px; font-size:15px; outline:none; }
   .search-results { position:absolute; top:100%; left:0; right:0; background:white; border:1px solid #ddd; border-radius:8px; box-shadow:0 8px 24px rgba(0,0,0,0.12); z-index:50; max-height:280px; overflow-y:auto; margin-top:4px; }
@@ -48,6 +48,8 @@
   .btn-primary:hover { background:#1557b0; }
   .btn-success { background:#2e7d32; color:white; margin-top:8px; }
   .btn-success:hover { background:#1b5e20; }
+  .btn-whatsapp { background:#25D366; color:white; margin-top:8px; }
+  .btn-whatsapp:hover { background:#128C7E; }
   .sell-badge { font-size:11px; padding:2px 7px; border-radius:10px; background:#e8f0fe; color:#1a73e8; margin-left:6px; }
   .sell-badge.loose { background:#fff3e0; color:#e65100; }
   .cust-suggestions { position:absolute; top:100%; left:0; right:0; background:white; border:1px solid #ddd; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.1); z-index:50; max-height:200px; overflow-y:auto; margin-top:2px; }
@@ -57,6 +59,7 @@
 
 <div class="navbar">
   <h1>💊 MedXpert Pharmacy</h1>
+  <span id="navBranch" style="font-size:12px;background:rgba(255,255,255,0.2);padding:4px 10px;border-radius:6px;margin-right:8px;cursor:pointer;" onclick="location.href='branches.html'">🏪 Main Branch</span>
   <span id="navUser"></span>
   <button onclick="logout()">Logout</button>
 </div>
@@ -67,8 +70,10 @@
   <a href="billing.html" class="active">🧾 Billing</a>
   <a href="purchase.html">🛒 Purchase Entry</a>
   <a href="customers.html">👥 Customers</a>
-  <a href="reports.html">📊 Reports</a>
   <a href="prescriptions.html">📋 Prescriptions</a>
+  <a href="branches.html">🏪 Branches</a>
+  <a href="reports.html">📊 Reports</a>
+  <a href="branches.html">🏪 Branches</a>
 </div>
 
 <div class="main">
@@ -87,7 +92,7 @@
           <input id="custPhone" placeholder="Optional" />
         </div>
       </div>
-      <!-- Loyalty Points Display -->
+      <!-- Loyalty Points -->
       <div id="loyaltyBar" style="display:none;margin-top:12px;background:#fff8e1;border-radius:8px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;">
         <div>
           <span style="font-size:12px;color:#888;">⭐ Loyalty Points: </span>
@@ -169,6 +174,7 @@
 
       <button class="btn btn-primary" onclick="saveBill()">💾 Save Bill</button>
       <button class="btn btn-success" onclick="printBill()">🖨️ Save & Print</button>
+      <button class="btn btn-whatsapp" onclick="saveAndWhatsApp()">📱 Save & WhatsApp</button>
     </div>
 
     <!-- Recent Bills -->
@@ -185,15 +191,9 @@
     <h2 style="font-size:18px;margin-bottom:6px;">💳 Collect Payment</h2>
     <p id="cp-customer" style="color:#888;font-size:13px;margin-bottom:18px;"></p>
     <div style="background:#f8f9fa;border-radius:10px;padding:14px;margin-bottom:18px;">
-      <div style="display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px;">
-        <span>Bill Amount</span><strong id="cp-total">₹0</strong>
-      </div>
-      <div style="display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px;">
-        <span>Already Paid</span><strong id="cp-paid" style="color:#2e7d32;">₹0</strong>
-      </div>
-      <div style="display:flex;justify-content:space-between;font-size:15px;font-weight:700;border-top:1px solid #eee;padding-top:8px;">
-        <span>Balance Due</span><span id="cp-balance" style="color:#c62828;">₹0</span>
-      </div>
+      <div style="display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px;"><span>Bill Amount</span><strong id="cp-total">₹0</strong></div>
+      <div style="display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px;"><span>Already Paid</span><strong id="cp-paid" style="color:#2e7d32;">₹0</strong></div>
+      <div style="display:flex;justify-content:space-between;font-size:15px;font-weight:700;border-top:1px solid #eee;padding-top:8px;"><span>Balance Due</span><span id="cp-balance" style="color:#c62828;">₹0</span></div>
     </div>
     <div style="display:flex;flex-direction:column;gap:12px;">
       <div class="form-group">
@@ -227,33 +227,17 @@
       <h2 style="font-size:18px;">✏️ Edit Bill <span id="editBillNo" style="color:#1a73e8;"></span></h2>
       <button onclick="closeEditModal()" style="background:#f5f5f5;border:none;padding:7px 14px;border-radius:6px;cursor:pointer;font-size:14px;">✕ Close</button>
     </div>
-
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
-      <div class="form-group">
-        <label>Customer Name</label>
-        <input id="edit-custName" style="padding:9px 12px;border:1.5px solid #ddd;border-radius:7px;font-size:14px;outline:none;" />
-      </div>
-      <div class="form-group">
-        <label>Phone</label>
-        <input id="edit-custPhone" style="padding:9px 12px;border:1.5px solid #ddd;border-radius:7px;font-size:14px;outline:none;" />
-      </div>
-      <div class="form-group">
-        <label>Bill Date</label>
-        <input type="date" id="edit-date" style="padding:9px 12px;border:1.5px solid #ddd;border-radius:7px;font-size:14px;outline:none;" />
-      </div>
-      <div class="form-group">
-        <label>Bill Time</label>
-        <input type="time" id="edit-time" style="padding:9px 12px;border:1.5px solid #ddd;border-radius:7px;font-size:14px;outline:none;" />
-      </div>
+      <div class="form-group"><label>Customer Name</label><input id="edit-custName" style="padding:9px 12px;border:1.5px solid #ddd;border-radius:7px;font-size:14px;outline:none;" /></div>
+      <div class="form-group"><label>Phone</label><input id="edit-custPhone" style="padding:9px 12px;border:1.5px solid #ddd;border-radius:7px;font-size:14px;outline:none;" /></div>
+      <div class="form-group"><label>Bill Date</label><input type="date" id="edit-date" style="padding:9px 12px;border:1.5px solid #ddd;border-radius:7px;font-size:14px;outline:none;" /></div>
+      <div class="form-group"><label>Bill Time</label><input type="time" id="edit-time" style="padding:9px 12px;border:1.5px solid #ddd;border-radius:7px;font-size:14px;outline:none;" /></div>
     </div>
-
     <div style="position:relative;margin-bottom:16px;">
-      <input type="text" id="edit-searchInput" placeholder="🔍 Add more items..."
-        oninput="editSearchProducts()" autocomplete="off"
+      <input type="text" id="edit-searchInput" placeholder="🔍 Add more items..." oninput="editSearchProducts()" autocomplete="off"
         style="width:100%;padding:10px 14px;border:2px solid #1a73e8;border-radius:8px;font-size:14px;outline:none;" />
       <div id="edit-searchResults" style="display:none;position:absolute;top:100%;left:0;right:0;background:white;border:1px solid #ddd;border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,0.12);z-index:50;max-height:200px;overflow-y:auto;margin-top:4px;"></div>
     </div>
-
     <table style="width:100%;border-collapse:collapse;margin-bottom:16px;">
       <thead>
         <tr style="background:#f8f9fa;">
@@ -267,41 +251,26 @@
       </thead>
       <tbody id="editItemsBody"></tbody>
     </table>
-
     <div style="background:#f8f9fa;border-radius:10px;padding:14px;margin-bottom:16px;">
-      <div style="display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px;">
-        <span>Subtotal</span><span id="edit-subtotal">₹0</span>
-      </div>
-      <div style="display:flex;justify-content:space-between;font-size:14px;margin-bottom:8px;">
-        <span>GST</span><span id="edit-gst">₹0</span>
-      </div>
+      <div style="display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px;"><span>Subtotal</span><span id="edit-subtotal">₹0</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:14px;margin-bottom:8px;"><span>GST</span><span id="edit-gst">₹0</span></div>
       <div style="display:flex;justify-content:space-between;align-items:center;font-size:14px;margin-bottom:8px;">
         <span>Extra Discount (₹)</span>
-        <input type="number" id="edit-discount" placeholder="0" oninput="calcEditTotal()"
-          style="width:90px;padding:5px 8px;border:1px solid #ddd;border-radius:5px;font-size:13px;text-align:right;outline:none;" />
+        <input type="number" id="edit-discount" placeholder="0" oninput="calcEditTotal()" style="width:90px;padding:5px 8px;border:1px solid #ddd;border-radius:5px;font-size:13px;text-align:right;outline:none;" />
       </div>
-      <div style="display:flex;justify-content:space-between;font-size:17px;font-weight:700;border-top:1.5px solid #eee;padding-top:10px;">
-        <span>TOTAL</span><span id="edit-total" style="color:#1a73e8;">₹0</span>
-      </div>
+      <div style="display:flex;justify-content:space-between;font-size:17px;font-weight:700;border-top:1.5px solid #eee;padding-top:10px;"><span>TOTAL</span><span id="edit-total" style="color:#1a73e8;">₹0</span></div>
     </div>
-
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;">
-      <div class="form-group">
-        <label>Payment Mode</label>
+      <div class="form-group"><label>Payment Mode</label>
         <select id="edit-payMode" style="padding:9px 12px;border:1.5px solid #ddd;border-radius:7px;font-size:14px;outline:none;">
-          <option value="cash">💵 Cash</option>
-          <option value="upi">📱 UPI</option>
-          <option value="card">💳 Card</option>
-          <option value="credit">📋 Credit</option>
+          <option value="cash">💵 Cash</option><option value="upi">📱 UPI</option>
+          <option value="card">💳 Card</option><option value="credit">📋 Credit</option>
         </select>
       </div>
-      <div class="form-group">
-        <label>Amount Paid (₹)</label>
-        <input type="number" id="edit-paidAmt" placeholder="0"
-          style="padding:9px 12px;border:1.5px solid #ddd;border-radius:7px;font-size:14px;outline:none;" />
+      <div class="form-group"><label>Amount Paid (₹)</label>
+        <input type="number" id="edit-paidAmt" placeholder="0" style="padding:9px 12px;border:1.5px solid #ddd;border-radius:7px;font-size:14px;outline:none;" />
       </div>
     </div>
-
     <div style="display:flex;gap:10px;">
       <button onclick="closeEditModal()" style="flex:1;padding:12px;background:#f5f5f5;color:#333;border:none;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600;">Cancel</button>
       <button onclick="saveEditedBill()" style="flex:2;padding:12px;background:#1a73e8;color:white;border:none;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600;">💾 Save Changes</button>
@@ -310,28 +279,24 @@
 </div>
 
 <script>
-let products = [];
-let billItems = [];
-let paymentMode = 'cash';
-let currentCreditSaleId = null;
-let editSaleId = null;
-let editItems = [];
-let selectedCustomerId = null;
-let selectedCustomerPoints = 0;
+let products = [], billItems = [], paymentMode = 'cash';
+let currentCreditSaleId = null, editSaleId = null, editItems = [];
+let selectedCustomerId = null, selectedCustomerPoints = 0;
+let pendingSaleForWhatsApp = null;
 
 function checkAuth() {
   const user = JSON.parse(localStorage.getItem('user') || 'null');
   if (!localStorage.getItem('token')) { location.href='index.html'; return; }
   document.getElementById('navUser').textContent = '👤 ' + (user?.name || '');
+  const branch = JSON.parse(localStorage.getItem('currentBranch') || 'null');
+  const branchEl = document.getElementById('navBranch');
+  if (branchEl) branchEl.textContent = '🏪 ' + (branch?.name || 'Main Branch');
 }
-
 function logout() { localStorage.clear(); location.href='index.html'; }
 
 async function loadProducts() {
-  try {
-    const res = await fetch('/api/products');
-    products = await res.json();
-  } catch(e) { console.log('Product load error:', e); }
+  try { const res = await fetch('/api/products'); products = await res.json(); }
+  catch(e) { console.log('Product load error:', e); }
 }
 
 function setCurrentDateTime() {
@@ -339,16 +304,6 @@ function setCurrentDateTime() {
   document.getElementById('billDate').value = now.toISOString().split('T')[0];
   document.getElementById('billTime').value = now.toTimeString().slice(0,5);
 }
-
-// Prescription se auto-fill
-function checkRxParams() {
-  const params = new URLSearchParams(window.location.search);
-  if (params.get('patient')) {
-    document.getElementById('custName').value = params.get('patient');
-    document.getElementById('custPhone').value = params.get('phone') || '';
-  }
-}
-checkRxParams();
 
 // ── CUSTOMER SEARCH ──
 async function searchCustomers() {
@@ -375,28 +330,20 @@ function selectCustomer(id, name, phone, points) {
   document.getElementById('custName').value = name;
   document.getElementById('custPhone').value = phone;
   document.getElementById('custSuggestions').style.display='none';
-  selectedCustomerId = id;
-  selectedCustomerPoints = points;
+  selectedCustomerId = id; selectedCustomerPoints = points;
   if (points > 0) {
     document.getElementById('loyaltyBar').style.display='flex';
     document.getElementById('loyaltyPts').textContent = points;
     document.getElementById('loyaltyVal').textContent = Math.floor(points/10);
   }
 }
-
-function hideLoyalty() {
-  document.getElementById('loyaltyBar').style.display='none';
-  selectedCustomerId = null;
-  selectedCustomerPoints = 0;
-}
-
+function hideLoyalty() { document.getElementById('loyaltyBar').style.display='none'; selectedCustomerId=null; selectedCustomerPoints=0; }
 function applyLoyalty() {
   const pts = parseInt(prompt(`Kitne points use karne hain?\nAvailable: ${selectedCustomerPoints}\n(10 pts = ₹1)`));
-  if (!pts || pts <= 0 || pts > selectedCustomerPoints) return;
-  const discount = Math.floor(pts/10);
-  document.getElementById('discountAmt').value = discount;
+  if (!pts||pts<=0||pts>selectedCustomerPoints) return;
+  document.getElementById('discountAmt').value = Math.floor(pts/10);
   calcTotal();
-  alert(`✅ ${pts} points use kiye — ₹${discount} discount lagaya!`);
+  alert(`✅ ${pts} points use kiye — ₹${Math.floor(pts/10)} discount!`);
 }
 
 // ── PRODUCT SEARCH ──
@@ -411,9 +358,7 @@ function searchProducts() {
   ).slice(0,10);
   if (!matches.length) { box.style.display='none'; return; }
   box.innerHTML = matches.map(p => {
-    let stockInfo = p.sellType==='loose'
-      ? `${p.stripStock||0} strips+${p.looseStock||0} loose`
-      : `${p.stock||0} in stock`;
+    let stockInfo = p.sellType==='loose' ? `${p.stripStock||0} strips+${p.looseStock||0} loose` : `${p.stock||0} in stock`;
     const sellLabel = p.sellType==='loose'?'Loose':p.sellType==='strip'?'Strip':'Piece';
     return `<div class="search-item" onclick="addItem('${p._id}')">
       <span class="s-stock">${stockInfo}</span>
@@ -425,19 +370,15 @@ function searchProducts() {
 }
 
 function addItem(id) {
-  const p = products.find(x => x._id === id);
+  const p = products.find(x => x._id===id);
   if (!p) return;
-  const existing = billItems.find(x => x.productId === id);
+  const existing = billItems.find(x => x.productId===id);
   if (existing) { existing.qty++; renderBill(); document.getElementById('searchInput').value=''; document.getElementById('searchResults').style.display='none'; return; }
-
-  let rate = p.salePrice;
-  let sellUnit = 'piece';
-  let maxQty = p.stock || 0;
-  if (p.category === 'medicine') {
-    if (p.sellType === 'loose') { rate = p.pricePerUnit||(p.mrp/(p.unitsPerStrip||10)); sellUnit='pill'; maxQty=(p.stripStock||0)*(p.unitsPerStrip||10)+(p.looseStock||0); }
-    else if (p.sellType === 'strip') { sellUnit='strip'; maxQty=p.stripStock||p.stock||0; }
+  let rate=p.salePrice, sellUnit='piece', maxQty=p.stock||0;
+  if (p.category==='medicine') {
+    if (p.sellType==='loose') { rate=p.pricePerUnit||(p.mrp/(p.unitsPerStrip||10)); sellUnit='pill'; maxQty=(p.stripStock||0)*(p.unitsPerStrip||10)+(p.looseStock||0); }
+    else if (p.sellType==='strip') { sellUnit='strip'; maxQty=p.stripStock||p.stock||0; }
   }
-
   billItems.push({ productId:id, name:p.name, category:p.category, sellType:p.sellType||'piece', sellUnit, qty:1, rate:parseFloat(rate.toFixed(2)), discount:0, gst:p.gst||0, maxQty, mrp:p.mrp, batch:p.batch||'', expiry:p.expiry||'' });
   document.getElementById('searchInput').value='';
   document.getElementById('searchResults').style.display='none';
@@ -446,10 +387,8 @@ function addItem(id) {
 
 // ── BILL RENDER ──
 function renderBill() {
-  const tbody = document.getElementById('billBody');
-  const table = document.getElementById('billTable');
-  const emptyMsg = document.getElementById('emptyMsg');
-  const countEl = document.getElementById('itemCount');
+  const tbody=document.getElementById('billBody'), table=document.getElementById('billTable');
+  const emptyMsg=document.getElementById('emptyMsg'), countEl=document.getElementById('itemCount');
   if (!billItems.length) { table.style.display='none'; emptyMsg.style.display='block'; countEl.textContent=''; calcTotal(); return; }
   table.style.display='table'; emptyMsg.style.display='none';
   countEl.textContent=`(${billItems.length} items)`;
@@ -475,7 +414,7 @@ function renderBill() {
   calcTotal();
 }
 
-function updateQty(i,val) { const qty=parseInt(val)||1; const max=billItems[i].maxQty||99999; billItems[i].qty=qty>max?max:qty; if(qty>max)alert(`Stock mein sirf ${max} ${billItems[i].sellUnit} hain!`); renderBill(); }
+function updateQty(i,val) { const qty=parseInt(val)||1,max=billItems[i].maxQty||99999; billItems[i].qty=qty>max?max:qty; if(qty>max)alert(`Stock mein sirf ${max} ${billItems[i].sellUnit} hain!`); renderBill(); }
 function updateDisc(i,val) { billItems[i].discount=parseFloat(val)||0; renderBill(); }
 function removeItem(i) { billItems.splice(i,1); renderBill(); }
 function selectPay(mode,el) { paymentMode=mode; document.querySelectorAll('.pay-btn').forEach(b=>b.classList.remove('selected')); el.classList.add('selected'); }
@@ -501,78 +440,107 @@ function calcChange() {
 }
 
 // ── SAVE BILL ──
-async function saveBill(print=false) {
-  if (!billItems.length) { alert('Bill mein koi item nahi!'); return; }
-  const totals=calcTotal();
-  const paid=parseFloat(document.getElementById('paidAmt').value)||totals.grand;
-
-  // Date + Time combine
-  const billDate = document.getElementById('billDate').value;
-  const billTime = document.getElementById('billTime').value;
-  const billDateTime = billDate ? new Date(`${billDate}T${billTime||'00:00'}:00`) : new Date();
-
-  const saleData={
-    customer: document.getElementById('custName').value||'Walk-in Customer',
-    customerPhone: document.getElementById('custPhone').value,
-    customerId: selectedCustomerId || undefined,
-    date: billDateTime,
-    items: billItems.map(item=>({
+function buildSaleData(totals, paid) {
+  const billDate=document.getElementById('billDate').value;
+  const billTime=document.getElementById('billTime').value;
+  const billDateTime=billDate?new Date(`${billDate}T${billTime||'00:00'}:00`):new Date();
+  return {
+    customer:document.getElementById('custName').value||'Walk-in Customer',
+    customerPhone:document.getElementById('custPhone').value,
+    customerId:selectedCustomerId||undefined,
+    date:billDateTime,
+    items:billItems.map(item=>({
       product:item.productId, productName:item.name, batch:item.batch,
       qty:item.qty, mrp:item.mrp, salePrice:item.rate, discount:item.discount,
       gst:item.gst, sellUnit:item.sellUnit,
       total:parseFloat((item.qty*item.rate*(1-item.discount/100)).toFixed(2))
     })),
-    subtotal: parseFloat(totals.subtotal.toFixed(2)),
-    discount: totals.discount,
-    gstAmount: parseFloat(totals.gstTotal.toFixed(2)),
-    totalAmount: parseFloat(totals.grand.toFixed(2)),
-    paidAmount: paymentMode==='credit'?0:paid,
+    subtotal:parseFloat(totals.subtotal.toFixed(2)),
+    discount:totals.discount,
+    gstAmount:parseFloat(totals.gstTotal.toFixed(2)),
+    totalAmount:parseFloat(totals.grand.toFixed(2)),
+    paidAmount:paymentMode==='credit'?0:paid,
     paymentMode,
-    paymentStatus: paymentMode==='credit'?'unpaid':'paid'
+    paymentStatus:paymentMode==='credit'?'unpaid':'paid'
   };
+}
 
+async function saveBill(mode='save') {
+  if (!billItems.length) { alert('Bill mein koi item nahi!'); return; }
+  const totals=calcTotal();
+  const paid=parseFloat(document.getElementById('paidAmt').value)||totals.grand;
+  const saleData=buildSaleData(totals,paid);
   try {
     const res=await fetch('/api/sales',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(saleData)});
     const data=await res.json();
-    if(data.success){
-      if(print) printInvoice(data.sale);
-      else { alert(`✅ Bill ${data.sale.billNo} saved!`); resetBill(); }
+    if (data.success) {
+      if (mode==='print') { printInvoice(data.sale); }
+      else if (mode==='whatsapp') { shareOnWhatsApp(data.sale); resetBill(); }
+      else {
+        const phone=document.getElementById('custPhone').value;
+        if (phone) {
+          const share=confirm(`✅ Bill ${data.sale.billNo} saved!\n\nWhatsApp pe bill bhejein?\n📱 ${phone}`);
+          if (share) shareOnWhatsApp(data.sale);
+        } else {
+          alert(`✅ Bill ${data.sale.billNo} saved!`);
+        }
+        resetBill();
+      }
     } else alert('Error: '+data.message);
-  } catch(e){ alert('Server error!'); }
+  } catch(e) { alert('Server error!'); }
 }
 
-function resetBill() {
-  billItems=[];
-  document.getElementById('custName').value='';
-  document.getElementById('custPhone').value='';
-  document.getElementById('discountAmt').value='';
-  document.getElementById('paidAmt').value='';
-  document.querySelectorAll('.pay-btn').forEach(b=>b.classList.remove('selected'));
-  document.querySelector('.pay-btn').classList.add('selected');
-  paymentMode='cash';
-  selectedCustomerId=null;
-  selectedCustomerPoints=0;
-  hideLoyalty();
-  setCurrentDateTime();
-  renderBill(); loadRecentBills(); loadProducts();
-}
+function printBill() { saveBill('print'); }
+function saveAndWhatsApp() { saveBill('whatsapp'); }
 
-function printBill() { saveBill(true); }
+// ── WHATSAPP ──
+function shareOnWhatsApp(sale) {
+  const phone=sale.customerPhone||'';
+  const date=new Date(sale.date);
+  const dayName=date.toLocaleDateString('en-IN',{weekday:'long'});
+  const dateStr=date.toLocaleDateString('en-IN');
+  const timeStr=date.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+  let msg=`💊 *MedXpert Pharmacy*\n`;
+  msg+=`━━━━━━━━━━━━━━━━\n`;
+  msg+=`🧾 *Bill No:* ${sale.billNo}\n`;
+  msg+=`📅 *Date:* ${dayName}, ${dateStr} ${timeStr}\n`;
+  msg+=`👤 *Customer:* ${sale.customer}\n`;
+  msg+=`━━━━━━━━━━━━━━━━\n*ITEMS:*\n`;
+  billItems.forEach(item=>{
+    const total=(item.qty*item.rate*(1-item.discount/100)).toFixed(2);
+    msg+=`• ${item.name}\n  ${item.qty} x ₹${item.rate.toFixed(2)} = ₹${total}\n`;
+    if(item.discount>0) msg+=`  Discount: ${item.discount}%\n`;
+  });
+  msg+=`━━━━━━━━━━━━━━━━\n`;
+  msg+=`💰 *Subtotal:* ₹${sale.subtotal.toFixed(2)}\n`;
+  if(sale.gstAmount>0) msg+=`📊 *GST:* ₹${sale.gstAmount.toFixed(2)}\n`;
+  if(sale.discount>0) msg+=`🏷️ *Discount:* -₹${sale.discount.toFixed(2)}\n`;
+  msg+=`✅ *TOTAL: ₹${sale.totalAmount.toFixed(2)}*\n`;
+  msg+=`💵 *Paid (${sale.paymentMode}):* ₹${sale.paidAmount.toFixed(2)}\n`;
+  if((sale.totalAmount-sale.paidAmount)>0.01) msg+=`⚠️ *Balance Due: ₹${(sale.totalAmount-sale.paidAmount).toFixed(2)}*\n`;
+  msg+=`━━━━━━━━━━━━━━━━\n🙏 Thank you! Get well soon 💊`;
+  const encoded=encodeURIComponent(msg);
+  const waUrl=phone?`https://wa.me/91${phone.replace(/\D/g,'')}?text=${encoded}`:`https://wa.me/?text=${encoded}`;
+  window.open(waUrl,'_blank');
+}
 
 function printInvoice(sale) {
   const win=window.open('','_blank','width=400,height=600');
-  const saleDate = new Date(sale.date);
-  const dayName = saleDate.toLocaleDateString('en-IN',{weekday:'long'});
-  const dateStr = saleDate.toLocaleDateString('en-IN');
-  const timeStr = saleDate.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
-
+  const saleDate=new Date(sale.date);
+  const dayName=saleDate.toLocaleDateString('en-IN',{weekday:'long'});
+  const dateStr=saleDate.toLocaleDateString('en-IN');
+  const timeStr=saleDate.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+  const phone=sale.customerPhone||'';
+  const waMsg=encodeURIComponent(`Bill ${sale.billNo} - Total: ₹${sale.totalAmount.toFixed(2)} - MedXpert Pharmacy`);
   win.document.write(`<html><head><title>Invoice ${sale.billNo}</title>
   <style>body{font-family:'Courier New',monospace;font-size:13px;margin:0;padding:16px;width:350px;}
   h2{text-align:center;font-size:18px;margin-bottom:2px;}.center{text-align:center;}
   hr{border:none;border-top:1px dashed #333;margin:8px 0;}
   table{width:100%;border-collapse:collapse;}
   th{font-size:11px;text-align:left;border-bottom:1px solid #333;padding:3px 0;}
-  td{font-size:12px;padding:3px 0;vertical-align:top;}.right{text-align:right;}.bold{font-weight:bold;font-size:14px;}</style>
+  td{font-size:12px;padding:3px 0;vertical-align:top;}.right{text-align:right;}
+  .bold{font-weight:bold;font-size:14px;}
+  .wa-btn{display:block;margin:12px auto 0;padding:10px 20px;background:#25D366;color:white;border:none;border-radius:8px;font-size:14px;cursor:pointer;font-family:sans-serif;text-align:center;text-decoration:none;width:fit-content;}</style>
   </head><body>
   <h2>💊 MedXpert Pharmacy</h2>
   <p class="center" style="font-size:11px;margin:0;">GST Invoice</p><hr/>
@@ -598,10 +566,24 @@ function printInvoice(sale) {
     ${sale.paymentMode==='credit'?`<tr><td style="color:#c62828;font-weight:600;">CREDIT DUE</td><td class="right" style="color:#c62828;">₹${sale.totalAmount.toFixed(2)}</td></tr>`:''}
   </table><hr/>
   <p class="center" style="font-size:11px;">Thank you! Get well soon 💊</p>
+  ${phone?`<a class="wa-btn" href="https://wa.me/91${phone.replace(/\D/g,'')}?text=${waMsg}" target="_blank">📱 WhatsApp pe Bill Bhejo</a>`:''}
   <script>window.print();window.onafterprint=()=>window.close();<\/script>
   </body></html>`);
   win.document.close();
   resetBill();
+}
+
+function resetBill() {
+  billItems=[];
+  document.getElementById('custName').value='';
+  document.getElementById('custPhone').value='';
+  document.getElementById('discountAmt').value='';
+  document.getElementById('paidAmt').value='';
+  document.querySelectorAll('.pay-btn').forEach(b=>b.classList.remove('selected'));
+  document.querySelector('.pay-btn').classList.add('selected');
+  paymentMode='cash'; selectedCustomerId=null; selectedCustomerPoints=0;
+  hideLoyalty(); setCurrentDateTime();
+  renderBill(); loadRecentBills(); loadProducts();
 }
 
 // ── RECENT BILLS ──
@@ -614,9 +596,9 @@ async function loadRecentBills() {
     el.innerHTML=sales.slice(0,10).map(s=>{
       const balance=(s.totalAmount||0)-(s.paidAmount||0);
       const isCredit=s.paymentMode==='credit'||balance>0.01;
-      const sDate = new Date(s.date);
-      const dayName = sDate.toLocaleDateString('en-IN',{weekday:'short'});
-      const timeStr = sDate.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+      const sDate=new Date(s.date);
+      const dayName=sDate.toLocaleDateString('en-IN',{weekday:'short'});
+      const timeStr=sDate.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
       return `<div style="padding:9px 0;border-bottom:1px solid #f5f5f5;">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;">
           <div style="flex:1;min-width:0;">
@@ -631,18 +613,38 @@ async function loadRecentBills() {
             ${isCredit?`<div style="font-size:11px;color:#c62828;">Due: ₹${balance.toFixed(0)}</div>`:''}
           </div>
         </div>
-        <div style="display:flex;gap:6px;margin-top:8px;">
-          <button onclick="openEditModal('${s._id}')"
-            style="flex:1;background:#e8f0fe;color:#1a73e8;border:none;padding:6px 0;border-radius:6px;font-size:12px;cursor:pointer;font-weight:600;">✏️ Edit</button>
-          <button onclick="cancelBill('${s._id}','${s.billNo||''}')"
-            style="flex:1;background:#ffebee;color:#c62828;border:none;padding:6px 0;border-radius:6px;font-size:12px;cursor:pointer;font-weight:600;">🗑️ Cancel</button>
-          ${isCredit&&balance>0.01?`
-          <button onclick="openCreditPayModal('${s._id}','${s.customer}',${s.totalAmount},${s.paidAmount||0})"
-            style="flex:1;background:#2e7d32;color:white;border:none;padding:6px 0;border-radius:6px;font-size:12px;cursor:pointer;font-weight:600;">💳 Pay</button>`:''}
+        <div style="display:flex;gap:5px;margin-top:8px;flex-wrap:wrap;">
+          <button onclick="openEditModal('${s._id}')" style="flex:1;min-width:60px;background:#e8f0fe;color:#1a73e8;border:none;padding:5px 0;border-radius:6px;font-size:11px;cursor:pointer;font-weight:600;">✏️ Edit</button>
+          <button onclick="cancelBill('${s._id}','${s.billNo||''}')" style="flex:1;min-width:60px;background:#ffebee;color:#c62828;border:none;padding:5px 0;border-radius:6px;font-size:11px;cursor:pointer;font-weight:600;">🗑️ Cancel</button>
+          <button onclick="shareRecentBillWA('${s._id}')" style="flex:1;min-width:60px;background:#e8f8ef;color:#25D366;border:none;padding:5px 0;border-radius:6px;font-size:11px;cursor:pointer;font-weight:600;">📱 WA</button>
+          ${isCredit&&balance>0.01?`<button onclick="openCreditPayModal('${s._id}','${s.customer}',${s.totalAmount},${s.paidAmount||0})" style="flex:1;min-width:60px;background:#2e7d32;color:white;border:none;padding:5px 0;border-radius:6px;font-size:11px;cursor:pointer;font-weight:600;">💳 Pay</button>`:''}
         </div>
       </div>`;
     }).join('');
   } catch(e){document.getElementById('recentBills').innerHTML='<p style="color:#e00;font-size:13px;">Error loading bills.</p>';}
+}
+
+async function shareRecentBillWA(saleId) {
+  const res=await fetch('/api/sales/'+saleId);
+  const sale=await res.json();
+  const date=new Date(sale.date);
+  const dayName=date.toLocaleDateString('en-IN',{weekday:'long'});
+  const dateStr=date.toLocaleDateString('en-IN');
+  const timeStr=date.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+  let msg=`💊 *MedXpert Pharmacy*\n━━━━━━━━━━━━━━━━\n`;
+  msg+=`🧾 *Bill No:* ${sale.billNo}\n📅 *Date:* ${dayName}, ${dateStr} ${timeStr}\n`;
+  msg+=`👤 *Customer:* ${sale.customer}\n━━━━━━━━━━━━━━━━\n*ITEMS:*\n`;
+  (sale.items||[]).forEach(item=>{
+    msg+=`• ${item.productName}\n  ${item.qty} x ₹${item.salePrice?.toFixed(2)} = ₹${item.total?.toFixed(2)}\n`;
+  });
+  msg+=`━━━━━━━━━━━━━━━━\n✅ *TOTAL: ₹${sale.totalAmount?.toFixed(2)}*\n`;
+  msg+=`💵 *Paid (${sale.paymentMode}):* ₹${sale.paidAmount?.toFixed(2)}\n`;
+  if((sale.totalAmount-sale.paidAmount)>0.01) msg+=`⚠️ *Due: ₹${(sale.totalAmount-sale.paidAmount).toFixed(2)}*\n`;
+  msg+=`━━━━━━━━━━━━━━━━\n🙏 Thank you! 💊`;
+  const phone=sale.customerPhone||'';
+  const encoded=encodeURIComponent(msg);
+  const waUrl=phone?`https://wa.me/91${phone.replace(/\D/g,'')}?text=${encoded}`:`https://wa.me/?text=${encoded}`;
+  window.open(waUrl,'_blank');
 }
 
 // ── CREDIT PAYMENT ──
@@ -683,64 +685,37 @@ async function openEditModal(saleId) {
     document.getElementById('edit-payMode').value=sale.paymentMode||'cash';
     document.getElementById('edit-paidAmt').value=sale.paidAmount||0;
     document.getElementById('edit-discount').value=sale.discount||0;
-
-    // Date + Time
-    const saleDate = new Date(sale.date);
-    document.getElementById('edit-date').value = saleDate.toISOString().split('T')[0];
-    document.getElementById('edit-time').value = saleDate.toTimeString().slice(0,5);
-
+    const saleDate=new Date(sale.date);
+    document.getElementById('edit-date').value=saleDate.toISOString().split('T')[0];
+    document.getElementById('edit-time').value=saleDate.toTimeString().slice(0,5);
     editItems=(sale.items||[]).map(item=>({
-      productId:item.product?._id||item.product,
-      name:item.productName||'', qty:item.qty, rate:item.salePrice,
-      discount:item.discount||0, gst:item.gst||0, mrp:item.mrp,
-      batch:item.batch||'', sellUnit:item.sellUnit||'piece'
+      productId:item.product?._id||item.product, name:item.productName||'',
+      qty:item.qty, rate:item.salePrice, discount:item.discount||0, gst:item.gst||0,
+      mrp:item.mrp, batch:item.batch||'', sellUnit:item.sellUnit||'piece'
     }));
     renderEditItems();
     document.getElementById('editBillModal').style.display='flex';
   }catch(e){alert('Error loading bill!');}
 }
-
-function closeEditModal(){
-  document.getElementById('editBillModal').style.display='none';
-  editSaleId=null; editItems=[];
-  document.getElementById('edit-searchInput').value='';
-  document.getElementById('edit-searchResults').style.display='none';
-}
-
+function closeEditModal(){document.getElementById('editBillModal').style.display='none';editSaleId=null;editItems=[];document.getElementById('edit-searchInput').value='';document.getElementById('edit-searchResults').style.display='none';}
 function renderEditItems(){
   const tbody=document.getElementById('editItemsBody');
   if(!editItems.length){tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:16px;color:#aaa;">No items</td></tr>';calcEditTotal();return;}
   tbody.innerHTML=editItems.map((item,i)=>{
     const total=(item.qty*item.rate*(1-item.discount/100)).toFixed(2);
     return `<tr style="border-bottom:1px solid #f5f5f5;">
-      <td style="padding:10px;"><strong style="font-size:13px;">${item.name}</strong>
-        ${item.batch?`<div style="font-size:11px;color:#aaa;">Batch: ${item.batch}</div>`:''}</td>
-      <td style="padding:10px;text-align:center;">
-        <input type="number" value="${item.qty}" min="1" onchange="updateEditItem(${i},'qty',this.value)"
-          style="width:60px;padding:5px;border:1px solid #ddd;border-radius:5px;font-size:13px;text-align:center;outline:none;" />
-      </td>
+      <td style="padding:10px;"><strong style="font-size:13px;">${item.name}</strong>${item.batch?`<div style="font-size:11px;color:#aaa;">Batch: ${item.batch}</div>`:''}</td>
+      <td style="padding:10px;text-align:center;"><input type="number" value="${item.qty}" min="1" onchange="updateEditItem(${i},'qty',this.value)" style="width:60px;padding:5px;border:1px solid #ddd;border-radius:5px;font-size:13px;text-align:center;outline:none;" /></td>
       <td style="padding:10px;text-align:center;">₹${item.rate.toFixed(2)}</td>
-      <td style="padding:10px;text-align:center;">
-        <input type="number" value="${item.discount}" min="0" max="100" onchange="updateEditItem(${i},'discount',this.value)"
-          style="width:55px;padding:5px;border:1px solid #ddd;border-radius:5px;font-size:13px;text-align:center;outline:none;" />
-      </td>
+      <td style="padding:10px;text-align:center;"><input type="number" value="${item.discount}" min="0" max="100" onchange="updateEditItem(${i},'discount',this.value)" style="width:55px;padding:5px;border:1px solid #ddd;border-radius:5px;font-size:13px;text-align:center;outline:none;" /></td>
       <td style="padding:10px;text-align:right;font-weight:600;">₹${total}</td>
-      <td style="padding:10px;text-align:center;">
-        <button onclick="removeEditItem(${i})"
-          style="background:#ffebee;color:#c62828;border:none;padding:4px 10px;border-radius:5px;cursor:pointer;font-size:12px;">✕</button>
-      </td>
+      <td style="padding:10px;text-align:center;"><button onclick="removeEditItem(${i})" style="background:#ffebee;color:#c62828;border:none;padding:4px 10px;border-radius:5px;cursor:pointer;font-size:12px;">✕</button></td>
     </tr>`;
   }).join('');
   calcEditTotal();
 }
-
-function updateEditItem(i,field,val){
-  if(field==='qty') editItems[i].qty=parseInt(val)||1;
-  if(field==='discount') editItems[i].discount=parseFloat(val)||0;
-  renderEditItems();
-}
+function updateEditItem(i,field,val){if(field==='qty')editItems[i].qty=parseInt(val)||1;if(field==='discount')editItems[i].discount=parseFloat(val)||0;renderEditItems();}
 function removeEditItem(i){if(editItems.length===1){alert('Kam se kam ek item hona chahiye!');return;}editItems.splice(i,1);renderEditItems();}
-
 function calcEditTotal(){
   let subtotal=0,gstTotal=0;
   editItems.forEach(item=>{const base=item.qty*item.rate*(1-item.discount/100);subtotal+=base;gstTotal+=base*(item.gst/100);});
@@ -751,32 +726,22 @@ function calcEditTotal(){
   document.getElementById('edit-total').textContent='₹'+grand.toFixed(2);
   return{subtotal,gstTotal,discount,grand};
 }
-
 function editSearchProducts(){
   const q=document.getElementById('edit-searchInput').value.toLowerCase().trim();
   const box=document.getElementById('edit-searchResults');
   if(!q){box.style.display='none';return;}
   const matches=products.filter(p=>p.name.toLowerCase().includes(q)||(p.generic||'').toLowerCase().includes(q)).slice(0,8);
   if(!matches.length){box.style.display='none';return;}
-  box.innerHTML=matches.map(p=>`
-    <div onclick="addEditItem('${p._id}')"
-      style="padding:11px 14px;cursor:pointer;border-bottom:1px solid #f5f5f5;font-size:13px;">
-      <strong>${p.name}</strong>
-      <span style="color:#888;font-size:11px;margin-left:8px;">₹${p.salePrice} · Stock:${p.stock||0}</span>
-    </div>`).join('');
+  box.innerHTML=matches.map(p=>`<div onclick="addEditItem('${p._id}')" style="padding:11px 14px;cursor:pointer;border-bottom:1px solid #f5f5f5;font-size:13px;"><strong>${p.name}</strong><span style="color:#888;font-size:11px;margin-left:8px;">₹${p.salePrice} · Stock:${p.stock||0}</span></div>`).join('');
   box.style.display='block';
 }
-
 function addEditItem(id){
-  const p=products.find(x=>x._id===id);
-  if(!p)return;
+  const p=products.find(x=>x._id===id);if(!p)return;
   const existing=editItems.find(x=>x.productId===id);
   if(existing){existing.qty++;renderEditItems();}
   else{editItems.push({productId:id,name:p.name,qty:1,rate:p.salePrice,discount:0,gst:p.gst||0,mrp:p.mrp,batch:p.batch||'',sellUnit:p.sellType==='loose'?'pill':'piece'});renderEditItems();}
-  document.getElementById('edit-searchInput').value='';
-  document.getElementById('edit-searchResults').style.display='none';
+  document.getElementById('edit-searchInput').value='';document.getElementById('edit-searchResults').style.display='none';
 }
-
 async function saveEditedBill(){
   if(!editItems.length){alert('Koi item nahi!');return;}
   const totals=calcEditTotal();
@@ -784,25 +749,14 @@ async function saveEditedBill(){
   const payMode=document.getElementById('edit-payMode').value;
   const editDate=document.getElementById('edit-date').value;
   const editTime=document.getElementById('edit-time').value;
-  const editDateTime=editDate?new Date(`${editDate}T${editTime||'00:00'}:00`):new Date();
-
   const data={
     customer:document.getElementById('edit-custName').value||'Walk-in Customer',
     customerPhone:document.getElementById('edit-custPhone').value,
-    date:editDateTime,
-    items:editItems.map(item=>({
-      product:item.productId,productName:item.name,batch:item.batch,
-      qty:item.qty,mrp:item.mrp,salePrice:item.rate,discount:item.discount,
-      gst:item.gst,sellUnit:item.sellUnit,
-      total:parseFloat((item.qty*item.rate*(1-item.discount/100)).toFixed(2))
-    })),
-    subtotal:parseFloat(totals.subtotal.toFixed(2)),
-    discount:totals.discount,
-    gstAmount:parseFloat(totals.gstTotal.toFixed(2)),
-    totalAmount:parseFloat(totals.grand.toFixed(2)),
-    paidAmount:payMode==='credit'?0:paid,
-    paymentMode:payMode,
-    paymentStatus:payMode==='credit'?'unpaid':'paid'
+    date:editDate?new Date(`${editDate}T${editTime||'00:00'}:00`):new Date(),
+    items:editItems.map(item=>({product:item.productId,productName:item.name,batch:item.batch,qty:item.qty,mrp:item.mrp,salePrice:item.rate,discount:item.discount,gst:item.gst,sellUnit:item.sellUnit,total:parseFloat((item.qty*item.rate*(1-item.discount/100)).toFixed(2))})),
+    subtotal:parseFloat(totals.subtotal.toFixed(2)),discount:totals.discount,
+    gstAmount:parseFloat(totals.gstTotal.toFixed(2)),totalAmount:parseFloat(totals.grand.toFixed(2)),
+    paidAmount:payMode==='credit'?0:paid,paymentMode:payMode,paymentStatus:payMode==='credit'?'unpaid':'paid'
   };
   try{
     const res=await fetch('/api/sales/'+editSaleId,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
@@ -811,7 +765,6 @@ async function saveEditedBill(){
     else alert('Error: '+result.message);
   }catch(e){alert('Server error!');}
 }
-
 async function cancelBill(saleId,billNo){
   if(!confirm(`Bill ${billNo} cancel karna chahte ho?\nStock wapas aa jaayega.`))return;
   try{
@@ -822,16 +775,23 @@ async function cancelBill(saleId,billNo){
   }catch(e){alert('Server error!');}
 }
 
+// Auto-fill from prescription
+function checkRxParams(){
+  const params=new URLSearchParams(window.location.search);
+  if(params.get('patient')){document.getElementById('custName').value=params.get('patient');document.getElementById('custPhone').value=params.get('phone')||'';}
+}
+
 document.addEventListener('click',e=>{
-  if(!e.target.closest('.search-box')) document.getElementById('searchResults').style.display='none';
-  if(!e.target.closest('#edit-searchInput')&&!e.target.closest('#edit-searchResults')) document.getElementById('edit-searchResults').style.display='none';
-  if(!e.target.closest('#custName')&&!e.target.closest('#custSuggestions')) document.getElementById('custSuggestions').style.display='none';
+  if(!e.target.closest('.search-box'))document.getElementById('searchResults').style.display='none';
+  if(!e.target.closest('#edit-searchInput')&&!e.target.closest('#edit-searchResults'))document.getElementById('edit-searchResults').style.display='none';
+  if(!e.target.closest('#custName')&&!e.target.closest('#custSuggestions'))document.getElementById('custSuggestions').style.display='none';
 });
 
 checkAuth();
 loadProducts();
 loadRecentBills();
 setCurrentDateTime();
+checkRxParams();
 </script>
 </body>
 </html>

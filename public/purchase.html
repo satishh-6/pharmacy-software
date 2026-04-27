@@ -48,6 +48,10 @@
   .modal-bg { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:200; align-items:center; justify-content:center; }
   .modal-bg.show { display:flex; }
   .modal { background:white; border-radius:16px; padding:28px; width:460px; max-height:90vh; overflow-y:auto; }
+  .edit-banner { background:#fff3e0; border:1.5px solid #ff9800; border-radius:10px; padding:12px 16px; margin-bottom:16px; display:none; align-items:center; gap:12px; }
+  .edit-banner.show { display:flex; }
+  .edit-banner span { flex:1; font-size:13.5px; color:#e65100; font-weight:600; }
+  .edit-banner button { background:#e65100; color:white; border:none; padding:6px 14px; border-radius:6px; cursor:pointer; font-size:12px; font-weight:600; }
 </style>
 </head>
 <body>
@@ -66,12 +70,16 @@
   <a href="reports.html">📊 Reports</a>
   <a href="customers.html">👥 Customers</a>
   <a href="prescriptions.html">📋 Prescriptions</a>
+  <a href="branches.html">🏪 Branches</a>
 </div>
 
 <div class="main">
-  <!-- LEFT PANEL -->
   <div>
-    <!-- Supplier -->
+    <div class="edit-banner" id="editBanner">
+      <span>✏️ Edit Mode — Purani purchase edit ho rahi hai. Changes karke Save karo.</span>
+      <button onclick="cancelEdit()">✕ Cancel Edit</button>
+    </div>
+
     <div class="card">
       <h3>🏪 Supplier Details</h3>
       <div class="form-grid">
@@ -100,7 +108,6 @@
       </div>
     </div>
 
-    <!-- Search -->
     <div class="card">
       <h3>🔍 Search & Add Item</h3>
       <div class="search-box">
@@ -109,7 +116,6 @@
       </div>
     </div>
 
-    <!-- Items Table -->
     <div class="card">
       <h3>📋 Purchase Items <span id="itemCount" style="font-size:13px;color:#888;font-weight:400;"></span></h3>
       <div id="emptyMsg" style="text-align:center;padding:24px;color:#bbb;font-size:14px;">No items added. Search above.</div>
@@ -127,9 +133,7 @@
     </div>
   </div>
 
-  <!-- RIGHT PANEL -->
   <div>
-    <!-- Summary -->
     <div class="card">
       <h3>💰 Purchase Summary</h3>
       <div class="summary-row"><span>Total Items</span><span id="totalItems">0</span></div>
@@ -143,7 +147,6 @@
       <button class="btn btn-success" style="width:100%;margin-top:14px;" onclick="savePurchase()">💾 Save Purchase</button>
     </div>
 
-    <!-- Recent Purchases -->
     <div class="card">
       <h3>🕒 Supplier Ledger</h3>
       <div style="margin-bottom:12px;">
@@ -160,7 +163,6 @@
   <div class="modal">
     <h2 style="margin-bottom:6px;font-size:18px;">💳 Pay Supplier</h2>
     <p id="paySupplierName" style="color:#888;font-size:13px;margin-bottom:20px;"></p>
-
     <div style="background:#f8f9fa;border-radius:10px;padding:14px;margin-bottom:18px;">
       <div style="display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px;">
         <span>Total Amount</span><strong id="payTotal">₹0</strong>
@@ -172,10 +174,7 @@
         <span>Balance Due</span><span id="payBalance" style="color:#c62828;">₹0</span>
       </div>
     </div>
-
-    <!-- Payment History -->
     <div id="payHistory" style="margin-bottom:16px;"></div>
-
     <div style="display:flex;flex-direction:column;gap:10px;">
       <div class="form-group">
         <label>Payment Amount (₹) *</label>
@@ -195,10 +194,24 @@
         <input id="payNote" placeholder="e.g. Partial payment, cheque no." />
       </div>
     </div>
-
     <div style="display:flex;gap:10px;margin-top:20px;">
       <button class="btn" style="background:#f5f5f5;color:#333;flex:1;" onclick="closePayModal()">Cancel</button>
       <button class="btn btn-success" style="flex:2;" onclick="submitPayment()">✅ Mark Payment</button>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE CONFIRM MODAL -->
+<div class="modal-bg" id="deleteModalBg">
+  <div class="modal" style="width:400px;">
+    <h2 style="margin-bottom:8px;font-size:18px;color:#c62828;">🗑️ Delete Purchase?</h2>
+    <p id="deleteModalMsg" style="color:#555;font-size:14px;margin-bottom:20px;line-height:1.6;"></p>
+    <div style="background:#fff3e0;border-radius:8px;padding:12px;margin-bottom:20px;">
+      <p style="font-size:13px;color:#e65100;">⚠️ <strong>Warning:</strong> Delete karne se stock reverse ho jayega aur ye entry permanently remove ho jayegi.</p>
+    </div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn" style="background:#f5f5f5;color:#333;flex:1;" onclick="closeDeleteModal()">Cancel</button>
+      <button class="btn" style="background:#c62828;color:white;flex:2;" onclick="confirmDelete()">🗑️ Haan, Delete Karo</button>
     </div>
   </div>
 </div>
@@ -208,6 +221,8 @@ let products = [];
 let allPurchases = [];
 let purchaseItems = [];
 let currentPayPurchaseId = null;
+let currentEditId = null;
+let currentDeleteId = null;
 
 function checkAuth() {
   const user = JSON.parse(localStorage.getItem('user') || 'null');
@@ -229,7 +244,6 @@ async function loadSupplierSuggestions() {
   dl.innerHTML = suppliers.map(s => `<option value="${s}">`).join('');
 }
 
-// Set today's date
 document.getElementById('purchaseDate').value = new Date().toISOString().split('T')[0];
 
 function searchProducts() {
@@ -280,7 +294,6 @@ function renderItems() {
   const table = document.getElementById('itemsTable');
   const emptyMsg = document.getElementById('emptyMsg');
   const countEl = document.getElementById('itemCount');
-
   if (purchaseItems.length === 0) {
     table.style.display = 'none';
     emptyMsg.style.display = 'block';
@@ -288,11 +301,9 @@ function renderItems() {
     calcSummary();
     return;
   }
-
   table.style.display = 'table';
   emptyMsg.style.display = 'none';
   countEl.textContent = `(${purchaseItems.length} items)`;
-
   tbody.innerHTML = purchaseItems.map((item, i) => {
     const total = (item.qty * item.purchasePrice).toFixed(2);
     return `<tr>
@@ -307,7 +318,6 @@ function renderItems() {
       <td><button class="btn-danger" onclick="removeItem(${i})">✕</button></td>
     </tr>`;
   }).join('');
-
   calcSummary();
 }
 
@@ -347,12 +357,10 @@ async function savePurchase() {
   if (purchaseItems.length === 0) {
     alert('Koi item nahi add kiya!'); return;
   }
-
   const grand = calcSummary();
   const paid = parseFloat(document.getElementById('paidAmt').value) || 0;
   const payMode = document.getElementById('payMode').value;
   const payStatus = paid >= grand ? 'paid' : paid > 0 ? 'partial' : 'unpaid';
-
   const data = {
     supplier: document.getElementById('supplier').value.trim(),
     invoiceNo: document.getElementById('invoiceNo').value.trim(),
@@ -373,26 +381,95 @@ async function savePurchase() {
     paidAmount: paid,
     paymentHistory: paid > 0 ? [{ amount: paid, date: new Date(), note: 'Initial payment' }] : []
   };
-
+  const url = currentEditId ? `/api/purchases/${currentEditId}` : '/api/purchases';
+  const method = currentEditId ? 'PUT' : 'POST';
   try {
-    const res = await fetch('/api/purchases', {
-      method: 'POST',
+    const res = await fetch(url, {
+      method,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data)
     });
     const result = await res.json();
     if (result.success) {
-      alert('✅ Purchase saved! Stock updated.');
-      purchaseItems = [];
-      document.getElementById('supplier').value = '';
-      document.getElementById('invoiceNo').value = '';
-      document.getElementById('paidAmt').value = '';
-      renderItems();
+      alert(currentEditId ? '✅ Purchase updated! Stock adjusted.' : '✅ Purchase saved! Stock updated.');
+      resetForm();
       loadRecentPurchases();
       loadProducts();
       loadSupplierSuggestions();
     } else {
       alert('Error: ' + result.message);
+    }
+  } catch(e) { alert('Server error!'); }
+}
+
+async function editPurchase(id) {
+  try {
+    const res = await fetch('/api/purchases/' + id);
+    const p = await res.json();
+    document.getElementById('supplier').value = p.supplier || '';
+    document.getElementById('invoiceNo').value = p.invoiceNo || '';
+    document.getElementById('purchaseDate').value = p.date ? new Date(p.date).toISOString().split('T')[0] : '';
+    document.getElementById('payMode').value = p.paymentMode || 'credit';
+    document.getElementById('paidAmt').value = p.paidAmount || 0;
+    purchaseItems = (p.items || []).map(item => ({
+      productId: item.product?._id || item.product,
+      name: item.productName || '',
+      batch: item.batch || '',
+      expiry: item.expiry || '',
+      qty: item.qty,
+      purchasePrice: item.purchasePrice,
+      mrp: item.mrp,
+      gst: item.gst || 0
+    }));
+    renderItems();
+    currentEditId = id;
+    document.getElementById('editBanner').classList.add('show');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } catch(e) {
+    alert('Purchase load karne mein error!');
+  }
+}
+
+function cancelEdit() { resetForm(); }
+
+function resetForm() {
+  currentEditId = null;
+  purchaseItems = [];
+  document.getElementById('supplier').value = '';
+  document.getElementById('invoiceNo').value = '';
+  document.getElementById('purchaseDate').value = new Date().toISOString().split('T')[0];
+  document.getElementById('payMode').value = 'credit';
+  document.getElementById('paidAmt').value = '';
+  document.getElementById('editBanner').classList.remove('show');
+  renderItems();
+}
+
+function deletePurchase(id, supplierName, invoiceNo, amount) {
+  currentDeleteId = id;
+  document.getElementById('deleteModalMsg').innerHTML =
+    `<strong>${supplierName}</strong> ki purchase delete karna chahte ho?<br><br>
+    Invoice: <strong>${invoiceNo || 'N/A'}</strong><br>
+    Amount: <strong style="color:#c62828;">₹${parseFloat(amount||0).toFixed(2)}</strong>`;
+  document.getElementById('deleteModalBg').classList.add('show');
+}
+
+function closeDeleteModal() {
+  document.getElementById('deleteModalBg').classList.remove('show');
+  currentDeleteId = null;
+}
+
+async function confirmDelete() {
+  if (!currentDeleteId) return;
+  try {
+    const res = await fetch('/api/purchases/' + currentDeleteId, { method: 'DELETE' });
+    const data = await res.json();
+    if (data.success) {
+      closeDeleteModal();
+      alert('✅ Purchase deleted! Stock reversed.');
+      loadRecentPurchases();
+      loadProducts();
+    } else {
+      alert('Error: ' + data.message);
     }
   } catch(e) { alert('Server error!'); }
 }
@@ -422,25 +499,12 @@ function renderPurchases(purchases) {
     el.innerHTML = '<p style="color:#aaa;font-size:13px;">No purchases found.</p>';
     return;
   }
-
-  // Group by supplier and show totals
-  const supplierTotals = {};
-  purchases.forEach(p => {
-    if (!supplierTotals[p.supplier]) {
-      supplierTotals[p.supplier] = { total: 0, paid: 0, count: 0 };
-    }
-    supplierTotals[p.supplier].total += p.totalAmount || 0;
-    supplierTotals[p.supplier].paid += p.paidAmount || 0;
-    supplierTotals[p.supplier].count++;
-  });
-
   el.innerHTML = purchases.slice(0, 10).map(p => {
     const balance = (p.totalAmount || 0) - (p.paidAmount || 0);
     const status = p.paymentStatus || (balance <= 0 ? 'paid' : p.paidAmount > 0 ? 'partial' : 'unpaid');
     const statusColor = status === 'paid' ? '#2e7d32' : status === 'partial' ? '#e65100' : '#c62828';
     const statusBg = status === 'paid' ? '#e8f5e9' : status === 'partial' ? '#fff3e0' : '#ffebee';
     const statusText = status === 'paid' ? '✅ Paid' : status === 'partial' ? '⚡ Partial' : '❌ Unpaid';
-
     return `
     <div class="history-item">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
@@ -453,30 +517,38 @@ function renderPurchases(purchases) {
         </div>
         <strong style="color:#1a73e8;font-size:14px;">₹${(p.totalAmount||0).toFixed(0)}</strong>
       </div>
+      <div style="display:flex;gap:6px;margin-top:8px;">
+        <button onclick="editPurchase('${p._id}')"
+          style="background:#e8f0fe;color:#1a73e8;border:1.5px solid #c5d8fb;padding:5px 12px;border-radius:6px;font-size:12px;cursor:pointer;font-weight:600;flex:1;">
+          ✏️ Edit
+        </button>
+        <button onclick="deletePurchase('${p._id}','${p.supplier.replace(/'/g,"\\'")}','${(p.invoiceNo||'').replace(/'/g,"\\'")}','${p.totalAmount||0}')"
+          style="background:#ffebee;color:#c62828;border:1.5px solid #ffcdd2;padding:5px 12px;border-radius:6px;font-size:12px;cursor:pointer;font-weight:600;flex:1;">
+          🗑️ Delete
+        </button>
+        ${balance > 0.01 ? `
+        <button onclick="openPayModalById('${p._id}')"
+          style="background:#1a73e8;color:white;border:none;padding:5px 12px;border-radius:6px;font-size:12px;cursor:pointer;font-weight:600;flex:1.5;">
+          💳 Pay Now
+        </button>` : ''}
+      </div>
       ${balance > 0.01 ? `
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;background:#fff8f8;padding:8px 10px;border-radius:8px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;background:#fff8f8;padding:8px 10px;border-radius:8px;">
         <div>
           <span style="font-size:12px;color:#888;">Paid: </span>
           <span style="font-size:12px;color:#2e7d32;font-weight:600;">₹${(p.paidAmount||0).toFixed(0)}</span>
           <span style="font-size:12px;color:#888;margin-left:8px;">Due: </span>
           <span style="font-size:12px;color:#c62828;font-weight:700;">₹${balance.toFixed(0)}</span>
         </div>
-        <button onclick="openPayModalById('${p._id}')"
-          style="background:#1a73e8;color:white;border:none;padding:6px 14px;border-radius:6px;font-size:12px;cursor:pointer;font-weight:600;">
-          💳 Pay Now
-        </button>
       </div>` : `
       <div style="font-size:12px;color:#2e7d32;margin-top:6px;">✅ Fully Paid · ₹${(p.paidAmount||0).toFixed(0)}</div>`}
     </div>`;
   }).join('');
 }
 
-// ── PAYMENT MODAL ──
 function openPayModal(purchase) {
   currentPayPurchaseId = purchase._id || purchase.id;
-  console.log('Purchase ID:', currentPayPurchaseId);
   const balance = (purchase.totalAmount || 0) - (purchase.paidAmount || 0);
-
   document.getElementById('paySupplierName').textContent =
     `${purchase.supplier} · Invoice: ${purchase.invoiceNo || 'N/A'} · ${new Date(purchase.date).toLocaleDateString('en-IN')}`;
   document.getElementById('payTotal').textContent = '₹' + (purchase.totalAmount || 0).toFixed(2);
@@ -484,7 +556,6 @@ function openPayModal(purchase) {
   document.getElementById('payBalance').textContent = '₹' + balance.toFixed(2);
   document.getElementById('payAmount').value = balance.toFixed(2);
   document.getElementById('payNote').value = '';
-
   const histEl = document.getElementById('payHistory');
   if (purchase.paymentHistory && purchase.paymentHistory.length > 0) {
     histEl.innerHTML = `
@@ -503,7 +574,6 @@ function openPayModal(purchase) {
   } else {
     histEl.innerHTML = '';
   }
-
   document.getElementById('payModalBg').classList.add('show');
 }
 
@@ -516,7 +586,6 @@ async function submitPayment() {
   const amount = parseFloat(document.getElementById('payAmount').value);
   if (!amount || amount <= 0) { alert('Amount enter karo!'); return; }
   const note = document.getElementById('payModeNew').value + (document.getElementById('payNote').value ? ' - ' + document.getElementById('payNote').value : '');
-
   try {
     const res = await fetch(`/api/purchases/${currentPayPurchaseId}/payment`, {
       method: 'PATCH',
@@ -534,15 +603,15 @@ async function submitPayment() {
   } catch(e) { alert('Server error!'); }
 }
 
-// Close search on outside click
 document.addEventListener('click', e => {
   if (!e.target.closest('.search-box'))
     document.getElementById('searchResults').style.display = 'none';
 });
-
-// Close modal on outside click
 document.getElementById('payModalBg').addEventListener('click', e => {
   if (e.target === document.getElementById('payModalBg')) closePayModal();
+});
+document.getElementById('deleteModalBg').addEventListener('click', e => {
+  if (e.target === document.getElementById('deleteModalBg')) closeDeleteModal();
 });
 
 checkAuth();
