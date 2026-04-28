@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Settings - MedXpert</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Segoe UI',sans-serif; background:#f0f4f8; }
+  .navbar { background:#1a73e8; color:white; padding:0 24px; display:flex; align-items:center; height:58px; position:fixed; width:100%; top:0; z-index:100; }
+  .navbar h1 { font-size:20px; font-weight:700; flex:1; }
+  .navbar button { background:rgba(255,255,255,0.2); border:none; color:white; padding:7px 16px; border-radius:6px; cursor:pointer; }
+  .sidebar { position:fixed; left:0; top:58px; width:220px; height:calc(100vh - 58px); background:white; border-right:1px solid #e0e0e0; padding:16px 0; overflow-y:auto; }
+  .sidebar a { display:flex; align-items:center; gap:12px; padding:12px 20px; color:#444; text-decoration:none; font-size:14.5px; border-left:3px solid transparent; }
+  .sidebar a:hover, .sidebar a.active { background:#e8f0fe; color:#1a73e8; border-left-color:#1a73e8; }
+  .main { margin-left:220px; margin-top:58px; padding:24px; max-width:calc(100vw - 220px); }
+  .card { background:white; border-radius:12px; padding:24px; box-shadow:0 2px 8px rgba(0,0,0,0.07); margin-bottom:20px; }
+  .card h3 { font-size:16px; color:#333; margin-bottom:18px; font-weight:600; }
+  .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .form-group { display:flex; flex-direction:column; gap:6px; }
+  .form-group.full { grid-column:1/-1; }
+  .form-group label { font-size:12px; color:#666; font-weight:600; text-transform:uppercase; }
+  .form-group input, .form-group select, .form-group textarea { padding:10px 12px; border:1.5px solid #ddd; border-radius:8px; font-size:14px; outline:none; }
+  .form-group input:focus { border-color:#1a73e8; }
+  .btn { padding:12px 24px; border:none; border-radius:8px; cursor:pointer; font-size:14px; font-weight:600; }
+  .btn-primary { background:#1a73e8; color:white; }
+  .preview-bill { border:1px solid #ddd; border-radius:8px; padding:0; overflow:hidden; }
+</style>
+</head>
+<body>
+<div class="navbar">
+  <h1>💊 MedXpert Pharmacy</h1>
+  <button onclick="logout()">Logout</button>
+</div>
+<div class="sidebar">
+  <a href="index.html">🏠 Dashboard</a>
+  <a href="stock.html">📦 Stock</a>
+  <a href="billing.html">🧾 Billing</a>
+  <a href="purchase.html">🛒 Purchase</a>
+  <a href="customers.html">👥 Customers</a>
+  <a href="prescriptions.html">📋 Prescriptions</a>
+  <a href="branches.html">🏪 Branches</a>
+  <a href="reports.html">📊 Reports</a>
+  <a href="settings.html" class="active">⚙️ Settings</a>
+</div>
+
+<div class="main">
+  <h2 style="font-size:22px;color:#333;margin-bottom:20px;">⚙️ Pharmacy Settings</h2>
+
+  <div class="card">
+    <h3>🏥 Pharmacy Information</h3>
+    <div class="form-grid">
+      <div class="form-group full">
+        <label>Pharmacy Name</label>
+        <input id="s_name" placeholder="e.g. MedXpert Pharmacy" />
+      </div>
+      <div class="form-group full">
+        <label>Address Line 1</label>
+        <input id="s_addr1" placeholder="e.g. Shop No. 5, MG Road" />
+      </div>
+      <div class="form-group full">
+        <label>Address Line 2</label>
+        <input id="s_addr2" placeholder="e.g. Indore, MP - 452001" />
+      </div>
+      <div class="form-group">
+        <label>Phone</label>
+        <input id="s_phone" placeholder="e.g. 9876543210" />
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input id="s_email" placeholder="e.g. medxpert@gmail.com" />
+      </div>
+      <div class="form-group">
+        <label>GST Number</label>
+        <input id="s_gst" placeholder="e.g. 23XXXXX1234Z1" />
+      </div>
+      <div class="form-group">
+        <label>Drug License No</label>
+        <input id="s_license" placeholder="e.g. DL/MP/123456" />
+      </div>
+      <div class="form-group">
+        <label>Default Bill Type</label>
+        <select id="s_billtype">
+          <option value="Tax Invoice">Tax Invoice (GST)</option>
+          <option value="Bill of Supply">Bill of Supply (Non-GST)</option>
+          <option value="Retail Invoice">Retail Invoice</option>
+          <option value="Cash Memo">Cash Memo</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Footer Message</label>
+        <input id="s_footer" placeholder="e.g. Thank you! Get well soon." />
+      </div>
+    </div>
+    <div style="margin-top:20px;">
+      <button class="btn btn-primary" onclick="saveSettings()">💾 Save Settings</button>
+    </div>
+  </div>
+
+  <!-- Bill Preview -->
+  <div class="card">
+    <h3>👁️ Bill Preview</h3>
+    <p style="color:#888;font-size:13px;margin-bottom:14px;">Settings save karne ke baad preview update hoga.</p>
+    <div id="billPreview" style="max-width:400px;margin:0 auto;"></div>
+  </div>
+</div>
+
+<script>
+function logout() { localStorage.clear(); location.href='index.html'; }
+
+async function loadSettings() {
+  const res = await fetch('/api/settings');
+  const s = await res.json();
+  document.getElementById('s_name').value = s.pharmacyName||'';
+  document.getElementById('s_addr1').value = s.address1||'';
+  document.getElementById('s_addr2').value = s.address2||'';
+  document.getElementById('s_phone').value = s.phone||'';
+  document.getElementById('s_email').value = s.email||'';
+  document.getElementById('s_gst').value = s.gstNo||'';
+  document.getElementById('s_license').value = s.licenseNo||'';
+  document.getElementById('s_billtype').value = s.billType||'Tax Invoice';
+  document.getElementById('s_footer').value = s.footer||'Thank you! Get well soon.';
+}
+
+async function saveSettings() {
+  const data = {
+    pharmacyName: document.getElementById('s_name').value,
+    address1: document.getElementById('s_addr1').value,
+    address2: document.getElementById('s_addr2').value,
+    phone: document.getElementById('s_phone').value,
+    email: document.getElementById('s_email').value,
+    gstNo: document.getElementById('s_gst').value,
+    licenseNo: document.getElementById('s_license').value,
+    billType: document.getElementById('s_billtype').value,
+    footer: document.getElementById('s_footer').value
+  };
+  const res = await fetch('/api/settings', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify(data)
+  });
+  const result = await res.json();
+  if (result.success) alert('✅ Settings saved!');
+}
+
+loadSettings();
+</script>
+</body>
+</html>

@@ -4,6 +4,8 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 
 dotenv.config();
+
+process.env.TZ = 'Asia/Kolkata';
 const app = express();
 
 app.use(cors());
@@ -138,3 +140,39 @@ mongoose.connect(process.env.MONGODB_URI, {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => console.log(`🚀 Server running on port ${PORT}`));
+
+const fs = require('fs');
+app.get('/api/logo', (req, res) => {
+  try {
+    const b64 = fs.readFileSync('assets/logo_b64.txt', 'utf8');
+    res.json({ logo: 'data:image/jpeg;base64,' + b64.trim() });
+  } catch(e) {
+    res.json({ logo: '' });
+  }
+});
+
+// Pharmacy settings
+app.get('/api/settings', (req, res) => {
+  try {
+    const settings = JSON.parse(fs.readFileSync('assets/settings.json', 'utf8'));
+    res.json(settings);
+  } catch(e) {
+    res.json({
+      pharmacyName: 'MedXpert Pharmacy',
+      address: '',
+      phone: '',
+      gstNo: '',
+      licenseNo: '',
+      billType: 'Tax Invoice'
+    });
+  }
+});
+
+app.post('/api/settings', (req, res) => {
+  try {
+    fs.writeFileSync('assets/settings.json', JSON.stringify(req.body, null, 2));
+    res.json({ success: true });
+  } catch(e) {
+    res.status(500).json({ success: false });
+  }
+});

@@ -1,6 +1,7 @@
 const { app, BrowserWindow, Menu, Tray, nativeImage } = require('electron');
 const path = require('path');
 const { exec } = require('child_process');
+const { app, BrowserWindow, Menu, Tray, nativeImage, globalShortcut } = require('electron');
 
 let mainWindow;
 let tray;
@@ -106,4 +107,43 @@ app.whenReady().then(() => {
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
+});
+
+function createWindow() {
+  mainWindow = new BrowserWindow({
+    width: 1280,
+    height: 800,
+    minWidth: 1024,
+    minHeight: 600,
+    title: 'MedXpert Pharmacy',
+    icon: path.join(__dirname, 'assets', 'icon.png'),
+    webPreferences: {
+      nodeIntegration: false,
+      contextIsolation: true,
+      sandbox: false  // ← Yeh add karo
+    },
+    show: false,
+    backgroundColor: '#f0f4f8'
+  });
+
+  mainWindow.loadURL(SERVER_URL);
+
+  // ← Yeh add karo — keyboard shortcuts enable
+  mainWindow.webContents.on('before-input-event', (event, input) => {
+    // Allow all keyboard input
+  });
+
+  // ← Zoom level fix
+  mainWindow.webContents.on('did-finish-load', () => {
+    mainWindow.webContents.setZoomFactor(1.0);
+  });
+
+  mainWindow.once('ready-to-show', () => {
+    mainWindow.show();
+    mainWindow.focus();
+  });
+
+  // Fix input issues on Windows
+app.on('browser-window-focus', () => {
+  globalShortcut.unregisterAll();
 });
