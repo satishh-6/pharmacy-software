@@ -176,3 +176,33 @@ app.post('/api/settings', (req, res) => {
     res.status(500).json({ success: false });
   }
 });
+
+
+app.get('/api/logo', (req, res) => {
+  try {
+    // Pehle b64 txt check karo
+    const b64Path = path.join(__dirname, 'assets', 'logo_b64.txt');
+    if (fs.existsSync(b64Path)) {
+      const b64 = fs.readFileSync(b64Path, 'utf8').trim();
+      // Check karo ki already data URI hai ya nahi
+      if (b64.startsWith('data:')) {
+        return res.json({ logo: b64 });
+      } else {
+        return res.json({ logo: 'data:image/jpeg;base64,' + b64 });
+      }
+    }
+    // JPG file directly check karo
+    const jpgPath = path.join(__dirname, 'assets', 'logo.jpg');
+    if (fs.existsSync(jpgPath)) {
+      const data = fs.readFileSync(jpgPath);
+      const b64 = 'data:image/jpeg;base64,' + data.toString('base64');
+      // Save for next time
+      fs.writeFileSync(b64Path, b64);
+      return res.json({ logo: b64 });
+    }
+    res.json({ logo: '' });
+  } catch(e) {
+    console.log('Logo error:', e.message);
+    res.json({ logo: '' });
+  }
+});
