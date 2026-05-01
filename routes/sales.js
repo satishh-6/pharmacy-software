@@ -26,14 +26,12 @@ router.post('/', async (req, res) => {
   try {
     const billNo = 'BILL-' + Date.now().toString().slice(-6);
     req.body.billNo = billNo;
-
-    // Date + Time handle
     if (!req.body.date) req.body.date = new Date();
 
     const sale = new Sale(req.body);
     await sale.save();
 
-    // Stock reduce
+    // ── Stock reduce ──
     for (const item of req.body.items) {
       const product = await Product.findById(item.product);
       if (!product) continue;
@@ -56,29 +54,60 @@ router.post('/', async (req, res) => {
       }
     }
 
-    // ── Customer auto-update ──
-    const customerPhone = req.body.customerPhone;
+    // ── AUTO SAVE/UPDATE CUSTOMER ──
     const customerName = req.body.customer;
-    if (customerPhone || customerName) {
-      const query = customerPhone
-        ? { phone: customerPhone }
-        : { name: { $regex: new RegExp('^'+customerName+'$', 'i') } };
+    const customerPhone = req.body.customerPhone;
+    const totalAmount = req.body.totalAmount || 0;
 
-      const customer = await Customer.findOne(query);
-      if (customer) {
-        // Loyalty points — 1 point per ₹10 spent
-        const pointsEarned = Math.floor((req.body.totalAmount || 0) / 10);
-        await Customer.findByIdAndUpdate(customer._id, {
-          $inc: {
+    if (customerName && customerName !== 'Walk-in Customer') {
+      try {
+        // Search by phone first, then by name
+        let customer = null;
+
+        if (customerPhone && customerPhone.trim()) {
+          customer = await Customer.findOne({
+            phone: customerPhone.trim()
+          });
+        }
+
+        if (!customer && customerName) {
+          customer = await Customer.findOne({
+            name: { $regex: new RegExp('^'+customerName.trim()+'$', 'i') }
+          });
+        }
+
+        const pointsEarned = Math.floor(totalAmount / 10);
+
+        if (customer) {
+          // Existing customer — update karo
+          await Customer.findByIdAndUpdate(customer._id, {
+            $inc: {
+              totalPurchases: 1,
+              totalSpent: totalAmount,
+              loyaltyPoints: pointsEarned
+            },
+            lastVisit: new Date(),
+            // Phone update karo agar nahi tha
+            ...(customerPhone && !customer.phone ? { phone: customerPhone } : {})
+          });
+          // Sale mein customerId save karo
+          await Sale.findByIdAndUpdate(sale._id, { customerId: customer._id });
+        } else {
+          // New customer — create karo
+          const newCustomer = await Customer.create({
+            name: customerName.trim(),
+            phone: customerPhone ? customerPhone.trim() : '',
+            totalSpent: totalAmount,
             totalPurchases: 1,
-            totalSpent: req.body.totalAmount || 0,
-            loyaltyPoints: pointsEarned
-          },
-          lastVisit: new Date()
-        });
-
-        // Sale mein customerId save karo
-        await Sale.findByIdAndUpdate(sale._id, { customerId: customer._id });
+            loyaltyPoints: pointsEarned,
+            lastVisit: new Date()
+          });
+          await Sale.findByIdAndUpdate(sale._id, { customerId: newCustomer._id });
+          console.log('✅ New customer auto-saved:', customerName);
+        }
+      } catch(custErr) {
+        console.log('Customer auto-save error:', custErr.message);
+        // Sale save ho chuki hai, customer error ignore karo
       }
     }
 
@@ -112,8 +141,6 @@ router.put('/:id', async (req, res) => {
   try {
     const oldSale = await Sale.findById(req.params.id);
     if (!oldSale) return res.status(404).json({ message: 'Sale not found' });
-
-    // Reverse old stock
     for (const item of oldSale.items) {
       const product = await Product.findById(item.product);
       if (!product) continue;
@@ -123,8 +150,6 @@ router.put('/:id', async (req, res) => {
         await Product.findByIdAndUpdate(item.product, { $inc: { stock: item.qty } });
       }
     }
-
-    // Apply new stock
     for (const item of req.body.items) {
       const product = await Product.findById(item.product);
       if (!product) continue;
@@ -137,12 +162,7 @@ router.put('/:id', async (req, res) => {
         await Product.findByIdAndUpdate(item.product, { $inc: { stock: -item.qty } });
       }
     }
-
-    const updated = await Sale.findByIdAndUpdate(req.params.id, {
-      ...req.body,
-      billNo: oldSale.billNo
-    }, { new: true });
-
+    const updated = await Sale.findByIdAndUpdate(req.params.id, { ...req.body, billNo: oldSale.billNo }, { new: true });
     res.json({ success: true, sale: updated });
   } catch (err) { res.status(400).json({ success: false, message: err.message }); }
 });

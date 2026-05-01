@@ -82,37 +82,46 @@
   <!-- LEFT -->
   <div class="left-panel">
     <div class="card">
-      <h3>👤 Customer Details</h3>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-        <div class="form-group" style="position:relative;">
-          <label>Customer Name</label>
-          <input id="custName" placeholder="Walk-in Customer" autocomplete="off" oninput="searchCustomers()" />
-          <div class="cust-suggestions" id="custSuggestions" style="display:none;"></div>
-        </div>
-        <div class="form-group">
-          <label>Phone</label>
-          <input id="custPhone" placeholder="Optional" />
-        </div>
-      </div>
-      <div id="loyaltyBar" style="display:none;margin-top:12px;background:#fff8e1;border-radius:8px;padding:10px 14px;justify-content:space-between;align-items:center;">
-        <div>
-          <span style="font-size:12px;color:#888;">⭐ Loyalty Points: </span>
-          <strong id="loyaltyPts" style="color:#f57f17;">0</strong>
-          <span style="font-size:11px;color:#aaa;margin-left:6px;">(= ₹<span id="loyaltyVal">0</span> discount)</span>
-        </div>
-        <button onclick="applyLoyalty()" style="background:#f57f17;color:white;border:none;padding:5px 12px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;">Use Points</button>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px;">
-        <div class="form-group">
-          <label>Bill Date</label>
-          <input type="date" id="billDate" />
-        </div>
-        <div class="form-group">
-          <label>Bill Time</label>
-          <input type="time" id="billTime" />
-        </div>
-      </div>
+  <h3>👤 Customer Details</h3>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+    <div class="form-group" style="position:relative;">
+      <label>Customer Name</label>
+      <input id="custName" placeholder="Type name to search or add new..."
+        autocomplete="off" oninput="searchCustomers()" onblur="onCustNameBlur()" />
+      <div id="custSuggestions" class="cust-suggestions" style="display:none;"></div>
     </div>
+    <div class="form-group">
+      <label>Phone</label>
+      <input id="custPhone" placeholder="Enter phone number"
+        oninput="onPhoneInput()" onblur="onPhoneBlur()" />
+    </div>
+  </div>
+  <!-- Customer found indicator -->
+  <div id="custFoundBar" style="display:none;margin-top:8px;background:#e8f5e9;border-radius:7px;padding:8px 12px;display:flex;justify-content:space-between;align-items:center;">
+    <span style="font-size:13px;color:#2e7d32;">✅ <strong id="custFoundName"></strong> — Existing Customer</span>
+    <button onclick="clearCustomer()" style="background:none;border:none;color:#888;cursor:pointer;font-size:13px;">✕ Clear</button>
+  </div>
+  <!-- Loyalty Points -->
+  <div id="loyaltyBar" style="display:none;margin-top:8px;background:#fff8e1;border-radius:8px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;">
+    <div>
+      <span style="font-size:12px;color:#888;">⭐ Loyalty Points: </span>
+      <strong id="loyaltyPts" style="color:#f57f17;">0</strong>
+      <span style="font-size:11px;color:#aaa;margin-left:6px;">(= ₹<span id="loyaltyVal">0</span> discount)</span>
+    </div>
+    <button onclick="applyLoyalty()" style="background:#f57f17;color:white;border:none;padding:5px 12px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;">Use Points</button>
+  </div>
+  <!-- Date Time -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px;">
+    <div class="form-group">
+      <label>Bill Date</label>
+      <input type="date" id="billDate" />
+    </div>
+    <div class="form-group">
+      <label>Bill Time</label>
+      <input type="time" id="billTime" />
+    </div>
+  </div>
+</div>
 
     <div class="card">
       <h3>🔍 Search & Add Medicine / Item</h3>
@@ -349,44 +358,122 @@ function setCurrentDateTime() {
   document.getElementById('billTime').value = now.toTimeString().slice(0,5);
 }
 
+// ── CUSTOMER FUNCTIONS ──
+let customerSearchTimeout = null;
+
 async function searchCustomers() {
   const q = document.getElementById('custName').value.trim();
   const box = document.getElementById('custSuggestions');
-  if (q.length < 2) { box.style.display='none'; selectedCustomerId=null; hideLoyalty(); return; }
+
+  if (q.length < 2) { box.style.display='none'; return; }
+
+  clearTimeout(customerSearchTimeout);
+  customerSearchTimeout = setTimeout(async () => {
+    try {
+      const res = await fetch(`/api/customers/search?q=${encodeURIComponent(q)}`);
+      const customers = await res.json();
+
+      if (!customers.length) {
+        box.innerHTML = `
+          <div style="padding:12px 14px;font-size:13px;color:#888;border-bottom:1px solid #f5f5f5;">
+            <div style="color:#1a73e8;font-weight:600;">+ New Customer: "${q}"</div>
+            <div style="font-size:12px;margin-top:2px;">Bill save hone pe auto-save ho jaayega</div>
+          </div>`;
+        box.style.display='block';
+        return;
+      }
+
+      box.innerHTML = customers.map(c => `
+        <div onclick="selectCustomer('${c._id}','${c.name}','${c.phone||''}',${c.loyaltyPoints||0})"
+          style="padding:10px 14px;cursor:pointer;border-bottom:1px solid #f5f5f5;display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <div style="font-weight:600;font-size:13px;">${c.name}</div>
+            ${c.phone?`<div style="font-size:12px;color:#888;">📞 ${c.phone}</div>`:''}
+            ${c.chronicConditions?`<div style="font-size:11px;color:#e65100;">⚠️ ${c.chronicConditions}</div>`:''}
+          </div>
+          <div style="text-align:right;flex-shrink:0;">
+            <div style="font-size:11px;color:#f57f17;font-weight:600;">⭐ ${c.loyaltyPoints||0} pts</div>
+            ${c.totalPurchases?`<div style="font-size:11px;color:#888;">${c.totalPurchases} visits</div>`:''}
+          </div>
+        </div>`).join('');
+      box.style.display='block';
+    } catch(e) { console.log('Search error:', e); }
+  }, 300);
+}
+
+async function onPhoneInput() {
+  const phone = document.getElementById('custPhone').value.trim();
+  if (phone.length === 10 && !selectedCustomerId) {
+    await searchByPhone(phone);
+  }
+}
+
+async function onPhoneBlur() {
+  const phone = document.getElementById('custPhone').value.trim();
+  if (phone.length >= 10 && !selectedCustomerId) {
+    await searchByPhone(phone);
+  }
+}
+
+async function searchByPhone(phone) {
   try {
-    const res = await fetch(`/api/customers/search?q=${encodeURIComponent(q)}`);
+    const res = await fetch(`/api/customers/search?q=${encodeURIComponent(phone)}`);
     const customers = await res.json();
-    if (!customers.length) { box.style.display='none'; return; }
-    box.innerHTML = customers.map(c => `
-      <div onclick="selectCustomer('${c._id}','${c.name}','${c.phone||''}',${c.loyaltyPoints||0})"
-        style="padding:10px 14px;cursor:pointer;border-bottom:1px solid #f5f5f5;font-size:13px;">
-        <strong>${c.name}</strong>
-        <span style="color:#888;font-size:12px;margin-left:8px;">${c.phone||''}</span>
-        ${c.chronicConditions?`<span style="color:#e65100;font-size:11px;margin-left:6px;">⚠️${c.chronicConditions}</span>`:''}
-        <span style="color:#f57f17;font-size:11px;float:right;">⭐${c.loyaltyPoints||0} pts</span>
-      </div>`).join('');
-    box.style.display='block';
+    if (customers.length > 0) {
+      const c = customers[0];
+      // Auto fill name
+      document.getElementById('custName').value = c.name;
+      selectCustomer(c._id, c.name, c.phone||'', c.loyaltyPoints||0);
+      showNotification(`✅ Customer found: ${c.name}`, 'green');
+    }
   } catch(e) {}
+}
+
+function onCustNameBlur() {
+  setTimeout(() => {
+    document.getElementById('custSuggestions').style.display='none';
+  }, 200);
 }
 
 function selectCustomer(id, name, phone, points) {
   document.getElementById('custName').value = name;
   document.getElementById('custPhone').value = phone;
   document.getElementById('custSuggestions').style.display='none';
-  selectedCustomerId = id; selectedCustomerPoints = points;
+  selectedCustomerId = id;
+  selectedCustomerPoints = points;
+
+  // Show found bar
+  document.getElementById('custFoundBar').style.display='flex';
+  document.getElementById('custFoundName').textContent = name;
+
+  // Loyalty points
   if (points > 0) {
     document.getElementById('loyaltyBar').style.display='flex';
     document.getElementById('loyaltyPts').textContent = points;
     document.getElementById('loyaltyVal').textContent = Math.floor(points/10);
   }
 }
-function hideLoyalty() { document.getElementById('loyaltyBar').style.display='none'; selectedCustomerId=null; selectedCustomerPoints=0; }
-function applyLoyalty() {
-  const pts = parseInt(prompt(`Kitne points use karne hain?\nAvailable: ${selectedCustomerPoints}\n(10 pts = ₹1)`));
-  if (!pts||pts<=0||pts>selectedCustomerPoints) return;
-  document.getElementById('discountAmt').value = Math.floor(pts/10);
-  calcTotal();
-  alert(`✅ ${pts} points use kiye — ₹${Math.floor(pts/10)} discount!`);
+
+function clearCustomer() {
+  selectedCustomerId = null;
+  selectedCustomerPoints = 0;
+  document.getElementById('custName').value = '';
+  document.getElementById('custPhone').value = '';
+  document.getElementById('custFoundBar').style.display='none';
+  hideLoyalty();
+}
+
+function hideLoyalty() {
+  document.getElementById('loyaltyBar').style.display='none';
+}
+
+function showNotification(msg, color='green') {
+  const notif = document.createElement('div');
+  const bg = color==='green'?'#2e7d32':color==='red'?'#c62828':'#1a73e8';
+  notif.style.cssText = `position:fixed;top:70px;right:20px;background:${bg};color:white;padding:12px 18px;border-radius:8px;font-size:13px;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.2);font-weight:600;transition:opacity 0.3s;`;
+  notif.textContent = msg;
+  document.body.appendChild(notif);
+  setTimeout(() => { notif.style.opacity='0'; setTimeout(()=>notif.remove(), 300); }, 2500);
 }
 
 function searchProducts() {
@@ -430,27 +517,52 @@ function addItem(id) {
     if (p.sellType==='loose') { rate=p.pricePerUnit||(p.mrp/(p.unitsPerStrip||10)); sellUnit='pill'; maxQty=(p.stripStock||0)*(p.unitsPerStrip||10)+(p.looseStock||0); }
     else if (p.sellType==='strip') { sellUnit='strip'; maxQty=p.stripStock||p.stock||0; }
   }
-  billItems.push({ productId:id, name:p.name, category:p.category, sellType:p.sellType||'piece', sellUnit, qty:1, rate:parseFloat((rate||0).toFixed(2)), discount:0, gst:p.gst||0, maxQty, mrp:p.mrp||0, batch:p.batch||'', expiry:p.expiry||'' });
+  billItems.push({
+    productId:id, name:p.name, category:p.category,
+    sellType:p.sellType||'piece',
+    originalSellType: p.sellType,
+    sellUnit, qty:1,
+    rate:parseFloat((rate||0).toFixed(2)),
+    discount:0, gst:p.gst||0, maxQty,
+    mrp:p.mrp||0, batch:p.batch||'', expiry:p.expiry||''
+  });
   document.getElementById('searchInput').value='';
   document.getElementById('searchResults').style.display='none';
   renderBill();
 }
 
 function renderBill() {
-  const tbody=document.getElementById('billBody'), table=document.getElementById('billTable');
-  const emptyMsg=document.getElementById('emptyMsg'), countEl=document.getElementById('itemCount');
+  const tbody=document.getElementById('billBody');
+  const table=document.getElementById('billTable');
+  const emptyMsg=document.getElementById('emptyMsg');
+  const countEl=document.getElementById('itemCount');
   if (!billItems.length) { table.style.display='none'; emptyMsg.style.display='block'; countEl.textContent=''; calcTotal(); return; }
   table.style.display='table'; emptyMsg.style.display='none';
   countEl.textContent=`(${billItems.length} items)`;
   tbody.innerHTML = billItems.map((item,i) => {
     const lineTotal=(item.qty*item.rate*(1-item.discount/100)).toFixed(2);
-    const badge = item.sellType==='loose'?`<span class="sell-badge loose">per pill</span>`
-      :item.sellType==='strip'?`<span class="sell-badge">strip</span>`
-      :item.category==='fmcg'?`<span class="sell-badge" style="background:#f3e5f5;color:#7b1fa2;">FMCG</span>`:'';
+
+    // ── TYPE SELECTOR ──
+    let typeHtml = '';
+    if (item.category === 'medicine' && item.originalSellType === 'loose') {
+      // Strip ya pill dono option
+      typeHtml = `<select onchange="changeSellUnit(${i},this.value)"
+        style="padding:4px 8px;border:1.5px solid #1a73e8;border-radius:6px;font-size:12px;outline:none;cursor:pointer;background:white;">
+        <option value="pill" ${item.sellUnit==='pill'?'selected':''}>💊 Per Pill</option>
+        <option value="strip" ${item.sellUnit==='strip'?'selected':''}>📦 Strip</option>
+      </select>`;
+    } else if (item.sellType === 'strip') {
+      typeHtml = `<span class="sell-badge">📦 Strip</span>`;
+    } else if (item.category === 'fmcg') {
+      typeHtml = `<span class="sell-badge" style="background:#f3e5f5;color:#7b1fa2;">🛍️ FMCG</span>`;
+    } else {
+      typeHtml = `<span style="font-size:12px;color:#888;">Piece</span>`;
+    }
+
     return `<tr>
       <td><div style="font-weight:600;font-size:13px;">${item.name}</div>
         ${item.batch?`<div style="font-size:11px;color:#aaa;">Batch:${item.batch}${item.expiry?' · Exp:'+item.expiry:''}</div>`:''}</td>
-      <td style="font-size:12px;">${badge}</td>
+      <td style="font-size:12px;">${typeHtml}</td>
       <td>
         <input type="number" value="${item.qty}" min="1" max="${item.maxQty||9999}" onchange="updateQty(${i},this.value)" style="width:60px;" />
         <div style="font-size:10px;color:#aaa;text-align:center;">max ${item.maxQty||'∞'}</div>
@@ -462,6 +574,23 @@ function renderBill() {
     </tr>`;
   }).join('');
   calcTotal();
+}
+
+function changeSellUnit(i, unit) {
+  const item = billItems[i];
+  const p = products.find(x => x._id === item.productId);
+  if (!p) return;
+
+  if (unit === 'pill') {
+    item.sellUnit = 'pill';
+    item.rate = p.pricePerUnit || parseFloat((p.mrp / (p.unitsPerStrip||10)).toFixed(2));
+    item.maxQty = (p.stripStock||0)*(p.unitsPerStrip||10)+(p.looseStock||0);
+  } else {
+    item.sellUnit = 'strip';
+    item.rate = p.salePrice;
+    item.maxQty = p.stripStock || p.stock || 0;
+  }
+  renderBill();
 }
 
 function updateQty(i,val) { const qty=parseInt(val)||1,max=billItems[i].maxQty||99999; billItems[i].qty=qty>max?max:qty; if(qty>max)alert(`Stock mein sirf ${max} ${billItems[i].sellUnit} hain!`); renderBill(); }
@@ -514,30 +643,95 @@ function buildSaleData(totals, paid) {
   };
 }
 
+
 async function saveBill(mode='save') {
-  if (!billItems.length) { alert('Bill mein koi item nahi!'); return; }
-  const totals=calcTotal();
-  const paid=parseFloat(document.getElementById('paidAmt').value)||totals.grand;
-  const saleData=buildSaleData(totals,paid);
+  if (!billItems.length) { alert('Koi item add nahi kiya!'); return; }
+  const totals = calcTotal();
+  const paid = parseFloat(document.getElementById('paidAmt').value) || totals.grand;
+
+  const saleData = buildSaleData(totals, paid);
+
   try {
-    const res=await fetch('/api/sales',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(saleData)});
-    const data=await res.json();
+    const res = await fetch('/api/sales', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token') },
+      body: JSON.stringify(saleData)
+    });
+    const data = await res.json();
+
     if (data.success) {
-      if (mode==='print') { printInvoice(data.sale); }
-      else if (mode==='whatsapp') { shareOnWhatsApp(data.sale); resetBill(); }
-      else {
-        const phone=document.getElementById('custPhone').value;
+      const custName = document.getElementById('custName').value.trim();
+      const custPhone = document.getElementById('custPhone').value.trim();
+      if (custName && custName !== 'Walk-in Customer' && !selectedCustomerId) {
+        autoSaveCustomer(custName, custPhone, totals.grand);
+      }
+
+      if (mode==='print') {
+        printInvoice(data.sale);
+      } else if (mode==='whatsapp') {
+        shareOnWhatsApp(data.sale);
+        resetBill();
+      } else {
+        const phone = document.getElementById('custPhone').value;
         if (phone) {
-          const share=confirm(`✅ Bill ${data.sale.billNo} saved!\n\nWhatsApp pe bill bhejein?\n📱 ${phone}`);
+          const share = confirm(`✅ Bill ${data.sale.billNo} saved!\n\nWhatsApp pe bill bhejein?\n📱 ${phone}`);
           if (share) shareOnWhatsApp(data.sale);
+          else resetBill();
         } else {
           alert(`✅ Bill ${data.sale.billNo} saved!`);
+          resetBill();
         }
-        resetBill();
       }
-    } else alert('Error: '+data.message);
+    } else {
+      alert('Error: ' + data.message);
+    }
   } catch(e) { alert('Server error!'); }
 }
+
+async function autoSaveCustomer(name, phone, spent) {
+  try {
+    // Check karo pehle se exist toh nahi karta
+    if (phone) {
+      const checkRes = await fetch(`/api/customers/search?q=${encodeURIComponent(phone)}`);
+      const existing = await checkRes.json();
+      if (existing.length > 0) {
+        // Already exists — update karo
+        await fetch(`/api/customers/${existing[0]._id}/loyalty`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            points: Math.floor(spent / 10),
+            spent: spent
+          })
+        });
+        return;
+      }
+    }
+
+    // New customer banao
+    const res = await fetch('/api/customers', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: name,
+        phone: phone || '',
+        totalSpent: spent,
+        totalPurchases: 1,
+        loyaltyPoints: Math.floor(spent / 10),
+        lastVisit: new Date()
+      })
+    });
+    const result = await res.json();
+    if (result.success) {
+      console.log('✅ Customer auto-saved:', name);
+      selectedCustomerId = result.customer._id;
+    }
+  } catch(e) {
+    console.log('Auto-save customer error:', e);
+  }
+}
+
+
 
 function printBill() { saveBill('print'); }
 function saveAndWhatsApp() { saveBill('whatsapp'); }
@@ -1204,6 +1398,7 @@ function resetBill() {
   document.getElementById('custPhone').value='';
   document.getElementById('discountAmt').value='';
   document.getElementById('paidAmt').value='';
+  document.getElementById('custFoundBar').style.display='none'; // ← Add
   document.querySelectorAll('.pay-btn').forEach(b=>b.classList.remove('selected'));
   document.querySelector('.pay-btn').classList.add('selected');
   paymentMode='cash'; selectedCustomerId=null; selectedCustomerPoints=0;
@@ -1240,12 +1435,111 @@ async function loadRecentBills() {
         <div style="display:flex;gap:5px;margin-top:8px;flex-wrap:wrap;">
           <button onclick="openEditModal('${s._id}')" style="flex:1;min-width:60px;background:#e8f0fe;color:#1a73e8;border:none;padding:5px 0;border-radius:6px;font-size:11px;cursor:pointer;font-weight:600;">✏️ Edit</button>
           <button onclick="cancelBill('${s._id}','${s.billNo||''}')" style="flex:1;min-width:60px;background:#ffebee;color:#c62828;border:none;padding:5px 0;border-radius:6px;font-size:11px;cursor:pointer;font-weight:600;">🗑️ Cancel</button>
-          <button onclick="shareRecentBillWA('${s._id}')" style="flex:1;min-width:60px;background:#e8f8ef;color:#25D366;border:none;padding:5px 0;border-radius:6px;font-size:11px;cursor:pointer;font-weight:600;">📱 WA</button>
+          <button onclick="downloadAndShareWA('${s._id}')" style="flex:1;min-width:60px;background:#e8f8ef;color:#25D366;border:none;padding:5px 0;border-radius:6px;font-size:11px;cursor:pointer;font-weight:600;">📱 WA</button>
           ${isCredit&&balance>0.01?`<button onclick="openCreditPayModal('${s._id}','${s.customer}',${s.totalAmount},${s.paidAmount||0})" style="flex:1;min-width:60px;background:#2e7d32;color:white;border:none;padding:5px 0;border-radius:6px;font-size:11px;cursor:pointer;font-weight:600;">💳 Pay</button>`:''}
         </div>
       </div>`;
     }).join('');
   } catch(e){document.getElementById('recentBills').innerHTML='<p style="color:#e00;font-size:13px;">Error loading bills.</p>';}
+}
+
+async function downloadAndShareWA(saleId) {
+  try {
+    // Bill data fetch karo
+    const res = await fetch('/api/sales/'+saleId);
+    const sale = await res.json();
+
+    // Temporarily billItems set karo
+    const savedItems = [...billItems];
+    billItems = (sale.items||[]).map(item => ({
+      productId: item.product?._id||item.product,
+      name: item.productName||'',
+      batch: item.batch||'',
+      expiry: '',
+      qty: item.qty,
+      rate: item.salePrice,
+      discount: item.discount||0,
+      gst: item.gst||0,
+      mrp: item.mrp,
+      sellType: item.sellUnit==='pill'?'loose':'strip',
+      sellUnit: item.sellUnit||'piece',
+      category: 'medicine'
+    }));
+
+    const s = PHARMACY_SETTINGS;
+    const billType = s.billType || 'Tax Invoice';
+    const saleDate = new Date(sale.date);
+    const dateStr = saleDate.toLocaleDateString('en-IN',{timeZone:'Asia/Kolkata'});
+    const dayName = saleDate.toLocaleDateString('en-IN',{timeZone:'Asia/Kolkata',weekday:'long'});
+    const timeStr = saleDate.toLocaleTimeString('en-IN',{timeZone:'Asia/Kolkata',hour:'2-digit',minute:'2-digit'});
+
+    // Image generate karo
+    await generateAndDownloadBillImage(sale, s, billType, dateStr, dayName, timeStr);
+
+    billItems = savedItems;
+  } catch(e) {
+    console.log('WA error:', e);
+    alert('Error loading bill!');
+  }
+}
+
+async function generateAndDownloadBillImage(sale, s, billType, dateStr, dayName, timeStr) {
+  return new Promise(async (resolve) => {
+    const billHtml = generateBillHTMLForImage(sale, s, billType, dateStr, dayName, timeStr);
+
+    // Hidden div mein render karo
+    const container = document.createElement('div');
+    container.style.cssText = 'position:fixed;top:-99999px;left:-99999px;width:794px;z-index:-1;background:white;';
+    container.innerHTML = billHtml;
+    document.body.appendChild(container);
+
+    setTimeout(async () => {
+      try {
+        const canvas = await html2canvas(container, {
+          scale: 2,
+          useCORS: true,
+          allowTaint: true,
+          backgroundColor: '#ffffff',
+          width: 794,
+          logging: false
+        });
+
+        const imageUrl = canvas.toDataURL('image/jpeg', 0.92);
+
+        // Download
+        const link = document.createElement('a');
+        link.download = `MedXpert-Bill-${sale.billNo}.jpg`;
+        link.href = imageUrl;
+        link.click();
+
+        document.body.removeChild(container);
+
+        // WhatsApp open karo
+        setTimeout(() => {
+          const phone = sale.customerPhone || '';
+          const msg = `🏥 *${s.pharmacyName||'MedXpert Pharmacy'}*\n` +
+            `🧾 Bill: *${sale.billNo}* | 📅 ${dateStr}\n` +
+            `👤 ${sale.customer||'Customer'}\n` +
+            `✅ *Total: ₹${sale.totalAmount?.toFixed(2)}*\n` +
+            `_Please find bill image attached above_\n` +
+            `🙏 ${s.footer||'Thank you! Get well soon.'}`;
+
+          const encoded = encodeURIComponent(msg);
+          const waUrl = phone
+            ? `https://wa.me/91${phone.replace(/\D/g,'')}?text=${encoded}`
+            : `https://wa.me/?text=${encoded}`;
+
+          window.open(waUrl, '_blank');
+          resolve();
+        }, 800);
+
+      } catch(e) {
+        document.body.removeChild(container);
+        console.log('Canvas error:', e);
+        resolve();
+      }
+    }, 1200);
+  });
 }
 
 async function shareRecentBillWA(saleId) {
@@ -1491,6 +1785,30 @@ document.addEventListener('click',e=>{
 });
 
 checkAuth();
+
+// Phone field pe customer search listener
+document.getElementById('custPhone').addEventListener('blur', async function() {
+  const phone = this.value.trim();
+  const nameEl = document.getElementById('custName');
+  if (phone.length >= 10 && !selectedCustomerId) {
+    try {
+      const res = await fetch(`/api/customers/search?q=${encodeURIComponent(phone)}`);
+      const customers = await res.json();
+      if (customers.length > 0) {
+        const c = customers[0];
+        nameEl.value = c.name;
+        selectCustomer(c._id, c.name, c.phone||'', c.loyaltyPoints||0);
+        // Small notification
+        const notif = document.createElement('div');
+        notif.style.cssText = 'position:fixed;top:70px;right:20px;background:#2e7d32;color:white;padding:10px 16px;border-radius:8px;font-size:13px;z-index:999;box-shadow:0 4px 12px rgba(0,0,0,0.2);';
+        notif.textContent = `✅ Customer found: ${c.name}`;
+        document.body.appendChild(notif);
+        setTimeout(() => notif.remove(), 2500);
+      }
+    } catch(e) {}
+  }
+});
+
 loadProducts();
 loadRecentBills();
 setCurrentDateTime();
