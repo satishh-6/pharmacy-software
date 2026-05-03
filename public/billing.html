@@ -157,7 +157,7 @@
     <div class="card">
       <h3>💰 Bill Summary</h3>
       <div class="summary-row"><span>Subtotal</span><span id="subtotal">₹0.00</span></div>
-      <div class="summary-row"><span>GST</span><span id="gstAmt">₹0.00</span></div>
+      <div class="summary-row" id="gstRow" style="display:none;"><span>GST</span><span id="gstAmt">₹0.00</span></div>
       <div class="summary-row">
         <span>Extra Discount</span>
         <input type="number" id="discountAmt" placeholder="₹0" oninput="calcTotal()" min="0"
@@ -599,15 +599,25 @@ function removeItem(i) { billItems.splice(i,1); renderBill(); }
 function selectPay(mode,el) { paymentMode=mode; document.querySelectorAll('.pay-btn').forEach(b=>b.classList.remove('selected')); el.classList.add('selected'); }
 
 function calcTotal() {
-  let subtotal=0,gstTotal=0;
-  billItems.forEach(item=>{ const base=item.qty*item.rate*(1-item.discount/100); subtotal+=base; gstTotal+=base*(item.gst/100); });
-  const discount=parseFloat(document.getElementById('discountAmt').value)||0;
-  const grand=Math.max(0,subtotal+gstTotal-discount);
+  let subtotal=0, gstTotal=0;
+  billItems.forEach(item => {
+    const base = item.qty * item.rate * (1 - item.discount/100);
+    subtotal += base;
+    // GST sirf tab lagao jab explicitly set ho (> 0)
+    // aur settings mein GST enabled ho
+    if (item.gst && item.gst > 0) {
+      gstTotal += base * (item.gst/100);
+    }
+  });
+  const discount = parseFloat(document.getElementById('discountAmt').value)||0;
+  const grand = Math.max(0, subtotal + gstTotal - discount);
   document.getElementById('subtotal').textContent='₹'+subtotal.toFixed(2);
   document.getElementById('gstAmt').textContent='₹'+gstTotal.toFixed(2);
-  document.getElementById('grandTotal').textContent='₹'+grand.toFixed(2);
-  calcChange();
-  return {subtotal,gstTotal,discount,grand};
+document.getElementById('grandTotal').textContent='₹'+grand.toFixed(2);
+const gstRow = document.getElementById('gstRow');
+if (gstRow) gstRow.style.display = gstTotal > 0 ? 'flex' : 'none';
+calcChange();
+  return {subtotal, gstTotal, discount, grand};
 }
 
 function calcChange() {
@@ -805,16 +815,22 @@ async function shareOnWhatsApp(sale) {
 }
 
 function generateBillHTMLForImage(sale, s, billType, dateStr, dayName, timeStr) {
-  let subtotal=0, gstTotal=0;
+  // billItems global use karo (caller ne set kiya hoga)
+  let subtotal=0, gstTotal=0, mrpTotal=0;
   billItems.forEach(item => {
     const base = item.qty * item.rate * (1 - item.discount/100);
     subtotal += base;
     gstTotal += base * (item.gst/100);
+    mrpTotal += item.qty * (item.mrp || item.rate);
   });
   const discount = sale.discount || 0;
   const grand = sale.totalAmount;
+  const itemDiscount = mrpTotal - subtotal;
+  const totalSavings = itemDiscount + discount;
+  const savingsPct = mrpTotal > 0 ? ((totalSavings/mrpTotal)*100).toFixed(1) : 0;
   const isGST = billType === 'Tax Invoice' && s.gstNo;
   const payIcon = sale.paymentMode==='cash'?'💵 Cash':sale.paymentMode==='upi'?'📱 UPI':sale.paymentMode==='card'?'💳 Card':'📋 Credit';
+  const hasDiscount = billItems.some(item => item.discount > 0);
 
   return `<!DOCTYPE html>
 <html>
@@ -855,8 +871,8 @@ function generateBillHTMLForImage(sale, s, billType, dateStr, dayName, timeStr) 
   .iname { font-weight:600; }
   .imeta { font-size:10px; color:#999; margin-top:1px; }
   .totals { display:flex; justify-content:flex-end; margin-bottom:16px; }
-  .tbox { min-width:240px; border-top:1px solid #e0e0e0; padding-top:8px; }
-  .trow { display:flex; justify-content:space-between; padding:4px 0; font-size:13px; }
+  .tbox { min-width:280px; border-top:1px solid #e0e0e0; padding-top:8px; }
+  .trow { display:flex; justify-content:space-between; padding:5px 0; font-size:13px; }
   .trow .l { color:#666; }
   .trow .v { font-weight:600; }
   .trow.grand { padding:8px 0 4px; font-size:15px; font-weight:700; border-top:2px solid #1a73e8; margin-top:4px; }
@@ -879,7 +895,6 @@ function generateBillHTMLForImage(sale, s, billType, dateStr, dayName, timeStr) 
 </head>
 <body>
 <div class="wrap">
-
   <div class="header">
     <div class="logo-area">
       ${LOGO_B64 ? `<img src="${LOGO_B64}" class="logo-img" crossorigin="anonymous" />` : '<div style="width:65px;height:65px;background:linear-gradient(135deg,#1a73e8,#0d47a1);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:28px;">💊</div>'}
@@ -924,11 +939,12 @@ function generateBillHTMLForImage(sale, s, billType, dateStr, dayName, timeStr) 
       <tr>
         <th style="width:5%;">#</th>
         <th style="width:35%;">Medicine / Item</th>
-        <th class="c" style="width:10%;">Qty</th>
-        <th class="r" style="width:12%;">MRP</th>
-        <th class="r" style="width:12%;">Rate</th>
-        ${isGST?'<th class="c" style="width:8%;">GST%</th>':''}
-        <th class="r" style="width:13%;">Amount</th>
+        <th class="c" style="width:9%;">Qty</th>
+        <th class="r" style="width:11%;">MRP</th>
+        <th class="r" style="width:11%;">Rate</th>
+        ${hasDiscount ? '<th class="c" style="width:8%;">Disc%</th>' : ''}
+        ${isGST ? '<th class="c" style="width:7%;">GST%</th>' : ''}
+        <th class="r" style="width:12%;">Amount</th>
       </tr>
     </thead>
     <tbody>
@@ -940,6 +956,7 @@ function generateBillHTMLForImage(sale, s, billType, dateStr, dayName, timeStr) 
           <td class="c">${item.qty} ${item.sellType==='strip'?'strip':'pcs'}</td>
           <td class="r">₹${(item.mrp||0).toFixed(2)}</td>
           <td class="r">₹${item.rate.toFixed(2)}</td>
+          ${hasDiscount?`<td class="c">${item.discount||0}%</td>`:''}
           ${isGST?`<td class="c">${item.gst}%</td>`:''}
           <td class="r">₹${amt}</td>
         </tr>`;
@@ -949,10 +966,11 @@ function generateBillHTMLForImage(sale, s, billType, dateStr, dayName, timeStr) 
 
   <div class="totals">
     <div class="tbox">
-      <div class="trow"><span class="l">Subtotal</span><span class="v">₹${subtotal.toFixed(2)}</span></div>
-      ${isGST&&gstTotal>0?`<div class="trow"><span class="l">GST</span><span class="v">₹${gstTotal.toFixed(2)}</span></div>`:''}
-      ${discount>0?`<div class="trow"><span class="l">Discount</span><span class="v" style="color:#2e7d32;">-₹${discount.toFixed(2)}</span></div>`:''}
-      <div class="trow grand"><span>TOTAL</span><span class="v">₹${grand.toFixed(2)}</span></div>
+      ${mrpTotal > grand + 0.01 ? `<div class="trow"><span class="l">Gross Amount (MRP)</span><span class="v">₹${mrpTotal.toFixed(2)}</span></div>` : `<div class="trow"><span class="l">Subtotal</span><span class="v">₹${subtotal.toFixed(2)}</span></div>`}
+      ${totalSavings > 0.01 ? `<div class="trow"><span class="l" style="color:#2e7d32;">🏷️ You Save (${savingsPct}%)</span><span class="v" style="color:#2e7d32;">-₹${totalSavings.toFixed(2)}</span></div>` : ''}
+      ${isGST && gstTotal > 0 ? `<div class="trow"><span class="l">GST</span><span class="v">₹${gstTotal.toFixed(2)}</span></div>` : ''}
+      ${discount > 0 ? `<div class="trow"><span class="l">Extra Discount</span><span class="v" style="color:#2e7d32;">-₹${discount.toFixed(2)}</span></div>` : ''}
+      <div class="trow grand"><span>AMOUNT PAYABLE</span><span class="v">₹${grand.toFixed(2)}</span></div>
     </div>
   </div>
 
@@ -969,7 +987,7 @@ function generateBillHTMLForImage(sale, s, billType, dateStr, dayName, timeStr) 
 
   <div class="footer">
     <div class="terms">
-      <strong>Terms & Conditions:</strong><br>
+      <strong>Terms &amp; Conditions:</strong><br>
       • Medicines once sold cannot be returned<br>
       • Please verify medicines before leaving<br>
       • Computer generated ${billType}
@@ -978,7 +996,6 @@ function generateBillHTMLForImage(sale, s, billType, dateStr, dayName, timeStr) 
       <div class="signline">Authorized Signatory<br>${s.pharmacyName||'MedXpert Pharmacy'}</div>
     </div>
   </div>
-
   <div class="thankbar">🙏 ${s.footer||'Thank you for your visit! Get well soon.'} | ${s.pharmacyName||'MedXpert Pharmacy'}</div>
 </div>
 </body>
@@ -1079,14 +1096,18 @@ function printInvoice(sale, fromEdit=false) {
   const timeStr = saleDate.toLocaleTimeString('en-IN', { timeZone:'Asia/Kolkata', hour:'2-digit', minute:'2-digit' });
  
   // Calculate totals
-  let subtotal=0, gstTotal=0;
-  billItems.forEach(item => {
-    const base = item.qty * item.rate * (1 - item.discount/100);
-    subtotal += base;
-    gstTotal += base * (item.gst/100);
-  });
-  const discount = sale.discount || 0;
-  const grand = sale.totalAmount;
+  let subtotal=0, gstTotal=0, mrpTotal=0;
+billItems.forEach(item => {
+  const base = item.qty * item.rate * (1 - item.discount/100);
+  subtotal += base;
+  gstTotal += base * (item.gst/100);
+  mrpTotal += item.qty * (item.mrp || item.rate);
+});
+const discount = sale.discount || 0;
+const grand = sale.totalAmount;
+const itemDiscount = mrpTotal - subtotal;
+const totalSavings = itemDiscount + discount;
+const savingsPct = mrpTotal > 0 ? ((totalSavings / mrpTotal) * 100).toFixed(1) : 0;
  
   const payIcon = sale.paymentMode==='cash'?'💵 Cash':sale.paymentMode==='upi'?'📱 UPI':sale.paymentMode==='card'?'💳 Card':'📋 Credit';
   const statusClass = sale.paymentMode==='credit'?'status-credit':(sale.totalAmount-sale.paidAmount)>0.01?'status-partial':'status-paid';
@@ -1275,13 +1296,14 @@ ${sale.paymentMode==='credit' ? '<div class="watermark">CREDIT DUE</div>' : ''}
  
   <!-- TOTALS -->
   <div class="totals-section">
-    <div class="totals-box">
-      <div class="total-row"><span class="lbl">Subtotal</span><span class="val">₹${subtotal.toFixed(2)}</span></div>
-      ${isGST && gstTotal>0 ? `<div class="total-row"><span class="lbl">GST Amount</span><span class="val">₹${gstTotal.toFixed(2)}</span></div>` : ''}
-      ${discount>0 ? `<div class="total-row"><span class="lbl">Discount</span><span class="val" style="color:#2e7d32;">-₹${discount.toFixed(2)}</span></div>` : ''}
-      <div class="total-row grand"><span>TOTAL AMOUNT</span><span class="val">₹${grand.toFixed(2)}</span></div>
-    </div>
+  <div class="totals-box">
+    ${mrpTotal > grand + 0.01 ? `<div class="total-row"><span class="lbl">Gross Amount (MRP)</span><span class="val">₹${mrpTotal.toFixed(2)}</span></div>` : ''}
+    ${totalSavings > 0.01 ? `<div class="total-row"><span class="lbl" style="color:#2e7d32;">🏷️ You Save (${savingsPct}%)</span><span class="val" style="color:#2e7d32;">-₹${totalSavings.toFixed(2)}</span></div>` : ''}
+    ${gstTotal > 0 ? `<div class="total-row"><span class="lbl">GST Amount</span><span class="val">₹${gstTotal.toFixed(2)}</span></div>` : ''}
+    ${discount > 0 ? `<div class="total-row"><span class="lbl">Extra Discount</span><span class="val" style="color:#2e7d32;">-₹${discount.toFixed(2)}</span></div>` : ''}
+    <div class="total-row grand"><span>AMOUNT PAYABLE</span><span class="val">₹${grand.toFixed(2)}</span></div>
   </div>
+</div>
  
   <!-- PAYMENT -->
   <div class="payment-section">
@@ -1711,15 +1733,15 @@ async function saveEditedBill(mode='save') {
     });
     const result = await res.json();
     if (result.success) {
-      // Save karo pehle
+      // ✅ editItems PEHLE save karo — closeEditModal se pehle
+      const itemsForPrint = [...editItems];
+
       closeEditModal();
       loadRecentBills();
       loadProducts();
 
       if (mode === 'print') {
-        // Edit items ko billItems mein temporarily set karo print ke liye
-        const savedBillItems = [...billItems];
-        billItems = editItems.map(item => ({
+        billItems = itemsForPrint.map(item => ({
           productId: item.productId,
           name: item.name,
           batch: item.batch,
@@ -1738,7 +1760,7 @@ async function saveEditedBill(mode='save') {
         // Isliye savedBillItems restore nahi karna — new bill fresh start hogi
       } else if (mode === 'whatsapp') {
         const savedBillItems = [...billItems];
-        billItems = editItems.map(item => ({
+        billItems = itemsForPrint.map(item => ({
           productId: item.productId,
           name: item.name,
           batch: item.batch || '',

@@ -23,7 +23,7 @@ const productSchema = new mongoose.Schema({
 
   minStock: { type: Number, default: 10 },
   hsn: { type: String },
-  gst: { type: Number, default: 12 },
+  gst: { type: Number, default: 0 },
   rack: { type: String }
 }, { timestamps: true });
 

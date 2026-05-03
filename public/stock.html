@@ -48,11 +48,9 @@
   .form-group input, .form-group select { padding:9px 12px; border:1.5px solid #ddd; border-radius:7px; font-size:14px; outline:none; transition:border 0.2s; }
   .form-group input:focus, .form-group select:focus { border-color:#1a73e8; }
   .modal-actions { display:flex; gap:10px; margin-top:20px; justify-content:flex-end; }
-  .section-divider { grid-column:1/-1; border-top:1.5px dashed #e0e0e0; padding-top:12px; margin-top:4px; }
   .section-label { grid-column:1/-1; font-size:12px; font-weight:700; color:#1a73e8; text-transform:uppercase; letter-spacing:0.5px; }
   .strip-info { background:#e8f0fe; border-radius:8px; padding:10px 14px; font-size:13px; color:#1a73e8; grid-column:1/-1; }
   #medicineFields { display:contents; }
-  #fmcgFields { display:contents; }
 </style>
 </head>
 <body>
@@ -106,7 +104,6 @@
     <h2 id="modalTitle">Add Item</h2>
     <div class="form-grid">
 
-      <!-- Category -->
       <div class="form-group full">
         <label>Category *</label>
         <select id="f_category" onchange="onCategoryChange()">
@@ -116,24 +113,45 @@
         </select>
       </div>
 
-      <div class="form-group full"><label>Item Name *</label><input id="f_name" placeholder="e.g. Paracetamol 500mg / Maggi 70g" /></div>
-      <div class="form-group"><label>Generic / Variant</label><input id="f_generic" placeholder="e.g. Paracetamol / Masala" /></div>
-      <div class="form-group"><label>Company / Brand</label><input id="f_company" placeholder="e.g. Cipla / Nestle" /></div>
+      <div class="form-group full">
+        <label>Item Name *</label>
+        <input id="f_name" placeholder="e.g. Paracetamol 500mg / Maggi 70g" />
+      </div>
+      <div class="form-group">
+        <label>Generic / Variant</label>
+        <input id="f_generic" placeholder="e.g. Paracetamol / Masala" />
+      </div>
+      <div class="form-group">
+        <label>Company / Brand</label>
+        <input id="f_company" placeholder="e.g. Cipla / Nestle" />
+      </div>
 
       <!-- Medicine only fields -->
       <div id="medicineFields">
         <div class="form-group full section-label" style="margin-top:4px;">Medicine Details</div>
-        <div class="form-group"><label>Batch No</label><input id="f_batch" placeholder="e.g. BT2024" /></div>
-        <div class="form-group"><label>Expiry (MM/YY)</label><input id="f_expiry" placeholder="e.g. 12/26" /></div>
-        <div class="form-group"><label>HSN Code</label><input id="f_hsn" placeholder="e.g. 3004" /></div>
-        <div class="form-group"><label>GST %</label>
+        <div class="form-group">
+          <label>Batch No</label>
+          <input id="f_batch" placeholder="e.g. BT2024" />
+        </div>
+        <div class="form-group">
+          <label>Expiry (MM/YY)</label>
+          <input id="f_expiry" placeholder="e.g. 12/26" />
+        </div>
+        <div class="form-group">
+          <label>HSN Code</label>
+          <input id="f_hsn" placeholder="e.g. 3004" />
+        </div>
+        <div class="form-group">
+          <label>GST % <span style="font-size:10px;color:#888;font-weight:400;">(MRP inclusive ho toh 0%)</span></label>
           <select id="f_gst">
-            <option value="0">0%</option><option value="5">5%</option>
-            <option value="12" selected>12%</option><option value="18">18%</option>
+            <option value="0" selected>0% (No GST / MRP Inclusive)</option>
+            <option value="5">5%</option>
+            <option value="12">12%</option>
+            <option value="18">18%</option>
+            <option value="28">28%</option>
           </select>
         </div>
 
-        <!-- Sell Type -->
         <div class="form-group full section-label">Selling Type</div>
         <div class="form-group full">
           <label>How is this sold?</label>
@@ -148,21 +166,51 @@
           <div class="strip-info full" id="stripInfoBox">
             Loose selling: Customer sirf 3 pills bhi le sakta hai — aapko strip mein se nikaal ke dena hoga.
           </div>
-          <div class="form-group"><label>Units Per Strip</label><input id="f_unitsPerStrip" type="number" placeholder="e.g. 10" value="10" oninput="calcUnitPrice()" /></div>
-          <div class="form-group"><label>Price Per Unit (₹)</label><input id="f_pricePerUnit" type="number" placeholder="Auto-calculated" readonly style="background:#f9f9f9;" /></div>
-          <div class="form-group"><label>Strips in Stock</label><input id="f_stripStock" type="number" placeholder="0" oninput="calcLoose()" /></div>
-          <div class="form-group"><label>Loose Pills in Stock</label><input id="f_looseStock" type="number" placeholder="0" /></div>
+          <div class="form-group">
+            <label>Units Per Strip</label>
+            <input id="f_unitsPerStrip" type="number" placeholder="e.g. 10" value="10" oninput="calcUnitPrice()" />
+          </div>
+          <div class="form-group">
+            <label>Price Per Unit (₹)</label>
+            <input id="f_pricePerUnit" type="number" placeholder="Auto-calculated" readonly style="background:#f9f9f9;" />
+          </div>
+          <div class="form-group">
+            <label>Strips in Stock</label>
+            <input id="f_stripStock" type="number" placeholder="0" />
+          </div>
+          <div class="form-group">
+            <label>Loose Pills in Stock</label>
+            <input id="f_looseStock" type="number" placeholder="0" />
+          </div>
         </div>
       </div>
 
-      <!-- Pricing (common) -->
+      <!-- Pricing -->
       <div class="form-group full section-label" style="margin-top:4px;">Pricing</div>
-      <div class="form-group"><label>MRP (₹) *</label><input id="f_mrp" type="number" placeholder="0.00" oninput="calcUnitPrice()" /></div>
-      <div class="form-group"><label>Purchase Price (₹) *</label><input id="f_purchase" type="number" placeholder="0.00" /></div>
-      <div class="form-group"><label>Sale Price (₹) *</label><input id="f_sale" type="number" placeholder="0.00" /></div>
-      <div class="form-group"><label>Stock (pieces/units)</label><input id="f_stock" type="number" placeholder="0" /></div>
-      <div class="form-group"><label>Min Stock Alert</label><input id="f_min" type="number" placeholder="10" /></div>
-      <div class="form-group"><label>Rack / Location</label><input id="f_rack" placeholder="e.g. A-12" /></div>
+      <div class="form-group">
+        <label>MRP (₹) *</label>
+        <input id="f_mrp" type="number" placeholder="0.00" oninput="calcUnitPrice()" />
+      </div>
+      <div class="form-group">
+        <label>Purchase Price (₹)</label>
+        <input id="f_purchase" type="number" placeholder="0.00" />
+      </div>
+      <div class="form-group">
+        <label>Sale Price (₹) *</label>
+        <input id="f_sale" type="number" placeholder="0.00" />
+      </div>
+      <div class="form-group">
+        <label>Stock (pieces/units)</label>
+        <input id="f_stock" type="number" placeholder="0" />
+      </div>
+      <div class="form-group">
+        <label>Min Stock Alert</label>
+        <input id="f_min" type="number" placeholder="10" />
+      </div>
+      <div class="form-group">
+        <label>Rack / Location</label>
+        <input id="f_rack" placeholder="e.g. A-12" />
+      </div>
 
     </div>
     <div class="modal-actions">
@@ -173,22 +221,24 @@
 </div>
 
 <script>
-let allProducts = [];
-let editingId = null;
-let currentFilter = 'all';
+let allProducts = [], editingId = null, currentFilter = 'all';
 
 function checkAuth() {
   const user = JSON.parse(localStorage.getItem('user') || 'null');
   if (!localStorage.getItem('token')) { location.href='index.html'; return; }
   document.getElementById('navUser').textContent = '👤 ' + (user?.name || '');
 }
-
 function logout() { localStorage.clear(); location.href='index.html'; }
 
 async function loadProducts() {
-  const res = await fetch('/api/products');
-  allProducts = await res.json();
-  renderTable();
+  try {
+    const token = localStorage.getItem('token');
+    const headers = token ? { 'Authorization': 'Bearer ' + token } : {};
+    const res = await fetch('/api/products', { headers });
+    const data = await res.json();
+    allProducts = Array.isArray(data) ? data : (data.products || []);
+    renderTable();
+  } catch(e) { console.error('Load error:', e); }
 }
 
 function setFilter(f, el) {
@@ -203,49 +253,39 @@ function renderTable() {
   let products = allProducts;
   if (currentFilter !== 'all') products = products.filter(p => p.category === currentFilter);
   if (q) products = products.filter(p =>
-    p.name.toLowerCase().includes(q) ||
+    (p.name||'').toLowerCase().includes(q) ||
     (p.generic||'').toLowerCase().includes(q) ||
     (p.company||'').toLowerCase().includes(q)
   );
-
   const tbody = document.getElementById('productTable');
-  if (products.length === 0) {
+  if (!products.length) {
     tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:30px;color:#aaa;">No items found.</td></tr>';
     return;
   }
-
   tbody.innerHTML = products.map(p => {
-    const catBadge = p.category === 'medicine' ? '<span class="badge badge-med">💊 Medicine</span>'
-      : p.category === 'fmcg' ? '<span class="badge badge-fmcg">🛍️ FMCG</span>'
+    const catBadge = p.category==='medicine' ? '<span class="badge badge-med">💊 Medicine</span>'
+      : p.category==='fmcg' ? '<span class="badge badge-fmcg">🛍️ FMCG</span>'
       : '<span class="badge badge-other">📦 Other</span>';
-
-    let stockDisplay = '';
-    let totalUnits = 0;
-    if (p.category === 'medicine' && p.sellType === 'loose') {
-      const strips = p.stripStock || 0;
-      const loose = p.looseStock || 0;
-      const ups = p.unitsPerStrip || 10;
-      totalUnits = strips * ups + loose;
+    let stockDisplay='', totalUnits=0;
+    if (p.category==='medicine' && p.sellType==='loose') {
+      const strips=p.stripStock||0, loose=p.looseStock||0, ups=p.unitsPerStrip||10;
+      totalUnits = strips*ups+loose;
       stockDisplay = `${strips} strips + ${loose} loose<br><small style="color:#888;">(${totalUnits} units total)</small>`;
     } else {
-      totalUnits = p.stock || 0;
+      totalUnits = p.stock||0;
       stockDisplay = `<strong>${totalUnits}</strong>`;
     }
-
-    const minStock = p.minStock || 10;
-    const status = totalUnits === 0
-      ? '<span class="badge badge-out">Out of Stock</span>'
-      : totalUnits <= minStock
-      ? '<span class="badge badge-low">Low Stock</span>'
+    const minStock = p.minStock||10;
+    const status = totalUnits===0 ? '<span class="badge badge-out">Out of Stock</span>'
+      : totalUnits<=minStock ? '<span class="badge badge-low">Low Stock</span>'
       : '<span class="badge badge-ok">In Stock</span>';
-
     return `<tr>
-      <td><strong>${p.name}</strong>${p.generic ? `<br><small style="color:#888;">${p.generic}</small>` : ''}</td>
+      <td><strong>${p.name}</strong>${p.generic?`<br><small style="color:#888;">${p.generic}</small>`:''}</td>
       <td>${catBadge}</td>
       <td>${p.company||'-'}</td>
-      <td>${p.batch ? p.batch : '-'}${p.expiry ? `<br><small style="color:#e65100;">${p.expiry}</small>` : ''}</td>
+      <td>${p.batch||'-'}${p.expiry?`<br><small style="color:#e65100;">${p.expiry}</small>`:''}</td>
       <td>₹${p.mrp}</td>
-      <td>₹${p.salePrice}${p.category==='medicine' && p.sellType==='loose' && p.pricePerUnit ? `<br><small style="color:#888;">₹${p.pricePerUnit}/pill</small>` : ''}</td>
+      <td>₹${p.salePrice}${p.category==='medicine'&&p.sellType==='loose'&&p.pricePerUnit?`<br><small style="color:#888;">₹${p.pricePerUnit}/pill</small>`:''}</td>
       <td>${stockDisplay}</td>
       <td>${status}</td>
       <td>
@@ -260,54 +300,39 @@ function filterProducts() { renderTable(); }
 
 function onCategoryChange() {
   const cat = document.getElementById('f_category').value;
-  const medFields = document.getElementById('medicineFields');
-  medFields.style.display = cat === 'medicine' ? 'contents' : 'none';
-  if (cat === 'fmcg' || cat === 'other') {
-    document.getElementById('f_gst').value = cat === 'fmcg' ? '5' : '0';
-  }
+  document.getElementById('medicineFields').style.display = cat==='medicine' ? 'contents' : 'none';
+  if (cat==='fmcg') document.getElementById('f_gst').value = '5';
+  else if (cat==='other') document.getElementById('f_gst').value = '0';
 }
 
 function onSellTypeChange() {
   const type = document.getElementById('f_sellType').value;
   const stripFields = document.getElementById('stripFields');
   const infoBox = document.getElementById('stripInfoBox');
-  if (type === 'loose') {
-    stripFields.style.display = 'contents';
-    infoBox.style.display = 'block';
-  } else if (type === 'strip') {
-    stripFields.style.display = 'contents';
-    infoBox.style.display = 'none';
-    document.getElementById('f_looseStock').value = 0;
-  } else {
-    stripFields.style.display = 'none';
-  }
+  if (type==='loose') { stripFields.style.display='contents'; infoBox.style.display='block'; }
+  else if (type==='strip') { stripFields.style.display='contents'; infoBox.style.display='none'; document.getElementById('f_looseStock').value=0; }
+  else { stripFields.style.display='none'; }
 }
 
 function calcUnitPrice() {
-  const mrp = parseFloat(document.getElementById('f_mrp').value) || 0;
-  const ups = parseInt(document.getElementById('f_unitsPerStrip').value) || 10;
-  if (mrp && ups) {
-    document.getElementById('f_pricePerUnit').value = (mrp / ups).toFixed(2);
-  }
+  const mrp = parseFloat(document.getElementById('f_mrp').value)||0;
+  const ups = parseInt(document.getElementById('f_unitsPerStrip').value)||10;
+  if (mrp && ups) document.getElementById('f_pricePerUnit').value = (mrp/ups).toFixed(2);
 }
-
-function calcLoose() {}
 
 function openModal(reset=true) {
   if (reset) {
     editingId = null;
     document.getElementById('modalTitle').textContent = 'Add Item';
     ['f_name','f_generic','f_company','f_batch','f_expiry','f_mrp','f_purchase',
-     'f_sale','f_stock','f_min','f_hsn','f_rack','f_stripStock','f_looseStock'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.value = '';
+     'f_sale','f_stock','f_min','f_hsn','f_rack','f_stripStock','f_looseStock','f_pricePerUnit'].forEach(id => {
+      const el = document.getElementById(id); if (el) el.value = '';
     });
-    document.getElementById('f_gst').value = '12';
+    document.getElementById('f_gst').value = '0';
     document.getElementById('f_unitsPerStrip').value = '10';
     document.getElementById('f_category').value = 'medicine';
     document.getElementById('f_sellType').value = 'strip';
-    onCategoryChange();
-    onSellTypeChange();
+    onCategoryChange(); onSellTypeChange();
   }
   document.getElementById('modalBg').classList.add('show');
 }
@@ -315,22 +340,22 @@ function openModal(reset=true) {
 function closeModal() { document.getElementById('modalBg').classList.remove('show'); }
 
 function editProduct(id) {
-  const p = allProducts.find(x => x._id === id);
+  const p = allProducts.find(x => x._id===id);
   if (!p) return;
   editingId = id;
   document.getElementById('modalTitle').textContent = 'Edit Item';
-  document.getElementById('f_category').value = p.category || 'medicine';
-  document.getElementById('f_name').value = p.name;
+  document.getElementById('f_category').value = p.category||'medicine';
+  document.getElementById('f_name').value = p.name||'';
   document.getElementById('f_generic').value = p.generic||'';
   document.getElementById('f_company').value = p.company||'';
   document.getElementById('f_batch').value = p.batch||'';
   document.getElementById('f_expiry').value = p.expiry||'';
-  document.getElementById('f_mrp').value = p.mrp;
-  document.getElementById('f_purchase').value = p.purchasePrice;
-  document.getElementById('f_sale').value = p.salePrice;
+  document.getElementById('f_mrp').value = p.mrp||'';
+  document.getElementById('f_purchase').value = p.purchasePrice||'';
+  document.getElementById('f_sale').value = p.salePrice||'';
   document.getElementById('f_stock').value = p.stock||0;
   document.getElementById('f_min').value = p.minStock||10;
-  document.getElementById('f_gst').value = p.gst||12;
+  document.getElementById('f_gst').value = p.gst!==undefined ? p.gst : 0;
   document.getElementById('f_hsn').value = p.hsn||'';
   document.getElementById('f_rack').value = p.rack||'';
   document.getElementById('f_sellType').value = p.sellType||'strip';
@@ -338,8 +363,7 @@ function editProduct(id) {
   document.getElementById('f_stripStock').value = p.stripStock||0;
   document.getElementById('f_looseStock').value = p.looseStock||0;
   document.getElementById('f_pricePerUnit').value = p.pricePerUnit||0;
-  onCategoryChange();
-  onSellTypeChange();
+  onCategoryChange(); onSellTypeChange();
   openModal(false);
 }
 
@@ -347,11 +371,9 @@ async function saveProduct() {
   const name = document.getElementById('f_name').value.trim();
   const mrp = parseFloat(document.getElementById('f_mrp').value)||0;
   const salePrice = parseFloat(document.getElementById('f_sale').value)||0;
-  if (!name || !mrp || !salePrice) { alert('Name, MRP aur Sale Price zaroori hai!'); return; }
-
+  if (!name||!mrp||!salePrice) { alert('Name, MRP aur Sale Price zaroori hai!'); return; }
   const data = {
-    name,
-    category: document.getElementById('f_category').value,
+    name, category: document.getElementById('f_category').value,
     generic: document.getElementById('f_generic').value,
     company: document.getElementById('f_company').value,
     batch: document.getElementById('f_batch').value,
@@ -369,18 +391,26 @@ async function saveProduct() {
     looseStock: parseInt(document.getElementById('f_looseStock').value)||0,
     pricePerUnit: parseFloat(document.getElementById('f_pricePerUnit').value)||0
   };
-
-  const url = editingId ? `/api/products/${editingId}` : '/api/products';
-  const method = editingId ? 'PUT' : 'POST';
-  await fetch(url, { method, headers:{'Content-Type':'application/json'}, body:JSON.stringify(data) });
-  closeModal();
-  loadProducts();
+  try {
+    const token = localStorage.getItem('token');
+    const headers = { 'Content-Type':'application/json' };
+    if (token) headers['Authorization'] = 'Bearer ' + token;
+    const url = editingId ? `/api/products/${editingId}` : '/api/products';
+    const method = editingId ? 'PUT' : 'POST';
+    const res = await fetch(url, { method, headers, body: JSON.stringify(data) });
+    if (res.ok) { closeModal(); loadProducts(); }
+    else { const r=await res.json(); alert('Error: '+(r.message||'Something went wrong')); }
+  } catch(e) { alert('Server error!'); }
 }
 
 async function deleteProduct(id) {
   if (!confirm('Delete karna chahte ho?')) return;
-  await fetch(`/api/products/${id}`, { method:'DELETE' });
-  loadProducts();
+  try {
+    const token = localStorage.getItem('token');
+    const headers = token ? { 'Authorization':'Bearer '+token } : {};
+    await fetch(`/api/products/${id}`, { method:'DELETE', headers });
+    loadProducts();
+  } catch(e) { alert('Server error!'); }
 }
 
 checkAuth();
