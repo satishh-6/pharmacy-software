@@ -3,111 +3,251 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Stock - MedXpert</title>
+<title>Stock / Inventory — Dawa Hisaab</title>
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
   body { font-family:'Segoe UI',sans-serif; background:#f0f4f8; }
-  .navbar { background:#1a73e8; color:white; padding:0 24px; display:flex; align-items:center; height:58px; position:fixed; width:100%; top:0; z-index:100; box-shadow:0 2px 8px rgba(0,0,0,0.15); }
-  .navbar h1 { font-size:20px; font-weight:700; flex:1; }
-  .navbar span { font-size:13px; opacity:0.85; margin-right:16px; }
-  .navbar button { background:rgba(255,255,255,0.2); border:none; color:white; padding:7px 16px; border-radius:6px; cursor:pointer; font-size:13px; }
-  .sidebar { position:fixed; left:0; top:58px; width:220px; height:calc(100vh - 58px); background:white; border-right:1px solid #e0e0e0; padding:16px 0; overflow-y:auto; }
-  .sidebar a { display:flex; align-items:center; gap:12px; padding:12px 20px; color:#444; text-decoration:none; font-size:14.5px; border-left:3px solid transparent; transition:all 0.2s; }
-  .sidebar a:hover, .sidebar a.active { background:#e8f0fe; color:#1a73e8; border-left-color:#1a73e8; }
-  .main { margin-left:220px; margin-top:58px; padding:24px; }
-  .top-bar { display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap; align-items:center; }
-  .top-bar input { padding:10px 14px; border:1.5px solid #ddd; border-radius:8px; font-size:14px; width:260px; outline:none; }
-  .top-bar input:focus { border-color:#1a73e8; }
-  .filter-tabs { display:flex; gap:8px; }
-  .tab { padding:9px 18px; border:1.5px solid #ddd; border-radius:8px; cursor:pointer; font-size:13px; background:white; color:#555; font-weight:500; transition:all 0.2s; }
-  .tab.active { background:#1a73e8; color:white; border-color:#1a73e8; }
-  .btn { padding:10px 20px; border:none; border-radius:8px; cursor:pointer; font-size:14px; font-weight:600; transition:all 0.2s; }
-  .btn-primary { background:#1a73e8; color:white; }
-  .btn-primary:hover { background:#1557b0; }
-  .btn-danger { background:#ffebee; color:#c62828; }
-  .btn-edit { background:#e8f0fe; color:#1a73e8; }
-  table { width:100%; border-collapse:collapse; background:white; border-radius:12px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,0.07); }
-  th { background:#f8f9fa; padding:13px 16px; text-align:left; font-size:12px; color:#666; font-weight:600; border-bottom:1px solid #eee; text-transform:uppercase; }
-  td { padding:11px 16px; font-size:13.5px; border-bottom:1px solid #f5f5f5; }
-  tr:hover td { background:#fafafa; }
-  .badge { padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600; }
-  .badge-ok { background:#e8f5e9; color:#2e7d32; }
-  .badge-low { background:#fff3e0; color:#e65100; }
-  .badge-out { background:#ffebee; color:#c62828; }
-  .badge-med { background:#e8f0fe; color:#1a73e8; }
-  .badge-fmcg { background:#f3e5f5; color:#7b1fa2; }
-  .badge-other { background:#f5f5f5; color:#555; }
-  .modal-bg { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:200; align-items:center; justify-content:center; }
+
+  .navbar { background:linear-gradient(135deg,#1B4F72,#154360); color:white; padding:0 24px; display:flex; align-items:center; height:60px; position:fixed; width:100%; top:0; z-index:100; box-shadow:0 4px 20px rgba(27,79,114,0.4); }
+  .navbar h1 { font-size:22px; font-weight:800; flex:1; letter-spacing:-0.5px; }
+  .navbar h1 span { color:#85C1E9; }
+  .nav-right { display:flex; align-items:center; gap:12px; }
+  .nav-badge { background:rgba(255,255,255,0.15); padding:6px 14px; border-radius:20px; font-size:13px; }
+  .btn-logout { background:rgba(255,255,255,0.15); border:1.5px solid rgba(255,255,255,0.4); color:white; padding:7px 18px; border-radius:8px; cursor:pointer; font-size:13px; font-weight:600; }
+  .btn-logout:hover { background:rgba(255,255,255,0.25); }
+
+  .sidebar { position:fixed; left:0; top:60px; width:230px; height:calc(100vh-60px); background:white; border-right:1px solid #e2e8f0; padding:20px 0; overflow-y:auto; box-shadow:2px 0 10px rgba(0,0,0,0.04); }
+  .sidebar-section { padding:8px 20px; font-size:10px; font-weight:700; color:#b0bec5; text-transform:uppercase; letter-spacing:1px; margin-top:12px; }
+  .sidebar a { display:flex; align-items:center; gap:12px; padding:11px 20px; color:#546e7a; text-decoration:none; font-size:14px; border-left:3px solid transparent; transition:all 0.2s; font-weight:500; }
+  .sidebar a:hover { background:#EBF5FB; color:#1B4F72; border-left-color:#1B4F72; }
+  .sidebar a.active { background:linear-gradient(90deg,#EBF5FB,#f0f9ff); color:#1B4F72; border-left-color:#1B4F72; font-weight:700; }
+  .sidebar a .icon { width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:16px; background:#f5f7fa; flex-shrink:0; }
+  .sidebar a.active .icon { background:#EBF5FB; }
+
+  .main { margin-left:230px; margin-top:60px; padding:24px; }
+
+  /* STAT STRIP */
+  .stat-strip { display:grid; grid-template-columns:repeat(5,1fr); gap:14px; margin-bottom:24px; }
+  .stat-mini { background:white; border-radius:14px; padding:16px 18px; box-shadow:0 2px 10px rgba(0,0,0,0.05); border:1px solid rgba(0,0,0,0.04); display:flex; align-items:center; gap:14px; transition:all 0.2s; }
+  .stat-mini:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(0,0,0,0.08); }
+  .stat-mini-icon { width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
+  .stat-mini.navy .stat-mini-icon { background:#EBF5FB; }
+  .stat-mini.green .stat-mini-icon { background:#EAFAF1; }
+  .stat-mini.orange .stat-mini-icon { background:#FEF9E7; }
+  .stat-mini.red .stat-mini-icon { background:#FDEDEC; }
+  .stat-mini.purple .stat-mini-icon { background:#F4ECF7; }
+  .stat-mini-info .label { font-size:11px; color:#90a4ae; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; }
+  .stat-mini-info .value { font-size:22px; font-weight:800; color:#1a2332; margin-top:2px; line-height:1; }
+
+  /* TOP BAR */
+  .top-bar { background:white; border-radius:14px; padding:16px 20px; margin-bottom:20px; display:flex; gap:12px; align-items:center; flex-wrap:wrap; box-shadow:0 2px 10px rgba(0,0,0,0.05); border:1px solid rgba(0,0,0,0.04); }
+  .search-wrap { position:relative; flex:1; min-width:220px; }
+  .search-wrap input { width:100%; padding:10px 14px 10px 40px; border:1.5px solid #e2e8f0; border-radius:10px; font-size:14px; outline:none; transition:border 0.2s; background:#f8fafc; }
+  .search-wrap input:focus { border-color:#1B4F72; background:white; }
+  .search-wrap .s-icon { position:absolute; left:13px; top:50%; transform:translateY(-50%); font-size:16px; pointer-events:none; }
+  .filter-tabs { display:flex; gap:6px; }
+  .tab { padding:9px 16px; border:1.5px solid #e2e8f0; border-radius:10px; cursor:pointer; font-size:13px; background:white; color:#546e7a; font-weight:600; transition:all 0.2s; }
+  .tab:hover { border-color:#1B4F72; color:#1B4F72; }
+  .tab.active { background:#1B4F72; color:white; border-color:#1B4F72; }
+  .btn-add { background:linear-gradient(135deg,#1B4F72,#154360); color:white; border:none; padding:10px 20px; border-radius:10px; font-size:14px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:8px; transition:all 0.2s; white-space:nowrap; }
+  .btn-add:hover { transform:translateY(-1px); box-shadow:0 6px 20px rgba(27,79,114,0.3); }
+
+  /* TABLE */
+  .table-wrap { background:white; border-radius:16px; box-shadow:0 2px 12px rgba(0,0,0,0.05); border:1px solid rgba(0,0,0,0.04); overflow:hidden; }
+  .table-header { padding:16px 20px; border-bottom:1px solid #f0f4f8; display:flex; justify-content:space-between; align-items:center; }
+  .table-title { font-size:15px; font-weight:700; color:#1a2332; }
+  .table-count { background:#EBF5FB; color:#1B4F72; padding:4px 12px; border-radius:20px; font-size:12px; font-weight:700; }
+  table { width:100%; border-collapse:collapse; }
+  thead tr { background:linear-gradient(135deg,#1B4F72,#154360); }
+  thead th { padding:12px 16px; text-align:left; font-size:11px; color:rgba(255,255,255,0.85); font-weight:700; text-transform:uppercase; letter-spacing:0.8px; white-space:nowrap; }
+  tbody tr { border-bottom:1px solid #f8f9fb; transition:background 0.15s; }
+  tbody tr:last-child { border-bottom:none; }
+  tbody tr:hover { background:#f8fafd; }
+  tbody td { padding:13px 16px; font-size:13px; color:#37474f; vertical-align:middle; }
+  .product-name { font-weight:700; color:#1a2332; font-size:14px; }
+  .product-generic { font-size:11px; color:#90a4ae; margin-top:2px; }
+  .product-company { font-size:12px; color:#78909c; }
+
+  /* BADGES */
+  .badge { padding:4px 10px; border-radius:20px; font-size:11px; font-weight:700; display:inline-block; }
+  .badge-med { background:#EBF5FB; color:#1B4F72; }
+  .badge-fmcg { background:#F4ECF7; color:#7D3C98; }
+  .badge-other { background:#ECEFF1; color:#546e7a; }
+  .badge-ok { background:#EAFAF1; color:#1E8449; }
+  .badge-low { background:#FEF9E7; color:#B7770D; }
+  .badge-out { background:#FDEDEC; color:#C0392B; }
+  .badge-exp { background:#FDEDEC; color:#C0392B; }
+  .badge-soon { background:#FEF9E7; color:#B7770D; }
+
+  /* PRICE CELLS */
+  .price { font-weight:700; color:#1a2332; }
+  .price-sale { color:#1B4F72; font-weight:800; }
+  .price-purchase { color:#78909c; font-size:12px; }
+  .stock-qty { font-size:15px; font-weight:800; color:#1a2332; }
+  .stock-detail { font-size:11px; color:#90a4ae; margin-top:2px; }
+
+  /* ACTION BTNS */
+  .action-btns { display:flex; gap:6px; }
+  .btn-edit { background:#EBF5FB; color:#1B4F72; border:none; padding:6px 14px; border-radius:8px; cursor:pointer; font-size:12px; font-weight:700; transition:all 0.2s; }
+  .btn-edit:hover { background:#1B4F72; color:white; }
+  .btn-del { background:#FDEDEC; color:#C0392B; border:none; padding:6px 14px; border-radius:8px; cursor:pointer; font-size:12px; font-weight:700; transition:all 0.2s; }
+  .btn-del:hover { background:#C0392B; color:white; }
+
+  .empty-state { text-align:center; padding:60px 20px; color:#b0bec5; }
+  .empty-state .emoji { font-size:48px; margin-bottom:12px; }
+  .empty-state p { font-size:14px; }
+
+  /* MODAL */
+  .modal-bg { display:none; position:fixed; inset:0; background:rgba(21,67,96,0.5); z-index:200; align-items:flex-start; justify-content:center; overflow-y:auto; padding:20px 0; backdrop-filter:blur(4px); }
   .modal-bg.show { display:flex; }
-  .modal { background:white; border-radius:16px; padding:28px; width:560px; max-height:90vh; overflow-y:auto; }
-  .modal h2 { margin-bottom:20px; font-size:18px; color:#333; }
+  .modal { background:white; border-radius:20px; padding:28px; width:600px; max-width:95vw; margin:0 auto; box-shadow:0 20px 60px rgba(21,67,96,0.2); }
+  .modal-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; padding-bottom:16px; border-bottom:2px solid #EBF5FB; }
+  .modal-title { font-size:18px; font-weight:800; color:#1a2332; }
+  .modal-close { background:#f0f4f8; border:none; width:32px; height:32px; border-radius:8px; cursor:pointer; font-size:16px; display:flex; align-items:center; justify-content:center; transition:all 0.2s; }
+  .modal-close:hover { background:#FDEDEC; color:#C0392B; }
   .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
-  .form-group { display:flex; flex-direction:column; gap:5px; }
+  .form-group { display:flex; flex-direction:column; gap:6px; }
   .form-group.full { grid-column:1/-1; }
-  .form-group label { font-size:12px; color:#666; font-weight:600; text-transform:uppercase; }
-  .form-group input, .form-group select { padding:9px 12px; border:1.5px solid #ddd; border-radius:7px; font-size:14px; outline:none; transition:border 0.2s; }
-  .form-group input:focus, .form-group select:focus { border-color:#1a73e8; }
-  .modal-actions { display:flex; gap:10px; margin-top:20px; justify-content:flex-end; }
-  .section-label { grid-column:1/-1; font-size:12px; font-weight:700; color:#1a73e8; text-transform:uppercase; letter-spacing:0.5px; }
-  .strip-info { background:#e8f0fe; border-radius:8px; padding:10px 14px; font-size:13px; color:#1a73e8; grid-column:1/-1; }
+  .form-group label { font-size:11px; color:#546e7a; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; }
+  .form-group input, .form-group select { padding:10px 12px; border:1.5px solid #e2e8f0; border-radius:10px; font-size:14px; outline:none; transition:border 0.2s; background:#f8fafc; }
+  .form-group input:focus, .form-group select:focus { border-color:#1B4F72; background:white; }
+  .section-divider { grid-column:1/-1; border-top:1.5px solid #EBF5FB; padding-top:4px; margin-top:4px; }
+  .section-label { grid-column:1/-1; font-size:11px; font-weight:800; color:#1B4F72; text-transform:uppercase; letter-spacing:1px; padding:4px 0 2px; border-bottom:2px solid #EBF5FB; }
+  .tip-text { font-size:11px; color:#90a4ae; margin-top:3px; }
+  .modal-footer { display:flex; gap:10px; margin-top:24px; padding-top:16px; border-top:1px solid #f0f4f8; }
+  .btn-cancel { flex:1; padding:12px; background:#f0f4f8; color:#546e7a; border:none; border-radius:10px; cursor:pointer; font-size:14px; font-weight:700; transition:all 0.2s; }
+  .btn-cancel:hover { background:#e2e8f0; }
+  .btn-save { flex:2; padding:12px; background:linear-gradient(135deg,#1B4F72,#154360); color:white; border:none; border-radius:10px; cursor:pointer; font-size:14px; font-weight:700; transition:all 0.2s; }
+  .btn-save:hover { transform:translateY(-1px); box-shadow:0 6px 20px rgba(27,79,114,0.3); }
+
   #medicineFields { display:contents; }
+  #stripFields { display:contents; }
+  .strip-info { grid-column:1/-1; background:#EBF5FB; border-radius:10px; padding:10px 14px; font-size:12px; color:#1B4F72; border-left:3px solid #1B4F72; }
 </style>
 </head>
 <body>
 
 <div class="navbar">
-  <h1>💊 MedXpert Pharmacy</h1>
-  <span id="navUser"></span>
-  <button onclick="logout()">Logout</button>
+  <h1>💊 Dawa <span>Hisaab</span></h1>
+  <div class="nav-right">
+    <div class="nav-badge">👤 <span id="navUser"></span></div>
+    <button class="btn-logout" onclick="logout()">Logout</button>
+  </div>
 </div>
 
 <div class="sidebar">
-  <a href="index.html">🏠 Dashboard</a>
-  <a href="stock.html" class="active">📦 Stock / Inventory</a>
-  <a href="billing.html">🧾 Billing</a>
-  <a href="purchase.html">🛒 Purchase Entry</a>
-  <a href="reports.html">📊 Reports</a>
-  <a href="customers.html">👥 Customers</a>
-  <a href="prescriptions.html">📋 Prescriptions</a>
-  <a href="branches.html">🏪 Branches</a>
+  <div class="sidebar-section">Main Menu</div>
+  <a href="index.html"><div class="icon">🏠</div> Dashboard</a>
+  <a href="stock.html" class="active"><div class="icon">📦</div> Stock / Inventory</a>
+  <a href="billing.html"><div class="icon">🧾</div> Billing</a>
+  <a href="purchase.html"><div class="icon">🛒</div> Purchase Entry</a>
+  <div class="sidebar-section">Management</div>
+  <a href="customers.html"><div class="icon">👥</div> Customers</a>
+  <a href="prescriptions.html"><div class="icon">📋</div> Prescriptions</a>
+  <a href="branches.html"><div class="icon">🏪</div> Branches</a>
+  <a href="reports.html"><div class="icon">📊</div> Reports</a>
+  <div class="sidebar-section">Settings</div>
+  <a href="profile.html"><div class="icon">⚙️</div> My Settings</a>
 </div>
 
 <div class="main">
+
+  <!-- STAT STRIP -->
+  <div class="stat-strip">
+    <div class="stat-mini navy">
+      <div class="stat-mini-icon">📦</div>
+      <div class="stat-mini-info">
+        <div class="label">Total Items</div>
+        <div class="value" id="st-total">—</div>
+      </div>
+    </div>
+    <div class="stat-mini green">
+      <div class="stat-mini-icon">💰</div>
+      <div class="stat-mini-info">
+        <div class="label">Stock Value</div>
+        <div class="value" id="st-value">—</div>
+      </div>
+    </div>
+    <div class="stat-mini orange">
+      <div class="stat-mini-icon">⚠️</div>
+      <div class="stat-mini-info">
+        <div class="label">Low Stock</div>
+        <div class="value" id="st-low">—</div>
+      </div>
+    </div>
+    <div class="stat-mini red">
+      <div class="stat-mini-icon">⏰</div>
+      <div class="stat-mini-info">
+        <div class="label">Expiring</div>
+        <div class="value" id="st-exp">—</div>
+      </div>
+    </div>
+    <div class="stat-mini purple">
+      <div class="stat-mini-icon">🛍️</div>
+      <div class="stat-mini-info">
+        <div class="label">FMCG Items</div>
+        <div class="value" id="st-fmcg">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOP BAR -->
   <div class="top-bar">
-    <input type="text" id="searchInput" placeholder="🔍 Search item..." oninput="filterProducts()" />
+    <div class="search-wrap">
+      <span class="s-icon">🔍</span>
+      <input type="text" id="searchInput" placeholder="Search by name, generic, company..." oninput="filterProducts()" />
+    </div>
     <div class="filter-tabs">
       <div class="tab active" onclick="setFilter('all',this)">All</div>
       <div class="tab" onclick="setFilter('medicine',this)">💊 Medicine</div>
       <div class="tab" onclick="setFilter('fmcg',this)">🛍️ FMCG</div>
       <div class="tab" onclick="setFilter('other',this)">📦 Other</div>
+      <div class="tab" onclick="setFilter('low',this)">⚠️ Low</div>
+      <div class="tab" onclick="setFilter('expiring',this)">⏰ Expiring</div>
     </div>
-    <button class="btn btn-primary" onclick="openModal()">+ Add Item</button>
+    <button class="btn-add" onclick="openModal()">+ Add Item</button>
   </div>
 
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th><th>Category</th><th>Company</th>
-        <th>Batch/Expiry</th><th>MRP</th><th>Sale Price</th>
-        <th>Stock</th><th>Status</th><th>Actions</th>
-      </tr>
-    </thead>
-    <tbody id="productTable">
-      <tr><td colspan="9" style="text-align:center;padding:30px;color:#aaa;">Loading...</td></tr>
-    </tbody>
-  </table>
+  <!-- TABLE -->
+  <div class="table-wrap">
+    <div class="table-header">
+      <div class="table-title">📦 Inventory List</div>
+      <span class="table-count" id="tableCount">0 items</span>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Category</th>
+          <th>Batch / Expiry</th>
+          <th>MRP</th>
+          <th>Sale Price</th>
+          <th>Purchase</th>
+          <th>Stock</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="productTable">
+        <tr><td colspan="9" style="text-align:center;padding:40px;color:#b0bec5;">Loading inventory...</td></tr>
+      </tbody>
+    </table>
+  </div>
 </div>
 
 <!-- ADD/EDIT MODAL -->
 <div class="modal-bg" id="modalBg">
   <div class="modal">
-    <h2 id="modalTitle">Add Item</h2>
-    <div class="form-grid">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle">➕ Add New Item</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
 
+    <div class="form-grid">
       <div class="form-group full">
         <label>Category *</label>
         <select id="f_category" onchange="onCategoryChange()">
-          <option value="medicine">💊 Medicine</option>
+          <option value="medicine">💊 Medicine / Drug</option>
           <option value="fmcg">🛍️ FMCG (Maggi, Chips, etc.)</option>
           <option value="other">📦 Other</option>
         </select>
@@ -118,17 +258,17 @@
         <input id="f_name" placeholder="e.g. Paracetamol 500mg / Maggi 70g" />
       </div>
       <div class="form-group">
-        <label>Generic / Variant</label>
-        <input id="f_generic" placeholder="e.g. Paracetamol / Masala" />
+        <label>Generic / Composition</label>
+        <input id="f_generic" placeholder="e.g. Paracetamol" />
       </div>
       <div class="form-group">
         <label>Company / Brand</label>
         <input id="f_company" placeholder="e.g. Cipla / Nestle" />
       </div>
 
-      <!-- Medicine only fields -->
+      <!-- Medicine Fields -->
       <div id="medicineFields">
-        <div class="form-group full section-label" style="margin-top:4px;">Medicine Details</div>
+        <div class="section-label">Medicine Details</div>
         <div class="form-group">
           <label>Batch No</label>
           <input id="f_batch" placeholder="e.g. BT2024" />
@@ -142,37 +282,36 @@
           <input id="f_hsn" placeholder="e.g. 3004" />
         </div>
         <div class="form-group">
-          <label>GST % <span style="font-size:10px;color:#888;font-weight:400;">(MRP inclusive ho toh 0%)</span></label>
+          <label>GST % <span class="tip-text">(0% if MRP inclusive)</span></label>
           <select id="f_gst">
-            <option value="0" selected>0% (No GST / MRP Inclusive)</option>
-            <option value="5">5%</option>
-            <option value="12">12%</option>
-            <option value="18">18%</option>
-            <option value="28">28%</option>
+            <option value="0" selected>0% — No GST / MRP Inclusive</option>
+            <option value="5">5% GST</option>
+            <option value="12">12% GST</option>
+            <option value="18">18% GST</option>
+            <option value="28">28% GST</option>
           </select>
         </div>
 
-        <div class="form-group full section-label">Selling Type</div>
+        <div class="section-label">Selling Type</div>
         <div class="form-group full">
           <label>How is this sold?</label>
           <select id="f_sellType" onchange="onSellTypeChange()">
-            <option value="strip">Strip only (e.g. full strip of 10)</option>
-            <option value="loose">Strip + Loose pills (e.g. can sell 3 pills from strip)</option>
+            <option value="strip">Strip only (sell full strip)</option>
+            <option value="loose">Strip + Loose pills (sell individual pills)</option>
             <option value="piece">Piece / Bottle / Unit</option>
           </select>
         </div>
-
-        <div id="stripFields" style="display:contents;">
+        <div id="stripFields">
           <div class="strip-info full" id="stripInfoBox">
-            Loose selling: Customer sirf 3 pills bhi le sakta hai — aapko strip mein se nikaal ke dena hoga.
+            💡 Loose selling: Customer 3 pills bhi le sakta hai — strip se nikaal ke dena hoga
           </div>
           <div class="form-group">
             <label>Units Per Strip</label>
             <input id="f_unitsPerStrip" type="number" placeholder="e.g. 10" value="10" oninput="calcUnitPrice()" />
           </div>
           <div class="form-group">
-            <label>Price Per Unit (₹)</label>
-            <input id="f_pricePerUnit" type="number" placeholder="Auto-calculated" readonly style="background:#f9f9f9;" />
+            <label>Price Per Pill (₹)</label>
+            <input id="f_pricePerUnit" type="number" placeholder="Auto-calculated" readonly style="background:#f0f4f8;color:#90a4ae;" />
           </div>
           <div class="form-group">
             <label>Strips in Stock</label>
@@ -186,7 +325,7 @@
       </div>
 
       <!-- Pricing -->
-      <div class="form-group full section-label" style="margin-top:4px;">Pricing</div>
+      <div class="section-label">Pricing & Stock</div>
       <div class="form-group">
         <label>MRP (₹) *</label>
         <input id="f_mrp" type="number" placeholder="0.00" oninput="calcUnitPrice()" />
@@ -211,11 +350,11 @@
         <label>Rack / Location</label>
         <input id="f_rack" placeholder="e.g. A-12" />
       </div>
-
     </div>
-    <div class="modal-actions">
-      <button class="btn" style="background:#f5f5f5;color:#333;" onclick="closeModal()">Cancel</button>
-      <button class="btn btn-primary" onclick="saveProduct()">Save Item</button>
+
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-save" onclick="saveProduct()">💾 Save Item</button>
     </div>
   </div>
 </div>
@@ -225,20 +364,55 @@ let allProducts = [], editingId = null, currentFilter = 'all';
 
 function checkAuth() {
   const user = JSON.parse(localStorage.getItem('user') || 'null');
-  if (!localStorage.getItem('token')) { location.href='index.html'; return; }
-  document.getElementById('navUser').textContent = '👤 ' + (user?.name || '');
+  if (!localStorage.getItem('tenantToken') && !localStorage.getItem('token')) { location.href='index.html'; return; }
+  document.getElementById('navUser').textContent = user?.name || '';
 }
 function logout() { localStorage.clear(); location.href='index.html'; }
 
 async function loadProducts() {
   try {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('tenantToken') || localStorage.getItem('token');
     const headers = token ? { 'Authorization': 'Bearer ' + token } : {};
     const res = await fetch('/api/products', { headers });
     const data = await res.json();
-    allProducts = Array.isArray(data) ? data : (data.products || []);
+    allProducts = Array.isArray(data) ? data : [];
+    updateStats();
     renderTable();
-  } catch(e) { console.error('Load error:', e); }
+  } catch(e) {
+    console.error('Load error:', e);
+    document.getElementById('productTable').innerHTML = '<tr><td colspan="9" style="text-align:center;padding:40px;color:#C0392B;">❌ Error loading products. Refresh karo.</td></tr>';
+  }
+}
+
+function updateStats() {
+  const now = new Date();
+  const in90 = new Date(); in90.setDate(now.getDate()+90);
+
+  const low = allProducts.filter(p => {
+    const qty = p.sellType==='loose' ? (p.stripStock||0)*(p.unitsPerStrip||10)+(p.looseStock||0) : (p.stock||0);
+    return qty <= (p.minStock||10);
+  });
+
+  const exp = allProducts.filter(p => {
+    if (!p.expiry) return false;
+    const parts = p.expiry.split('/');
+    if (parts.length < 2) return false;
+    const d = new Date(parseInt('20'+parts[1]), parseInt(parts[0])-1, 28);
+    return d >= now && d <= in90;
+  });
+
+  const stockValue = allProducts.reduce((a,p) => {
+    const qty = p.sellType==='loose' ? (p.stripStock||0)*(p.unitsPerStrip||10)+(p.looseStock||0) : (p.stock||0);
+    return a + qty*(p.purchasePrice||0);
+  }, 0);
+
+  const fmcg = allProducts.filter(p => p.category==='fmcg');
+
+  document.getElementById('st-total').textContent = allProducts.length;
+  document.getElementById('st-value').textContent = '₹'+(stockValue>=1000?(stockValue/1000).toFixed(1)+'K':stockValue.toFixed(0));
+  document.getElementById('st-low').textContent = low.length;
+  document.getElementById('st-exp').textContent = exp.length;
+  document.getElementById('st-fmcg').textContent = fmcg.length;
 }
 
 function setFilter(f, el) {
@@ -248,70 +422,121 @@ function setFilter(f, el) {
   renderTable();
 }
 
+function filterProducts() { renderTable(); }
+
 function renderTable() {
   const q = document.getElementById('searchInput').value.toLowerCase();
-  let products = allProducts;
-  if (currentFilter !== 'all') products = products.filter(p => p.category === currentFilter);
-  if (q) products = products.filter(p =>
-    (p.name||'').toLowerCase().includes(q) ||
-    (p.generic||'').toLowerCase().includes(q) ||
-    (p.company||'').toLowerCase().includes(q)
-  );
+  const now = new Date();
+  const in90 = new Date(); in90.setDate(now.getDate()+90);
+
+  let products = allProducts.filter(p => {
+    if (q && !(p.name||'').toLowerCase().includes(q) && !(p.generic||'').toLowerCase().includes(q) && !(p.company||'').toLowerCase().includes(q)) return false;
+
+    const qty = p.sellType==='loose' ? (p.stripStock||0)*(p.unitsPerStrip||10)+(p.looseStock||0) : (p.stock||0);
+
+    if (currentFilter === 'medicine') return p.category === 'medicine';
+    if (currentFilter === 'fmcg') return p.category === 'fmcg';
+    if (currentFilter === 'other') return p.category === 'other';
+    if (currentFilter === 'low') return qty <= (p.minStock||10);
+    if (currentFilter === 'expiring') {
+      if (!p.expiry) return false;
+      const parts = p.expiry.split('/');
+      if (parts.length < 2) return false;
+      const d = new Date(parseInt('20'+parts[1]), parseInt(parts[0])-1, 28);
+      return d >= now && d <= in90;
+    }
+    return true;
+  });
+
+  document.getElementById('tableCount').textContent = products.length + ' items';
+
   const tbody = document.getElementById('productTable');
   if (!products.length) {
-    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:30px;color:#aaa;">No items found.</td></tr>';
+    tbody.innerHTML = `<tr><td colspan="9"><div class="empty-state"><div class="emoji">📦</div><p>No items found</p></div></td></tr>`;
     return;
   }
+
   tbody.innerHTML = products.map(p => {
-    const catBadge = p.category==='medicine' ? '<span class="badge badge-med">💊 Medicine</span>'
-      : p.category==='fmcg' ? '<span class="badge badge-fmcg">🛍️ FMCG</span>'
+    // Category badge
+    const catBadge = p.category==='medicine'
+      ? '<span class="badge badge-med">💊 Medicine</span>'
+      : p.category==='fmcg'
+      ? '<span class="badge badge-fmcg">🛍️ FMCG</span>'
       : '<span class="badge badge-other">📦 Other</span>';
-    let stockDisplay='', totalUnits=0;
+
+    // Stock display
+    let qty = 0, stockDisplay = '';
     if (p.category==='medicine' && p.sellType==='loose') {
-      const strips=p.stripStock||0, loose=p.looseStock||0, ups=p.unitsPerStrip||10;
-      totalUnits = strips*ups+loose;
-      stockDisplay = `${strips} strips + ${loose} loose<br><small style="color:#888;">(${totalUnits} units total)</small>`;
+      const strips = p.stripStock||0, loose = p.looseStock||0, ups = p.unitsPerStrip||10;
+      qty = strips*ups+loose;
+      stockDisplay = `<div class="stock-qty">${qty}</div><div class="stock-detail">${strips}s + ${loose} pills</div>`;
     } else {
-      totalUnits = p.stock||0;
-      stockDisplay = `<strong>${totalUnits}</strong>`;
+      qty = p.stock||0;
+      stockDisplay = `<div class="stock-qty">${qty}</div><div class="stock-detail">units</div>`;
     }
+
+    // Status
     const minStock = p.minStock||10;
-    const status = totalUnits===0 ? '<span class="badge badge-out">Out of Stock</span>'
-      : totalUnits<=minStock ? '<span class="badge badge-low">Low Stock</span>'
-      : '<span class="badge badge-ok">In Stock</span>';
+    let statusBadge = '';
+    if (qty === 0) statusBadge = '<span class="badge badge-out">Out of Stock</span>';
+    else if (qty <= minStock) statusBadge = '<span class="badge badge-low">Low Stock</span>';
+    else statusBadge = '<span class="badge badge-ok">In Stock</span>';
+
+    // Expiry
+    let expiryDisplay = '-';
+    if (p.expiry) {
+      const parts = p.expiry.split('/');
+      if (parts.length >= 2) {
+        const d = new Date(parseInt('20'+parts[1]), parseInt(parts[0])-1, 28);
+        const isExp = d < now;
+        const isSoon = d >= now && d <= in90;
+        expiryDisplay = `<div>${p.batch||'-'}</div>
+          <div style="margin-top:3px;">
+            <span class="badge ${isExp?'badge-exp':isSoon?'badge-soon':''}" style="${!isExp&&!isSoon?'background:transparent;color:#90a4ae;padding:0;':''}">${p.expiry}${isExp?' ⚠️Expired':isSoon?' ⚡Soon':''}</span>
+          </div>`;
+      }
+    } else {
+      expiryDisplay = `<div>${p.batch||'-'}</div><div style="color:#b0bec5;font-size:11px;">No expiry</div>`;
+    }
+
     return `<tr>
-      <td><strong>${p.name}</strong>${p.generic?`<br><small style="color:#888;">${p.generic}</small>`:''}</td>
-      <td>${catBadge}</td>
-      <td>${p.company||'-'}</td>
-      <td>${p.batch||'-'}${p.expiry?`<br><small style="color:#e65100;">${p.expiry}</small>`:''}</td>
-      <td>₹${p.mrp}</td>
-      <td>₹${p.salePrice}${p.category==='medicine'&&p.sellType==='loose'&&p.pricePerUnit?`<br><small style="color:#888;">₹${p.pricePerUnit}/pill</small>`:''}</td>
-      <td>${stockDisplay}</td>
-      <td>${status}</td>
       <td>
-        <button class="btn btn-edit" style="padding:5px 12px;font-size:12px;margin-right:5px;" onclick="editProduct('${p._id}')">Edit</button>
-        <button class="btn btn-danger" style="padding:5px 12px;font-size:12px;" onclick="deleteProduct('${p._id}')">Delete</button>
+        <div class="product-name">${p.name}</div>
+        ${p.generic ? `<div class="product-generic">${p.generic}</div>` : ''}
+        ${p.rack ? `<div style="font-size:11px;color:#b0bec5;margin-top:2px;">📍 ${p.rack}</div>` : ''}
+      </td>
+      <td>${catBadge}<div class="product-company" style="margin-top:4px;">${p.company||'-'}</div></td>
+      <td>${expiryDisplay}</td>
+      <td><div class="price">₹${p.mrp||0}</div></td>
+      <td><div class="price-sale">₹${p.salePrice||0}</div>${p.category==='medicine'&&p.pricePerUnit?`<div class="price-purchase">₹${p.pricePerUnit}/pill</div>`:''}</td>
+      <td><div class="price-purchase" style="font-size:13px;color:#546e7a;">₹${p.purchasePrice||0}</div></td>
+      <td>${stockDisplay}</td>
+      <td>${statusBadge}</td>
+      <td>
+        <div class="action-btns">
+          <button class="btn-edit" onclick="editProduct('${p._id}')">✏️ Edit</button>
+          <button class="btn-del" onclick="deleteProduct('${p._id}')">🗑️</button>
+        </div>
       </td>
     </tr>`;
   }).join('');
 }
 
-function filterProducts() { renderTable(); }
-
+// MODAL
 function onCategoryChange() {
   const cat = document.getElementById('f_category').value;
   document.getElementById('medicineFields').style.display = cat==='medicine' ? 'contents' : 'none';
-  if (cat==='fmcg') document.getElementById('f_gst').value = '5';
-  else if (cat==='other') document.getElementById('f_gst').value = '0';
+  if (cat==='fmcg') document.getElementById('f_gst').value='5';
+  else if (cat==='other') document.getElementById('f_gst').value='0';
 }
 
 function onSellTypeChange() {
   const type = document.getElementById('f_sellType').value;
-  const stripFields = document.getElementById('stripFields');
-  const infoBox = document.getElementById('stripInfoBox');
-  if (type==='loose') { stripFields.style.display='contents'; infoBox.style.display='block'; }
-  else if (type==='strip') { stripFields.style.display='contents'; infoBox.style.display='none'; document.getElementById('f_looseStock').value=0; }
-  else { stripFields.style.display='none'; }
+  const sf = document.getElementById('stripFields');
+  const info = document.getElementById('stripInfoBox');
+  if (type==='loose') { sf.style.display='contents'; info.style.display='block'; }
+  else if (type==='strip') { sf.style.display='contents'; info.style.display='none'; }
+  else { sf.style.display='none'; }
 }
 
 function calcUnitPrice() {
@@ -323,27 +548,26 @@ function calcUnitPrice() {
 function openModal(reset=true) {
   if (reset) {
     editingId = null;
-    document.getElementById('modalTitle').textContent = 'Add Item';
-    ['f_name','f_generic','f_company','f_batch','f_expiry','f_mrp','f_purchase',
-     'f_sale','f_stock','f_min','f_hsn','f_rack','f_stripStock','f_looseStock','f_pricePerUnit'].forEach(id => {
-      const el = document.getElementById(id); if (el) el.value = '';
+    document.getElementById('modalTitle').textContent = '➕ Add New Item';
+    ['f_name','f_generic','f_company','f_batch','f_expiry','f_mrp','f_purchase','f_sale','f_stock','f_min','f_hsn','f_rack','f_stripStock','f_looseStock','f_pricePerUnit'].forEach(id => {
+      const el = document.getElementById(id); if(el) el.value='';
     });
-    document.getElementById('f_gst').value = '0';
-    document.getElementById('f_unitsPerStrip').value = '10';
-    document.getElementById('f_category').value = 'medicine';
-    document.getElementById('f_sellType').value = 'strip';
+    document.getElementById('f_gst').value='0';
+    document.getElementById('f_unitsPerStrip').value='10';
+    document.getElementById('f_category').value='medicine';
+    document.getElementById('f_sellType').value='strip';
     onCategoryChange(); onSellTypeChange();
   }
   document.getElementById('modalBg').classList.add('show');
 }
 
-function closeModal() { document.getElementById('modalBg').classList.remove('show'); }
+function closeModal() { document.getElementById('modalBg').classList.remove('show'); editingId=null; }
 
 function editProduct(id) {
   const p = allProducts.find(x => x._id===id);
   if (!p) return;
   editingId = id;
-  document.getElementById('modalTitle').textContent = 'Edit Item';
+  document.getElementById('modalTitle').textContent = '✏️ Edit Item';
   document.getElementById('f_category').value = p.category||'medicine';
   document.getElementById('f_name').value = p.name||'';
   document.getElementById('f_generic').value = p.generic||'';
@@ -355,7 +579,7 @@ function editProduct(id) {
   document.getElementById('f_sale').value = p.salePrice||'';
   document.getElementById('f_stock').value = p.stock||0;
   document.getElementById('f_min').value = p.minStock||10;
-  document.getElementById('f_gst').value = p.gst!==undefined ? p.gst : 0;
+  document.getElementById('f_gst').value = p.gst!==undefined?p.gst:0;
   document.getElementById('f_hsn').value = p.hsn||'';
   document.getElementById('f_rack').value = p.rack||'';
   document.getElementById('f_sellType').value = p.sellType||'strip';
@@ -372,6 +596,7 @@ async function saveProduct() {
   const mrp = parseFloat(document.getElementById('f_mrp').value)||0;
   const salePrice = parseFloat(document.getElementById('f_sale').value)||0;
   if (!name||!mrp||!salePrice) { alert('Name, MRP aur Sale Price zaroori hai!'); return; }
+
   const data = {
     name, category: document.getElementById('f_category').value,
     generic: document.getElementById('f_generic').value,
@@ -391,10 +616,10 @@ async function saveProduct() {
     looseStock: parseInt(document.getElementById('f_looseStock').value)||0,
     pricePerUnit: parseFloat(document.getElementById('f_pricePerUnit').value)||0
   };
+
   try {
-    const token = localStorage.getItem('token');
-    const headers = { 'Content-Type':'application/json' };
-    if (token) headers['Authorization'] = 'Bearer ' + token;
+    const token = localStorage.getItem('tenantToken') || localStorage.getItem('token');
+const headers = { 'Content-Type':'application/json', 'Authorization':'Bearer '+(token||'') };
     const url = editingId ? `/api/products/${editingId}` : '/api/products';
     const method = editingId ? 'PUT' : 'POST';
     const res = await fetch(url, { method, headers, body: JSON.stringify(data) });
@@ -404,14 +629,15 @@ async function saveProduct() {
 }
 
 async function deleteProduct(id) {
-  if (!confirm('Delete karna chahte ho?')) return;
+  if (!confirm('Delete karna chahte ho? Stock bhi remove ho jaayega.')) return;
   try {
-    const token = localStorage.getItem('token');
-    const headers = token ? { 'Authorization':'Bearer '+token } : {};
-    await fetch(`/api/products/${id}`, { method:'DELETE', headers });
+    const token = localStorage.getItem('tenantToken') || localStorage.getItem('token');
+await fetch(`/api/products/${id}`, { method:'DELETE', headers:{'Authorization':'Bearer '+(token||'')} });
     loadProducts();
   } catch(e) { alert('Server error!'); }
 }
+
+document.getElementById('modalBg').addEventListener('click', e => { if(e.target===document.getElementById('modalBg')) closeModal(); });
 
 checkAuth();
 loadProducts();

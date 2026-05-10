@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Settings — Dawa Hisaab</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Segoe UI',sans-serif; background:#eef2f7; }
+
+  .navbar { background:linear-gradient(135deg,#1B4F72,#154360); color:white; padding:0 24px; display:flex; align-items:center; height:60px; position:fixed; width:100%; top:0; z-index:100; box-shadow:0 4px 20px rgba(27,79,114,0.45); }
+  .navbar h1 { font-size:22px; font-weight:800; flex:1; }
+  .navbar h1 span { color:#85C1E9; }
+  .nav-right { display:flex; align-items:center; gap:10px; }
+  .nav-badge { background:rgba(255,255,255,0.15); padding:6px 14px; border-radius:20px; font-size:12px; }
+  .btn-logout { background:transparent; border:1.5px solid rgba(255,255,255,0.5); color:white; padding:7px 16px; border-radius:8px; cursor:pointer; font-size:13px; font-weight:600; }
+  .btn-back { background:rgba(255,255,255,0.15); border:1.5px solid rgba(255,255,255,0.3); color:white; padding:7px 16px; border-radius:8px; cursor:pointer; font-size:13px; font-weight:600; }
+
+  .sidebar { position:fixed; left:0; top:60px; width:225px; height:calc(100vh - 60px); background:white; border-right:1px solid #e2e8f0; padding:16px 0; overflow-y:auto; }
+  .sidebar-section { padding:10px 20px 4px; font-size:10px; font-weight:800; color:#b0bec5; text-transform:uppercase; letter-spacing:1px; }
+  .sidebar a { display:flex; align-items:center; gap:10px; padding:10px 20px; color:#546e7a; text-decoration:none; font-size:13.5px; border-left:3px solid transparent; transition:all 0.2s; font-weight:500; }
+  .sidebar a:hover { background:#EBF5FB; color:#1B4F72; border-left-color:#1B4F72; }
+  .sidebar a.active { background:#EBF5FB; color:#1B4F72; border-left-color:#1B4F72; font-weight:700; }
+  .sidebar a .sicon { width:30px; height:30px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:15px; background:#f5f7fa; flex-shrink:0; }
+
+  .main { margin-left:225px; margin-top:60px; padding:24px; }
+
+  .page-hdr { display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; }
+  .page-title { font-size:22px; font-weight:800; color:#1a2332; }
+  .page-sub { font-size:13px; color:#78909c; margin-top:3px; }
+
+  .profile-banner { background:linear-gradient(135deg,#1B4F72,#154360); border-radius:16px; padding:24px 28px; margin-bottom:24px; display:flex; align-items:center; gap:20px; position:relative; overflow:hidden; }
+  .profile-banner::before { content:''; position:absolute; top:-30px; right:-30px; width:180px; height:180px; background:rgba(255,255,255,0.06); border-radius:50%; }
+  .profile-banner::after { content:''; position:absolute; bottom:-40px; right:100px; width:120px; height:120px; background:rgba(255,255,255,0.04); border-radius:50%; }
+  .profile-avatar { width:72px; height:72px; border-radius:18px; background:rgba(255,255,255,0.2); display:flex; align-items:center; justify-content:center; font-size:32px; flex-shrink:0; position:relative; z-index:1; border:2px solid rgba(255,255,255,0.3); }
+  .profile-info { flex:1; position:relative; z-index:1; }
+  .profile-name { font-size:20px; font-weight:800; color:white; }
+  .profile-sub { font-size:13px; color:rgba(255,255,255,0.7); margin-top:4px; }
+  .profile-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .pbadge { background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.3); color:white; font-size:11px; font-weight:700; padding:4px 12px; border-radius:20px; }
+  .pbadge.green { background:rgba(39,174,96,0.3); border-color:rgba(39,174,96,0.5); }
+
+  .tabs-wrap { display:flex; gap:4px; background:white; border-radius:14px; padding:6px; margin-bottom:20px; box-shadow:0 2px 10px rgba(0,0,0,0.05); border:1px solid rgba(0,0,0,0.04); overflow-x:auto; }
+  .tab-btn { padding:10px 20px; border:none; border-radius:10px; cursor:pointer; font-size:13px; font-weight:700; color:#546e7a; background:transparent; transition:all 0.2s; white-space:nowrap; display:flex; align-items:center; gap:7px; }
+  .tab-btn:hover { background:#f0f4f8; color:#1B4F72; }
+  .tab-btn.active { background:linear-gradient(135deg,#1B4F72,#154360); color:white; box-shadow:0 4px 12px rgba(27,79,114,0.25); }
+  .tab-content { display:none; }
+  .tab-content.active { display:block; }
+
+  .card { background:white; border-radius:14px; padding:24px; box-shadow:0 2px 12px rgba(0,0,0,0.06); border:1px solid rgba(0,0,0,0.04); margin-bottom:18px; }
+  .card-hdr { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; padding-bottom:14px; border-bottom:2px solid #EBF5FB; }
+  .card-title { font-size:15px; font-weight:800; color:#1a2332; display:flex; align-items:center; gap:8px; }
+  .card-sub { font-size:12px; color:#78909c; margin-top:3px; }
+
+  .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .form-group { display:flex; flex-direction:column; gap:5px; }
+  .form-group.full { grid-column:1/-1; }
+  .form-group label { font-size:10.5px; color:#78909c; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; }
+  .form-group input, .form-group select, .form-group textarea { padding:10px 12px; border:1.5px solid #e2e8f0; border-radius:8px; font-size:14px; outline:none; transition:all 0.2s; background:#f8fafc; color:#333; }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color:#1B4F72; background:white; box-shadow:0 0 0 3px rgba(27,79,114,0.08); }
+  .form-group input:disabled { background:#f0f4f8; color:#90a4ae; cursor:not-allowed; }
+  .locked-badge { display:inline-flex; align-items:center; gap:5px; background:#FEF9E7; color:#B7770D; font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px; margin-top:4px; border:1px solid #F9E79F; }
+
+  .section-lbl { grid-column:1/-1; font-size:11px; font-weight:800; color:#1B4F72; text-transform:uppercase; letter-spacing:0.8px; padding:8px 0 4px; border-bottom:2px solid #EBF5FB; margin-top:4px; }
+
+  .btn { padding:10px 20px; border:none; border-radius:9px; cursor:pointer; font-size:13.5px; font-weight:700; transition:all 0.2s; display:inline-flex; align-items:center; gap:7px; }
+  .btn:hover { transform:translateY(-1px); }
+  .btn-primary { background:linear-gradient(135deg,#1B4F72,#154360); color:white; }
+  .btn-primary:hover { box-shadow:0 6px 20px rgba(27,79,114,0.3); }
+  .btn-danger { background:#FDEDEC; color:#C0392B; border:1px solid #F1948A; }
+  .btn-danger:hover { background:#C0392B; color:white; }
+  .btn-success { background:#EAFAF1; color:#1E8449; border:1px solid #A9DFBF; }
+  .btn-success:hover { background:#1E8449; color:white; }
+  .btn-secondary { background:#f0f4f8; color:#546e7a; }
+  .btn-secondary:hover { background:#e2e8f0; }
+
+  .logo-upload-area { border:2.5px dashed #D6EAF8; border-radius:14px; padding:32px; text-align:center; cursor:pointer; transition:all 0.2s; background:#f8faff; }
+  .logo-upload-area:hover { border-color:#1B4F72; background:#EBF5FB; }
+  .logo-upload-area.has-logo { border-color:#1E8449; border-style:solid; background:#EAFAF1; }
+  .logo-preview-img { max-width:180px; max-height:100px; object-fit:contain; border-radius:10px; }
+
+  .staff-card { background:#f8fafc; border-radius:12px; padding:16px 18px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; border:1px solid #e2e8f0; transition:all 0.2s; }
+  .staff-card:hover { border-color:#D6EAF8; box-shadow:0 2px 10px rgba(27,79,114,0.08); }
+  .staff-avatar { width:42px; height:42px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:800; color:white; flex-shrink:0; margin-right:14px; }
+  .role-badge { padding:3px 10px; border-radius:20px; font-size:11px; font-weight:700; }
+  .role-owner { background:#EBF5FB; color:#1B4F72; }
+  .role-manager { background:#EAFAF1; color:#1E8449; }
+  .role-staff { background:#f0f4f8; color:#546e7a; }
+
+  .bill-preview { background:linear-gradient(135deg,#f8faff,#EBF5FB); border-radius:12px; padding:20px; border:1px solid #D6EAF8; }
+  .bill-preview-hdr { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px; padding-bottom:12px; border-bottom:2px solid #1B4F72; }
+  .bill-preview-name { font-size:16px; font-weight:800; color:#1B4F72; }
+  .bill-preview-type { font-size:12px; font-weight:700; color:#1B4F72; text-align:right; }
+
+  .info-box { background:#EBF5FB; border-radius:10px; padding:14px 16px; border-left:4px solid #1B4F72; font-size:13px; color:#1B4F72; margin-bottom:16px; line-height:1.6; }
+  .warning-box { background:#FEF9E7; border-radius:10px; padding:14px 16px; border-left:4px solid #F39C12; font-size:13px; color:#B7770D; margin-bottom:16px; line-height:1.6; }
+
+  .save-bar { position:sticky; bottom:0; background:white; border-top:1px solid #e2e8f0; padding:14px 0; margin-top:20px; display:flex; gap:10px; align-items:center; }
+
+  .notif { position:fixed; top:74px; right:20px; padding:12px 20px; border-radius:10px; font-size:13px; font-weight:700; color:white; z-index:9999; box-shadow:0 4px 16px rgba(0,0,0,0.22); max-width:320px; display:none; transition:opacity 0.3s; }
+
+  .modal-bg { display:none; position:fixed; inset:0; background:rgba(21,67,96,0.55); z-index:300; align-items:center; justify-content:center; backdrop-filter:blur(3px); }
+  .modal-bg.open { display:flex; }
+  .modal { background:white; border-radius:18px; padding:28px; width:480px; max-width:96vw; box-shadow:0 24px 64px rgba(21,67,96,0.22); }
+  .modal-hdr { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; padding-bottom:14px; border-bottom:2px solid #EBF5FB; }
+  .modal-title { font-size:17px; font-weight:800; color:#1a2332; }
+  .modal-close { background:#f0f4f8; border:none; width:32px; height:32px; border-radius:8px; cursor:pointer; font-size:16px; }
+  .modal-close:hover { background:#FDEDEC; color:#C0392B; }
+
+  /* GST Status */
+  .gst-result { display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin-top:8px; }
+  .gst-tag { padding:3px 10px; border-radius:10px; font-size:11px; font-weight:700; }
+</style>
+</head>
+<body>
+
+<div class="navbar">
+  <h1>💊 Dawa <span>Hisaab</span></h1>
+  <div class="nav-right">
+    <div class="nav-badge">👤 <span id="navUser"></span></div>
+    <button class="btn-back" onclick="location.href='billing.html'">← Billing</button>
+    <button class="btn-logout" onclick="logout()">Logout</button>
+  </div>
+</div>
+
+<div class="sidebar">
+  <div class="sidebar-section">Main Menu</div>
+  <a href="index.html"><div class="sicon">🏠</div> Dashboard</a>
+  <a href="stock.html"><div class="sicon">📦</div> Stock / Inventory</a>
+  <a href="billing.html"><div class="sicon">🧾</div> Billing</a>
+  <a href="purchase.html"><div class="sicon">🛒</div> Purchase Entry</a>
+  <div class="sidebar-section">Management</div>
+  <a href="customers.html"><div class="sicon">👥</div> Customers</a>
+  <a href="prescriptions.html"><div class="sicon">📋</div> Prescriptions</a>
+  <a href="branches.html"><div class="sicon">🏪</div> Branches</a>
+  <a href="reports.html"><div class="sicon">📊</div> Reports</a>
+  <div class="sidebar-section">Settings</div>
+  <a href="profile.html" class="active"><div class="sicon">⚙️</div> My Settings</a>
+</div>
+
+<div class="main">
+
+  <div class="notif" id="notifEl"></div>
+
+  <!-- PROFILE BANNER -->
+  <div class="profile-banner">
+    <div class="profile-avatar" id="bannerAvatar">🏥</div>
+    <div class="profile-info">
+      <div class="profile-name" id="bannerName">Loading...</div>
+      <div class="profile-sub" id="bannerSub">Pharmacy Settings</div>
+      <div class="profile-badges">
+        <span class="pbadge">⚙️ Settings</span>
+        <span class="pbadge green" id="bannerRole">Owner</span>
+      </div>
+    </div>
+    <div style="position:relative;z-index:1;text-align:right;">
+      <div id="logoSmall" style="display:none;">
+        <img id="logoSmallImg" style="max-width:80px;max-height:50px;object-fit:contain;border-radius:8px;background:rgba(255,255,255,0.1);padding:4px;" />
+        <div style="font-size:11px;color:rgba(255,255,255,0.6);margin-top:4px;">Your Logo</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs-wrap">
+    <button class="tab-btn active" onclick="showTab('business',this)">🏥 Business Info</button>
+    <button class="tab-btn" onclick="showTab('logo',this)">🖼️ Logo & Brand</button>
+    <button class="tab-btn" onclick="showTab('staff',this)" id="staffTabBtn">👥 Staff</button>
+    <button class="tab-btn" onclick="showTab('billing',this)">🧾 Bill Settings</button>
+    <button class="tab-btn" onclick="showTab('security',this)">🔐 Security</button>
+  </div>
+
+  <!-- ══ TAB 1: BUSINESS INFO ══ -->
+  <div class="tab-content active" id="tab-business">
+    <div class="card">
+      <div class="card-hdr">
+        <div>
+          <div class="card-title">🏥 Pharmacy / Business Details</div>
+          <div class="card-sub">Yeh details bills aur invoices pe print hongi</div>
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="form-group full">
+          <label>Pharmacy / Business Name *</label>
+          <input id="s_pharmacyName" placeholder="e.g. Sharma Medical Store" />
+        </div>
+        <div class="form-group full">
+          <label>Owner Name</label>
+          <input id="s_ownerName" disabled />
+          <span class="locked-badge">🔒 Locked — Super Admin se change karwayein</span>
+        </div>
+        <div class="section-lbl">📍 Address</div>
+        <div class="form-group full">
+          <label>Address Line 1</label>
+          <input id="s_addr1" placeholder="e.g. Shop No. 5, Gandhi Road" />
+        </div>
+        <div class="form-group full">
+          <label>Address Line 2 (City, State, PIN)</label>
+          <input id="s_addr2" placeholder="e.g. Indore, MP — 452001" />
+        </div>
+        <div class="section-lbl">📞 Contact Info</div>
+        <div class="form-group">
+          <label>Phone Number</label>
+          <input id="s_phone" placeholder="e.g. 9876543210" />
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input id="s_email" type="email" placeholder="pharmacy@gmail.com" />
+        </div>
+        <div class="section-lbl">📄 Legal Info</div>
+        <div class="form-group">
+          <label>GST Number <span style="color:#78909c;font-size:10px;">(Optional)</span></label>
+          <input id="s_gst" placeholder="e.g. 23XXXXX1234Z1" maxlength="15"
+            style="text-transform:uppercase;"
+            oninput="this.value=this.value.toUpperCase();document.getElementById('myGstStatus').innerHTML=''" />
+          <div style="display:flex;gap:8px;margin-top:8px;align-items:center;flex-wrap:wrap;">
+            <button type="button" onclick="verifyMyGST()"
+              style="padding:7px 16px;background:#EBF5FB;color:#1B4F72;border:1.5px solid #1B4F72;border-radius:8px;cursor:pointer;font-size:12px;font-weight:700;">
+              🔍 Verify GST
+            </button>
+            <div id="myGstStatus" style="font-size:12px;"></div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Drug License No <span style="color:#78909c;font-size:10px;">(Optional)</span></label>
+          <input id="s_license" placeholder="e.g. DL/MP/123456" />
+        </div>
+        <div class="form-group full">
+          <label>Authorized Signatory (Bill pe)</label>
+          <input id="s_signatory" placeholder="e.g. Dr. Ramesh Sharma / Proprietor" />
+        </div>
+      </div>
+      <div class="save-bar">
+        <button class="btn btn-primary" onclick="saveSettings()">💾 Save Business Info</button>
+        <span id="saveStatus" style="font-size:13px;color:#78909c;"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TAB 2: LOGO & BRAND ══ -->
+  <div class="tab-content" id="tab-logo">
+    <div class="card">
+      <div class="card-hdr">
+        <div>
+          <div class="card-title">🖼️ Pharmacy Logo</div>
+          <div class="card-sub">Logo bills aur invoices pe dikhega</div>
+        </div>
+      </div>
+      <div class="logo-upload-area" id="logoZone" onclick="document.getElementById('logoFile').click()">
+        <div id="logoPlaceholder">
+          <div style="font-size:48px;margin-bottom:10px;">🏥</div>
+          <div style="font-size:15px;font-weight:700;color:#1B4F72;">Click to upload logo</div>
+          <div style="font-size:12px;color:#78909c;margin-top:6px;">PNG, JPG — max 2MB • Recommended: 300x150px</div>
+        </div>
+        <img id="logoPreview" class="logo-preview-img" style="display:none;" />
+      </div>
+      <input type="file" id="logoFile" accept="image/*" style="display:none;" onchange="previewLogo(event)" />
+      <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;">
+        <button class="btn btn-primary" onclick="saveLogo()">💾 Save Logo</button>
+        <button class="btn btn-danger" onclick="removeLogo()">🗑️ Remove Logo</button>
+      </div>
+      <div class="info-box" style="margin-top:16px;">
+        💡 Logo nahi hai toh bills mein pharmacy ka naam automatically bold dikhega. PNG format transparent background ke saath best lagta hai.
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-hdr">
+        <div>
+          <div class="card-title">💬 Bill Footer Message</div>
+          <div class="card-sub">Har bill ke neeche yeh message print hoga</div>
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:16px;">
+        <label>Footer Text</label>
+        <input id="s_footer" placeholder="e.g. Thank you! Get well soon. Visit again."
+          oninput="document.getElementById('footerPreview').textContent=this.value||'Thank you! Get well soon.'" />
+      </div>
+      <div style="background:#f8fafc;border-radius:10px;padding:14px;border:1px solid #e2e8f0;margin-bottom:16px;">
+        <div style="font-size:11px;color:#78909c;font-weight:700;text-transform:uppercase;margin-bottom:6px;">Preview</div>
+        <div style="font-size:13px;color:#1B4F72;font-weight:600;text-align:center;border-top:1px solid #e2e8f0;padding-top:10px;" id="footerPreview">Thank you! Get well soon.</div>
+      </div>
+      <button class="btn btn-primary" onclick="saveSettings()">💾 Save Footer</button>
+    </div>
+  </div>
+
+  <!-- ══ TAB 3: STAFF ══ -->
+  <div class="tab-content" id="tab-staff">
+    <div class="info-box">
+      👥 Staff members pharmacy system access kar sakte hain. Owner ka account lock hota hai. Max 5 staff (Owner + 4).
+    </div>
+    <div class="card">
+      <div class="card-hdr">
+        <div>
+          <div class="card-title">👥 Staff Management</div>
+          <div class="card-sub" id="staffCount">Loading...</div>
+        </div>
+        <button class="btn btn-primary" onclick="openAddStaff()">+ Add Staff</button>
+      </div>
+      <div id="staffList"><p style="color:#b0bec5;text-align:center;padding:20px;">Loading...</p></div>
+    </div>
+    <div class="card">
+      <div class="card-hdr">
+        <div class="card-title">🎭 Role Permissions</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;">
+        <div style="background:#EBF5FB;border-radius:12px;padding:16px;border:1px solid #D6EAF8;">
+          <div style="font-size:18px;margin-bottom:8px;">👑</div>
+          <div style="font-weight:800;color:#1B4F72;margin-bottom:6px;">Owner</div>
+          <div style="font-size:12px;color:#546e7a;line-height:1.7;">Full access · Settings · Staff manage · All reports · Cannot be deleted</div>
+        </div>
+        <div style="background:#EAFAF1;border-radius:12px;padding:16px;border:1px solid #A9DFBF;">
+          <div style="font-size:18px;margin-bottom:8px;">👔</div>
+          <div style="font-weight:800;color:#1E8449;margin-bottom:6px;">Manager</div>
+          <div style="font-size:12px;color:#546e7a;line-height:1.7;">Billing · Stock · Customers · Purchase · Reports · No settings access</div>
+        </div>
+        <div style="background:#f8fafc;border-radius:12px;padding:16px;border:1px solid #e2e8f0;">
+          <div style="font-size:18px;margin-bottom:8px;">👤</div>
+          <div style="font-weight:800;color:#546e7a;margin-bottom:6px;">Staff</div>
+          <div style="font-size:12px;color:#546e7a;line-height:1.7;">Billing only · View stock · Limited access</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TAB 4: BILL SETTINGS ══ -->
+  <div class="tab-content" id="tab-billing">
+    <div class="card">
+      <div class="card-hdr">
+        <div>
+          <div class="card-title">🧾 Default Bill Settings</div>
+          <div class="card-sub">Har bill pe yeh settings default apply hongi</div>
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Default Bill Type</label>
+          <select id="s_billType" onchange="updateBillPreview()">
+            <option value="Retail Invoice">🏪 Retail Invoice</option>
+            <option value="Tax Invoice">🧾 Tax Invoice (GST)</option>
+            <option value="Bill of Supply">📄 Bill of Supply</option>
+            <option value="Cash Memo">💵 Cash Memo</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Default Payment Mode</label>
+          <select id="s_defPayment">
+            <option value="cash">💵 Cash</option>
+            <option value="upi">📱 UPI</option>
+            <option value="card">💳 Card</option>
+          </select>
+        </div>
+        <div class="form-group full">
+          <label>Bill Number Prefix</label>
+          <input id="s_billPrefix" placeholder="e.g. INV, BILL, RX" maxlength="6" />
+          <span style="font-size:11px;color:#78909c;margin-top:3px;">Bills will be: INV-001, INV-002...</span>
+        </div>
+      </div>
+      <div style="margin-top:20px;margin-bottom:16px;">
+        <div style="font-size:11px;color:#78909c;font-weight:700;text-transform:uppercase;margin-bottom:10px;">📄 Bill Preview</div>
+        <div class="bill-preview">
+          <div class="bill-preview-hdr">
+            <div>
+              <div class="bill-preview-name" id="prev-pharma">Dawa Hisaab Pharmacy</div>
+              <div style="font-size:11px;color:#78909c;margin-top:2px;" id="prev-addr">Your Address Here</div>
+            </div>
+            <div class="bill-preview-type">
+              <div style="font-size:14px;font-weight:800;" id="prev-btype">Retail Invoice</div>
+              <div style="font-size:11px;color:#78909c;margin-top:2px;">Bill No: INV-001</div>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:#78909c;">
+            <span>Customer: Walk-in Customer</span>
+            <span id="prev-date">Date: Today</span>
+          </div>
+          <div style="margin-top:12px;background:white;border-radius:8px;padding:10px;border:1px solid #e2e8f0;">
+            <div style="display:grid;grid-template-columns:3fr 1fr 1fr 1fr;font-size:11px;font-weight:700;color:#1B4F72;border-bottom:1px solid #e2e8f0;padding-bottom:6px;margin-bottom:6px;">
+              <span>Item</span><span>Qty</span><span>Rate</span><span>Amt</span>
+            </div>
+            <div style="display:grid;grid-template-columns:3fr 1fr 1fr 1fr;font-size:12px;color:#546e7a;">
+              <span>Sample Medicine</span><span>2</span><span>₹50</span><span>₹100</span>
+            </div>
+          </div>
+          <div style="text-align:right;margin-top:10px;font-size:14px;font-weight:800;color:#1B4F72;">TOTAL: ₹100.00</div>
+          <div style="text-align:center;font-size:11px;color:#78909c;margin-top:10px;border-top:1px solid #e2e8f0;padding-top:8px;" id="prev-footer">Thank you! Get well soon.</div>
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="saveSettings()">💾 Save Bill Settings</button>
+    </div>
+  </div>
+
+  <!-- ══ TAB 5: SECURITY ══ -->
+  <div class="tab-content" id="tab-security">
+    <div class="card">
+      <div class="card-hdr">
+        <div>
+          <div class="card-title">🔐 Change Password</div>
+          <div class="card-sub">Account ka password change karo</div>
+        </div>
+      </div>
+      <div style="max-width:420px;">
+        <div class="form-group" style="margin-bottom:14px;">
+          <label>Current Password</label>
+          <input type="password" id="cp_current" placeholder="Current password" />
+        </div>
+        <div class="form-group" style="margin-bottom:14px;">
+          <label>New Password</label>
+          <input type="password" id="cp_new" placeholder="Min 6 characters" />
+        </div>
+        <div class="form-group" style="margin-bottom:20px;">
+          <label>Confirm New Password</label>
+          <input type="password" id="cp_confirm" placeholder="Repeat new password" />
+        </div>
+        <div class="warning-box">
+          ⚠️ Password change ke baad dobara login karna padega.
+        </div>
+        <button class="btn btn-primary" onclick="changePassword()">🔐 Update Password</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-hdr">
+        <div>
+          <div class="card-title">📱 Session Info</div>
+          <div class="card-sub">Current login details</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+        <div style="background:#f8fafc;border-radius:10px;padding:14px;">
+          <div style="font-size:11px;color:#78909c;font-weight:700;text-transform:uppercase;margin-bottom:6px;">Logged In As</div>
+          <div style="font-weight:700;color:#1a2332;" id="sec-user">—</div>
+        </div>
+        <div style="background:#f8fafc;border-radius:10px;padding:14px;">
+          <div style="font-size:11px;color:#78909c;font-weight:700;text-transform:uppercase;margin-bottom:6px;">Role</div>
+          <div style="font-weight:700;color:#1B4F72;" id="sec-role">—</div>
+        </div>
+        <div style="background:#f8fafc;border-radius:10px;padding:14px;">
+          <div style="font-size:11px;color:#78909c;font-weight:700;text-transform:uppercase;margin-bottom:6px;">Pharmacy</div>
+          <div style="font-weight:700;color:#1a2332;" id="sec-pharmacy">—</div>
+        </div>
+        <div style="background:#f8fafc;border-radius:10px;padding:14px;">
+          <div style="font-size:11px;color:#78909c;font-weight:700;text-transform:uppercase;margin-bottom:6px;">Tenant ID</div>
+          <div style="font-weight:700;color:#78909c;font-size:12px;" id="sec-tenant">—</div>
+        </div>
+      </div>
+      <div style="margin-top:16px;">
+        <button class="btn btn-danger" onclick="logout()">🚪 Logout from this device</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ADD STAFF MODAL -->
+<div class="modal-bg" id="staffModal">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div class="modal-title" id="staffModalTitle">➕ Add Staff Member</div>
+      <button class="modal-close" onclick="closeStaffModal()">✕</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <div class="form-group">
+        <label>Full Name *</label>
+        <input id="sf_name" placeholder="e.g. Ramesh Kumar" />
+      </div>
+      <div class="form-group">
+        <label>Username / Email *</label>
+        <input id="sf_username" placeholder="e.g. ramesh or ramesh@pharmacy.com" />
+      </div>
+      <div class="form-group">
+        <label>Password *</label>
+        <input type="password" id="sf_password" placeholder="Min 6 characters" />
+      </div>
+      <div class="form-group">
+        <label>Role</label>
+        <select id="sf_role">
+          <option value="staff">👤 Staff — Basic access (Billing only)</option>
+          <option value="manager">👔 Manager — Full access (No settings)</option>
+        </select>
+      </div>
+      <div class="info-box" style="margin:0;">
+        💡 Staff login karne ke liye: <strong>username</strong> aur yeh password use karenge.
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:20px;">
+      <button class="btn btn-secondary" onclick="closeStaffModal()" style="flex:1;">Cancel</button>
+      <button class="btn btn-primary" onclick="saveStaff()" style="flex:2;">✅ Add Staff Member</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let logoBase64='', currentSettings={}, tenantRole='owner';
+
+function getToken(){return localStorage.getItem('tenantToken')||localStorage.getItem('token')||'';}
+function authH(extra){const t=getToken();return t?{'Authorization':'Bearer '+t,...(extra||{})}:{...(extra||{})};}
+function logout(){localStorage.clear();location.href='index.html';}
+
+function notif(msg,ok=true){
+  const el=document.getElementById('notifEl');
+  el.textContent=msg;
+  el.style.background=ok?'#1E8449':'#C0392B';
+  el.style.display='block';
+  el.style.opacity='1';
+  setTimeout(()=>{
+    el.style.opacity='0';
+    setTimeout(()=>{el.style.display='none';el.style.opacity='1';},300);
+  },2800);
+}
+
+function showTab(name,btn){
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  btn.classList.add('active');
+  if(name==='staff')loadStaff();
+  if(name==='billing')updateBillPreview();
+}
+
+// ── GST VERIFY ── ✅ FIXED
+function verifyMyGST(){
+  const gstEl=document.getElementById('s_gst');
+  const stEl=document.getElementById('myGstStatus');
+  const gst=(gstEl?.value||'').trim().toUpperCase();
+
+  if(!gst||gst.length!==15){
+    stEl.innerHTML='<span style="color:#C0392B;font-weight:700;">⚠️ 15 digit GST number enter karo!</span>';
+    return;
+  }
+  const regex=/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
+  if(!regex.test(gst)){
+    stEl.innerHTML='<span style="color:#C0392B;font-weight:700;">❌ Invalid GST format</span>';
+    return;
+  }
+
+  // Client-side decode — no internet needed
+  const STATES={
+    '01':'Jammu & Kashmir','02':'Himachal Pradesh','03':'Punjab','04':'Chandigarh',
+    '05':'Uttarakhand','06':'Haryana','07':'Delhi','08':'Rajasthan','09':'Uttar Pradesh',
+    '10':'Bihar','11':'Sikkim','12':'Arunachal Pradesh','13':'Nagaland','14':'Manipur',
+    '15':'Mizoram','16':'Tripura','17':'Meghalaya','18':'Assam','19':'West Bengal',
+    '20':'Jharkhand','21':'Odisha','22':'Chhattisgarh','23':'Madhya Pradesh',
+    '24':'Gujarat','26':'Dadra & NH','27':'Maharashtra','28':'Andhra Pradesh',
+    '29':'Karnataka','30':'Goa','31':'Lakshadweep','32':'Kerala','33':'Tamil Nadu',
+    '34':'Puducherry','35':'Andaman & Nicobar','36':'Telangana','37':'Andhra Pradesh'
+  };
+  const ENTITIES={
+    'P':'Proprietor','C':'Company/Pvt Ltd','F':'Firm/LLP','H':'HUF',
+    'A':'AOP/BOI','T':'Trust','G':'Government','L':'Local Authority','B':'Body of Individuals'
+  };
+
+  const stateCode=gst.substring(0,2);
+  const pan=gst.substring(2,12);
+  const entityType=ENTITIES[pan.charAt(3)]||'Business Entity';
+  const state=STATES[stateCode]||'State: '+stateCode;
+
+  stEl.innerHTML=`
+    <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:4px;">
+      <span style="color:#1E8449;font-weight:700;font-size:13px;">✅ Valid GST</span>
+      <span style="background:#EBF5FB;color:#1B4F72;padding:3px 10px;border-radius:10px;font-size:12px;font-weight:700;">📍 ${state}</span>
+      <span style="background:#FEF9E7;color:#B7770D;padding:3px 10px;border-radius:10px;font-size:12px;font-weight:700;">🏢 ${entityType}</span>
+      <span style="background:#f0f4f8;color:#546e7a;padding:3px 10px;border-radius:10px;font-size:12px;">🪪 PAN: ${pan}</span>
+    </div>`;
+}
+function getAvatarColor(name){
+  const colors=['#1B4F72','#1E8449','#7D3C98','#B7770D','#C0392B','#2E86C1'];
+  return colors[(name||'?').charCodeAt(0)%colors.length];
+}
+
+// ── LOAD PROFILE ── ✅ FIXED (double body consumption removed)
+async function loadProfile(){
+  try{
+    const res=await fetch('/api/tenant-auth/profile',{headers:authH()});
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const tenant=await res.json(); // ✅ Sirf ek baar consume
+
+    currentSettings=tenant.settings||{};
+    const user=JSON.parse(localStorage.getItem('user')||'{}');
+    tenantRole=user.role||'owner';
+
+    // ── Fill all form fields ──
+    document.getElementById('s_pharmacyName').value = currentSettings.pharmacyName||tenant.pharmacyName||'';
+    document.getElementById('s_ownerName').value    = tenant.ownerName||'';
+    document.getElementById('s_addr1').value        = currentSettings.address1||'';
+    document.getElementById('s_addr2').value        = currentSettings.address2||'';
+    document.getElementById('s_phone').value        = currentSettings.phone||'';
+    document.getElementById('s_email').value        = currentSettings.email||'';
+    document.getElementById('s_gst').value          = currentSettings.gstNo||'';
+    document.getElementById('s_license').value      = currentSettings.licenseNo||'';
+    document.getElementById('s_signatory').value    = currentSettings.signatory||'';
+    document.getElementById('s_footer').value       = currentSettings.footer||'Thank you! Get well soon.';
+    document.getElementById('s_billType').value     = currentSettings.billType||'Retail Invoice';
+
+    // ── Banner ──
+    const pname=currentSettings.pharmacyName||tenant.pharmacyName||'Pharmacy';
+    document.getElementById('navUser').textContent    = tenant.ownerName||user.name||'';
+    document.getElementById('bannerName').textContent = pname;
+    document.getElementById('bannerSub').textContent  = tenant.ownerName||user.name||'Pharmacy Owner';
+    document.getElementById('bannerAvatar').textContent = (pname[0]||'🏥').toUpperCase();
+    document.getElementById('bannerRole').textContent =
+      tenantRole==='owner'?'👑 Owner':tenantRole==='manager'?'👔 Manager':'👤 Staff';
+
+    // ── Security tab ──
+    document.getElementById('sec-user').textContent     = tenant.ownerName||user.name||'—';
+    document.getElementById('sec-role').textContent     = tenantRole;
+    document.getElementById('sec-pharmacy').textContent = pname;
+    document.getElementById('sec-tenant').textContent   = tenant.tenantId||'—';
+
+    // ── Bill preview ──
+    document.getElementById('footerPreview').textContent = currentSettings.footer||'Thank you! Get well soon.';
+    document.getElementById('prev-pharma').textContent   = pname;
+    document.getElementById('prev-addr').textContent     =
+      (currentSettings.address1||'')+(currentSettings.address2?', '+currentSettings.address2:'');
+
+    // ── Hide staff tab for non-owners ──
+    if(tenantRole==='staff'){
+      document.getElementById('staffTabBtn').style.display='none';
+    }
+
+    // ── Logo ──
+    const logoRes=await fetch('/api/tenant-auth/logo',{headers:authH()});
+    if(logoRes.ok){
+      const logoData=await logoRes.json();
+      if(logoData.logo){
+        logoBase64=logoData.logo;
+        document.getElementById('logoPlaceholder').style.display='none';
+        document.getElementById('logoPreview').src=logoData.logo;
+        document.getElementById('logoPreview').style.display='block';
+        document.getElementById('logoZone').classList.add('has-logo');
+        document.getElementById('logoSmall').style.display='block';
+        document.getElementById('logoSmallImg').src=logoData.logo;
+      }
+    }
+
+    if(!currentSettings.pharmacyName){
+  const saved=JSON.parse(localStorage.getItem('pharmacySettings')||'{}');
+  if(saved.pharmacyName){
+    document.getElementById('s_pharmacyName').value=saved.pharmacyName||'';
+    document.getElementById('s_addr1').value=saved.address1||'';
+    document.getElementById('s_addr2').value=saved.address2||'';
+    document.getElementById('s_phone').value=saved.phone||'';
+    document.getElementById('s_email').value=saved.email||'';
+    document.getElementById('s_gst').value=saved.gstNo||'';
+    document.getElementById('s_license').value=saved.licenseNo||'';
+    document.getElementById('s_signatory').value=saved.signatory||'';
+    document.getElementById('s_footer').value=saved.footer||'';
+    document.getElementById('s_billType').value=saved.billType||'Retail Invoice';
+  }
+}
+
+  }catch(e){
+    console.error('Profile load error:',e);
+    // Fallback from localStorage
+    const user=JSON.parse(localStorage.getItem('user')||'{}');
+    document.getElementById('bannerName').textContent  = user.pharmacyName||user.name||'Dawa Hisaab';
+    document.getElementById('bannerSub').textContent   = user.name||'Pharmacy Owner';
+    document.getElementById('navUser').textContent     = user.name||'';
+    document.getElementById('sec-user').textContent    = user.name||'—';
+    document.getElementById('sec-role').textContent    = user.role||'owner';
+    document.getElementById('sec-pharmacy').textContent= user.pharmacyName||'—';
+    document.getElementById('bannerRole').textContent  =
+      user.role==='manager'?'👔 Manager':user.role==='staff'?'👤 Staff':'👑 Owner';
+    notif('⚠️ Profile load failed — server check karo',false);
+  }
+}
+
+// ── SAVE SETTINGS ──
+async function saveSettings(){
+  const btn=event?.target;
+  const origTxt=btn?.innerHTML||'';
+  if(btn){btn.innerHTML='⏳ Saving...';btn.disabled=true;}
+
+  const settings={
+    pharmacyName : document.getElementById('s_pharmacyName').value.trim(),
+    address1     : document.getElementById('s_addr1').value.trim(),
+    address2     : document.getElementById('s_addr2').value.trim(),
+    phone        : document.getElementById('s_phone').value.trim(),
+    email        : document.getElementById('s_email').value.trim(),
+    gstNo        : document.getElementById('s_gst').value.trim(),
+    licenseNo    : document.getElementById('s_license').value.trim(),
+    signatory    : document.getElementById('s_signatory').value.trim(),
+    footer       : document.getElementById('s_footer').value.trim()||'Thank you! Get well soon.',
+    billType     : document.getElementById('s_billType').value
+  };
+
+  if(!settings.pharmacyName){
+    notif('⚠️ Pharmacy name required!',false);
+    if(btn){btn.innerHTML=origTxt;btn.disabled=false;}
+    return;
+  }
+
+  try{
+    const res=await fetch('/api/tenant-auth/settings',{
+      method:'PUT',
+      headers:authH({'Content-Type':'application/json'}),
+      body:JSON.stringify(settings)
+    });
+
+    if(res.status===401){
+      notif('❌ Session expire — dobara login karo!',false);
+      setTimeout(()=>{localStorage.clear();location.href='index.html';},2000);
+      return;
+    }
+
+    const result=await res.json();
+
+    if(res.ok&&result.success){
+      // ✅ LocalStorage mein bhi save karo — reload pe bhi dikhega
+      localStorage.setItem('pharmacySettings',JSON.stringify(settings));
+      const user=JSON.parse(localStorage.getItem('user')||'{}');
+      user.pharmacyName=settings.pharmacyName;
+      localStorage.setItem('user',JSON.stringify(user));
+
+      // UI update
+      document.getElementById('footerPreview').textContent=settings.footer;
+      document.getElementById('prev-pharma').textContent=settings.pharmacyName;
+      document.getElementById('bannerName').textContent=settings.pharmacyName;
+      updateBillPreview();
+
+      notif('✅ Settings saved successfully!');
+      if(btn)btn.innerHTML='✅ Saved!';
+      setTimeout(()=>{if(btn){btn.innerHTML=origTxt;btn.disabled=false;}},2000);
+    } else {
+      notif('❌ '+(result.message||'Save failed'),false);
+      if(btn){btn.innerHTML=origTxt;btn.disabled=false;}
+    }
+  }catch(e){
+    notif('❌ Server error: '+e.message,false);
+    console.error('Save error:',e);
+    if(btn){btn.innerHTML=origTxt;btn.disabled=false;}
+  }
+}
+
+// ── LOGO ──
+function previewLogo(event){
+  const file=event.target.files[0];
+  if(!file)return;
+  if(file.size>2*1024*1024){notif('⚠️ Logo 2MB se chhota hona chahiye!',false);return;}
+  const reader=new FileReader();
+  reader.onload=e=>{
+    logoBase64=e.target.result;
+    document.getElementById('logoPlaceholder').style.display='none';
+    document.getElementById('logoPreview').src=logoBase64;
+    document.getElementById('logoPreview').style.display='block';
+    document.getElementById('logoZone').classList.add('has-logo');
+  };
+  reader.readAsDataURL(file);
+}
+
+async function saveLogo(){
+  if(!logoBase64){notif('⚠️ Pehle logo select karo!',false);return;}
+  try{
+    const res=await fetch('/api/tenant-auth/settings',{
+      method:'PUT',
+      headers:authH({'Content-Type':'application/json'}),
+      body:JSON.stringify({logo:logoBase64})
+    });
+    const result=await res.json();
+    if(result.success){
+      notif('✅ Logo saved!');
+      document.getElementById('logoSmall').style.display='block';
+      document.getElementById('logoSmallImg').src=logoBase64;
+    } else {
+      notif('❌ '+result.message,false);
+    }
+  }catch(e){notif('❌ Server error!',false);}
+}
+
+async function removeLogo(){
+  if(!confirm('Logo remove karna chahte ho?'))return;
+  logoBase64='';
+  document.getElementById('logoPlaceholder').style.display='block';
+  document.getElementById('logoPreview').style.display='none';
+  document.getElementById('logoZone').classList.remove('has-logo');
+  document.getElementById('logoSmall').style.display='none';
+  try{
+    await fetch('/api/tenant-auth/settings',{
+      method:'PUT',
+      headers:authH({'Content-Type':'application/json'}),
+      body:JSON.stringify({logo:''})
+    });
+    notif('✅ Logo removed!');
+  }catch(e){}
+}
+
+// ── BILL PREVIEW ──
+function updateBillPreview(){
+  const bt=document.getElementById('s_billType')?.value||'Retail Invoice';
+  const el=document.getElementById('prev-btype');
+  if(el)el.textContent=bt;
+  const now=new Date();
+  const dp=document.getElementById('prev-date');
+  if(dp)dp.textContent='Date: '+now.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+}
+
+// ── STAFF ──
+async function loadStaff(){
+  try{
+    const res=await fetch('/api/tenant-auth/staff',{headers:authH()});
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    const staff=await res.json();
+    const el=document.getElementById('staffList');
+    const cnt=document.getElementById('staffCount');
+    if(cnt)cnt.textContent=staff.length+' members · Max 5';
+    if(!Array.isArray(staff)||!staff.length){
+      el.innerHTML='<div style="text-align:center;padding:30px;color:#b0bec5;"><div style="font-size:36px;margin-bottom:8px;">👥</div><p>No staff added yet.</p></div>';
+      return;
+    }
+    el.innerHTML=staff.map(s=>{
+      const roleClass=s.role==='owner'?'role-owner':s.role==='manager'?'role-manager':'role-staff';
+      const roleLabel=s.role==='owner'?'👑 Owner':s.role==='manager'?'👔 Manager':'👤 Staff';
+      const initial=(s.name||'?')[0].toUpperCase();
+      const bgColor=getAvatarColor(s.name||'?');
+      return `<div class="staff-card">
+        <div style="display:flex;align-items:center;">
+          <div class="staff-avatar" style="background:${bgColor};">${initial}</div>
+          <div>
+            <div style="font-weight:700;font-size:14px;">${s.name}</div>
+            <div style="font-size:12px;color:#78909c;margin-top:2px;">@${s.username}</div>
+            <div style="margin-top:6px;display:flex;gap:6px;align-items:center;">
+              <span class="role-badge ${roleClass}">${roleLabel}</span>
+              ${!s.isActive
+                ?'<span style="background:#FDEDEC;color:#C0392B;padding:3px 8px;border-radius:10px;font-size:11px;font-weight:700;">Inactive</span>'
+                :'<span style="background:#EAFAF1;color:#1E8449;padding:3px 8px;border-radius:10px;font-size:11px;font-weight:700;">Active</span>'}
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          ${s.role!=='owner'?`
+            <button class="btn btn-success" style="padding:7px 14px;font-size:12px;" onclick="toggleStaff('${s._id}',${!s.isActive})">
+              ${s.isActive?'🚫 Deactivate':'✅ Activate'}
+            </button>
+            <button class="btn btn-danger" style="padding:7px 14px;font-size:12px;" onclick="deleteStaff('${s._id}','${(s.name||'').replace(/'/g,"\\'")}')">
+              🗑️ Delete
+            </button>
+          `:'<span style="font-size:12px;color:#b0bec5;align-self:center;">Owner — cannot modify</span>'}
+        </div>
+      </div>`;
+    }).join('');
+  }catch(e){
+    document.getElementById('staffList').innerHTML='<p style="color:#C0392B;padding:16px;">Error: '+e.message+'</p>';
+  }
+}
+
+function openAddStaff(){
+  document.getElementById('staffModalTitle').textContent='➕ Add Staff Member';
+  ['sf_name','sf_username','sf_password'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('sf_role').value='staff';
+  document.getElementById('staffModal').classList.add('open');
+}
+function closeStaffModal(){document.getElementById('staffModal').classList.remove('open');}
+
+async function saveStaff(){
+  const name=document.getElementById('sf_name').value.trim();
+  const username=document.getElementById('sf_username').value.trim();
+  const password=document.getElementById('sf_password').value;
+  const role=document.getElementById('sf_role').value;
+  if(!name||!username||!password){notif('⚠️ Sab fields fill karo!',false);return;}
+  if(password.length<6){notif('⚠️ Password min 6 characters!',false);return;}
+  try{
+    const res=await fetch('/api/tenant-auth/staff',{
+      method:'POST',
+      headers:authH({'Content-Type':'application/json'}),
+      body:JSON.stringify({name,username,password,role})
+    });
+    const result=await res.json();
+    if(result.success){closeStaffModal();loadStaff();notif('✅ Staff added!');}
+    else notif(result.message||'Error',false);
+  }catch(e){notif('Server error: '+e.message,false);}
+}
+
+async function toggleStaff(staffId,activate){
+  try{
+    await fetch('/api/tenant-auth/staff/'+staffId,{
+      method:'PUT',
+      headers:authH({'Content-Type':'application/json'}),
+      body:JSON.stringify({isActive:activate})
+    });
+    loadStaff();
+    notif(activate?'✅ Staff activated!':'✅ Staff deactivated!');
+  }catch(e){notif('Error: '+e.message,false);}
+}
+
+async function deleteStaff(staffId,name){
+  if(!confirm('"'+name+'" ko delete karna chahte ho?'))return;
+  try{
+    const res=await fetch('/api/tenant-auth/staff/'+staffId,{method:'DELETE',headers:authH()});
+    const data=await res.json();
+    if(data.success){loadStaff();notif('✅ Staff deleted!');}
+    else notif(data.message||'Error',false);
+  }catch(e){notif('Error: '+e.message,false);}
+}
+
+// ── CHANGE PASSWORD ──
+async function changePassword(){
+  const current=document.getElementById('cp_current').value;
+  const newPass=document.getElementById('cp_new').value;
+  const confirm=document.getElementById('cp_confirm').value;
+  if(!current||!newPass||!confirm){notif('⚠️ Sab fields fill karo!',false);return;}
+  if(newPass.length<6){notif('⚠️ Password min 6 characters!',false);return;}
+  if(newPass!==confirm){notif('⚠️ Passwords match nahi kar rahe!',false);return;}
+  try{
+    const res=await fetch('/api/tenant-auth/change-password',{
+      method:'POST',
+      headers:authH({'Content-Type':'application/json'}),
+      body:JSON.stringify({currentPassword:current,newPassword:newPass})
+    });
+    const result=await res.json();
+    if(result.success){
+      notif('✅ Password changed! Dobara login karo.');
+      setTimeout(()=>{localStorage.clear();location.href='index.html';},2000);
+    } else {
+      notif(result.message||'Error — current password wrong?',false);
+    }
+  }catch(e){notif('Server error: '+e.message,false);}
+}
+
+// ── INIT ──
+if(!getToken()){location.href='index.html';}
+updateBillPreview();
+loadProfile();
+</script>
+</body>
+</html>

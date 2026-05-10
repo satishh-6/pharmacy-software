@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 const prescriptionSchema = new mongoose.Schema({
+  tenantId: { type: String, required: true, index: true },
   // Patient
   patient: { type: String, required: true },
   patientPhone: { type: String },

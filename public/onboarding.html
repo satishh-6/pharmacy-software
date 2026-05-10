@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Setup Your Pharmacy — MedXpert</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Segoe UI',sans-serif; background:linear-gradient(135deg,#f0f4f8 0%,#e8f0fe 100%); min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px; }
+  .container { background:white; border-radius:20px; padding:40px; width:640px; max-width:95vw; box-shadow:0 20px 60px rgba(0,0,0,0.1); }
+  .header { text-align:center; margin-bottom:32px; }
+  .header .step-badge { background:#e8f0fe; color:#1a73e8; border-radius:20px; padding:5px 16px; font-size:12px; font-weight:600; display:inline-block; margin-bottom:12px; }
+  .header h1 { font-size:26px; font-weight:700; color:#1a1a2e; margin-bottom:6px; }
+  .header p { color:#888; font-size:14px; }
+  .steps { display:flex; justify-content:center; gap:0; margin-bottom:32px; }
+  .step { flex:1; text-align:center; padding:10px; position:relative; }
+  .step::after { content:''; position:absolute; top:18px; right:-50%; width:100%; height:2px; background:#e0e0e0; z-index:0; }
+  .step:last-child::after { display:none; }
+  .step-circle { width:36px; height:36px; border-radius:50%; background:#e0e0e0; color:#888; font-size:13px; font-weight:700; display:flex; align-items:center; justify-content:center; margin:0 auto 6px; position:relative; z-index:1; }
+  .step.active .step-circle { background:#1a73e8; color:white; }
+  .step.done .step-circle { background:#2e7d32; color:white; }
+  .step-label { font-size:11px; color:#888; }
+  .step.active .step-label { color:#1a73e8; font-weight:600; }
+  .section { display:none; }
+  .section.active { display:block; }
+  .form-group { display:flex; flex-direction:column; gap:6px; margin-bottom:16px; }
+  .form-group label { font-size:12px; color:#555; font-weight:600; text-transform:uppercase; letter-spacing:0.4px; }
+  .form-group input, .form-group select, .form-group textarea { padding:11px 14px; border:1.5px solid #e0e0e0; border-radius:8px; font-size:14px; outline:none; transition:border 0.2s; }
+  .form-group input:focus, .form-group select:focus { border-color:#1a73e8; }
+  .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .full { grid-column:1/-1; }
+  .logo-upload { border:2px dashed #e0e0e0; border-radius:12px; padding:32px; text-align:center; cursor:pointer; transition:all 0.2s; position:relative; }
+  .logo-upload:hover { border-color:#1a73e8; background:#f8faff; }
+  .logo-upload.has-logo { border-color:#2e7d32; background:#f0fff4; border-style:solid; }
+  .logo-preview { max-width:120px; max-height:80px; object-fit:contain; border-radius:8px; }
+  .btn { padding:13px 24px; border:none; border-radius:10px; cursor:pointer; font-size:15px; font-weight:600; transition:all 0.2s; }
+  .btn-primary { background:#1a73e8; color:white; width:100%; }
+  .btn-primary:hover { background:#1557b0; }
+  .btn-secondary { background:#f0f4f8; color:#333; }
+  .btn-skip { background:none; border:none; color:#aaa; cursor:pointer; font-size:13px; text-decoration:underline; }
+  .nav-btns { display:flex; justify-content:space-between; align-items:center; margin-top:24px; }
+  .success-screen { text-align:center; padding:20px 0; }
+  .success-screen .emoji { font-size:64px; margin-bottom:16px; }
+  .success-screen h2 { font-size:24px; font-weight:700; color:#2e7d32; margin-bottom:8px; }
+  .success-screen p { color:#888; font-size:14px; margin-bottom:24px; line-height:1.6; }
+  .tip-box { background:#fff8e1; border-radius:10px; padding:14px 16px; font-size:13px; color:#555; margin-bottom:16px; border-left:3px solid #f57f17; }
+  .color-options { display:flex; gap:10px; flex-wrap:wrap; }
+  .color-opt { width:36px; height:36px; border-radius:50%; cursor:pointer; border:3px solid transparent; transition:all 0.2s; }
+  .color-opt.selected { border-color:#333; transform:scale(1.1); }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <div class="step-badge">🎉 Welcome to MedXpert!</div>
+    <h1>Setup Your Pharmacy</h1>
+    <p>2 minute mein setup complete karo — phir billing shuru!</p>
+  </div>
+
+  <!-- Steps indicator -->
+  <div class="steps">
+    <div class="step active" id="step-ind-1">
+      <div class="step-circle">1</div>
+      <div class="step-label">Business Info</div>
+    </div>
+    <div class="step" id="step-ind-2">
+      <div class="step-circle">2</div>
+      <div class="step-label">Logo & Brand</div>
+    </div>
+    <div class="step" id="step-ind-3">
+      <div class="step-circle">3</div>
+      <div class="step-label">Done!</div>
+    </div>
+  </div>
+
+  <!-- SECTION 1 — Business Info -->
+  <div class="section active" id="sec-1">
+    <div class="tip-box">💡 Yeh details aapke bills aur invoices pe print hongi</div>
+    <div class="form-grid">
+      <div class="form-group full">
+        <label>Pharmacy / Business Name *</label>
+        <input id="o_name" placeholder="e.g. Sharma Medical Store" />
+      </div>
+      <div class="form-group full">
+        <label>Address Line 1</label>
+        <input id="o_addr1" placeholder="e.g. Shop No. 5, Gandhi Road" />
+      </div>
+      <div class="form-group full">
+        <label>Address Line 2 (City, State, PIN)</label>
+        <input id="o_addr2" placeholder="e.g. Indore, MP — 452001" />
+      </div>
+      <div class="form-group">
+        <label>Phone Number</label>
+        <input id="o_phone" placeholder="e.g. 9876543210" />
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input id="o_email" placeholder="pharmacy@gmail.com" />
+      </div>
+      <div class="form-group">
+        <label>GST Number (Optional)</label>
+        <input id="o_gst" placeholder="e.g. 23XXXXX1234Z1" />
+      </div>
+      <div class="form-group">
+        <label>Drug License No (Optional)</label>
+        <input id="o_license" placeholder="e.g. DL/MP/123456" />
+      </div>
+      <div class="form-group full">
+        <label>Default Bill Type</label>
+        <select id="o_billtype">
+          <option value="Retail Invoice">Retail Invoice (Most Common)</option>
+          <option value="Tax Invoice">Tax Invoice (GST registered)</option>
+          <option value="Bill of Supply">Bill of Supply</option>
+          <option value="Cash Memo">Cash Memo</option>
+        </select>
+      </div>
+      <div class="form-group full">
+        <label>Footer Message on Bills</label>
+        <input id="o_footer" placeholder="e.g. Thank you! Get well soon." value="Thank you! Get well soon." />
+      </div>
+    </div>
+    <div class="nav-btns">
+      <button class="btn-skip" onclick="skipOnboarding()">Skip setup →</button>
+      <button class="btn btn-primary" style="width:auto;padding:12px 32px;" onclick="goStep(2)">Next →</button>
+    </div>
+  </div>
+
+  <!-- SECTION 2 — Logo & Brand -->
+  <div class="section" id="sec-2">
+    <div class="form-group">
+      <label>Upload Your Logo</label>
+      <div class="logo-upload" id="logoUploadZone" onclick="document.getElementById('logoFile').click()">
+        <div id="logoPlaceholder">
+          <div style="font-size:40px;margin-bottom:8px;">🖼️</div>
+          <div style="font-size:14px;color:#666;font-weight:600;">Click to upload logo</div>
+          <div style="font-size:12px;color:#aaa;margin-top:4px;">PNG, JPG — max 2MB</div>
+        </div>
+        <img id="logoPreviewImg" class="logo-preview" style="display:none;" />
+      </div>
+      <input type="file" id="logoFile" accept="image/*" style="display:none;" onchange="previewLogo(event)" />
+    </div>
+
+    <div class="tip-box" style="margin-top:8px;">
+      💡 Logo nahi hai toh koi baat nahi — bills mein pharmacy ka naam auto dikhega
+    </div>
+
+    <div class="form-group" style="margin-top:16px;">
+      <label>Authorized Signatory Name</label>
+      <input id="o_signatory" placeholder="e.g. Dr. Ramesh Sharma / Proprietor" />
+    </div>
+
+    <div class="nav-btns">
+      <button class="btn btn-secondary" onclick="goStep(1)">← Back</button>
+      <button class="btn btn-primary" style="width:auto;padding:12px 32px;" onclick="saveAndFinish()">
+        ✅ Finish Setup
+      </button>
+    </div>
+  </div>
+
+  <!-- SECTION 3 — Done -->
+  <div class="section" id="sec-3">
+    <div class="success-screen">
+      <div class="emoji">🎉</div>
+      <h2>Pharmacy Ready!</h2>
+      <p id="done-msg">Aapki pharmacy successfully setup ho gayi hai.<br>Ab billing shuru karo!</p>
+      <a href="/billing.html" style="display:block;padding:14px;background:#1a73e8;color:white;border-radius:10px;text-decoration:none;font-size:15px;font-weight:600;margin-bottom:12px;">
+        🧾 Start Billing →
+      </a>
+      <a href="/stock.html" style="display:block;padding:12px;background:#f0f4f8;color:#333;border-radius:10px;text-decoration:none;font-size:14px;font-weight:600;">
+        📦 Add Medicines First
+      </a>
+    </div>
+  </div>
+
+</div>
+
+<script>
+let logoBase64 = '';
+let currentStep = 1;
+
+// Load existing settings
+async function loadExisting() {
+  try {
+    const token = localStorage.getItem('tenantToken') || localStorage.getItem('token');
+    const res = await fetch('/api/tenant-auth/profile', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    const tenant = await res.json();
+    if (tenant?.settings) {
+      const s = tenant.settings;
+      document.getElementById('o_name').value = s.pharmacyName || tenant.pharmacyName || '';
+      document.getElementById('o_addr1').value = s.address1 || '';
+      document.getElementById('o_addr2').value = s.address2 || '';
+      document.getElementById('o_phone').value = s.phone || '';
+      document.getElementById('o_email').value = s.email || '';
+      document.getElementById('o_gst').value = s.gstNo || '';
+      document.getElementById('o_license').value = s.licenseNo || '';
+      document.getElementById('o_billtype').value = s.billType || 'Retail Invoice';
+      document.getElementById('o_footer').value = s.footer || 'Thank you! Get well soon.';
+      document.getElementById('o_signatory').value = s.signatory || '';
+    }
+  } catch(e) {}
+}
+
+function goStep(n) {
+  if (n === 2) {
+    const name = document.getElementById('o_name').value.trim();
+    if (!name) { alert('Pharmacy name zaroori hai!'); return; }
+  }
+  currentStep = n;
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById('sec-'+n).classList.add('active');
+  // Update step indicators
+  for (let i = 1; i <= 3; i++) {
+    const el = document.getElementById('step-ind-'+i);
+    el.className = 'step';
+    if (i < n) el.classList.add('done');
+    else if (i === n) el.classList.add('active');
+  }
+}
+
+function previewLogo(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  if (file.size > 2*1024*1024) { alert('Logo 2MB se chhota hona chahiye!'); return; }
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    logoBase64 = e.target.result;
+    document.getElementById('logoPlaceholder').style.display = 'none';
+    const img = document.getElementById('logoPreviewImg');
+    img.src = logoBase64;
+    img.style.display = 'block';
+    document.getElementById('logoUploadZone').classList.add('has-logo');
+  };
+  reader.readAsDataURL(file);
+}
+
+async function saveAndFinish() {
+  const settings = {
+    pharmacyName: document.getElementById('o_name').value.trim(),
+    address1: document.getElementById('o_addr1').value.trim(),
+    address2: document.getElementById('o_addr2').value.trim(),
+    phone: document.getElementById('o_phone').value.trim(),
+    email: document.getElementById('o_email').value.trim(),
+    gstNo: document.getElementById('o_gst').value.trim(),
+    licenseNo: document.getElementById('o_license').value.trim(),
+    billType: document.getElementById('o_billtype').value,
+    footer: document.getElementById('o_footer').value.trim(),
+    signatory: document.getElementById('o_signatory').value.trim(),
+    logo: logoBase64 || ''
+  };
+
+  try {
+    const token = localStorage.getItem('tenantToken') || localStorage.getItem('token');
+    const res = await fetch('/api/tenant-auth/settings', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token
+      },
+      body: JSON.stringify(settings)
+    });
+    const result = await res.json();
+    if (result.success) {
+      // Local mein bhi save karo
+      localStorage.setItem('pharmacySettings', JSON.stringify(settings));
+      document.getElementById('done-msg').innerHTML =
+        `<strong>${settings.pharmacyName}</strong> successfully setup ho gayi!<br>Ab billing shuru karo!`;
+      goStep(3);
+    } else {
+      alert('Error saving: ' + result.message);
+    }
+  } catch(e) {
+    alert('Server error! Try again.');
+  }
+}
+
+function skipOnboarding() {
+  location.href = '/billing.html';
+}
+
+// Auth check
+const token = localStorage.getItem('tenantToken') || localStorage.getItem('token');
+if (!token) { location.href = '/index.html'; }
+
+loadExisting();
+</script>
+</body>
+</html>

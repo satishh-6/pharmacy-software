@@ -3,474 +3,945 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Customers - MedXpert</title>
+<title>Customers — Dawa Hisaab</title>
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
-  body { font-family:'Segoe UI',sans-serif; background:#f0f4f8; }
-  .navbar { background:#1a73e8; color:white; padding:0 24px; display:flex; align-items:center; height:58px; position:fixed; width:100%; top:0; z-index:100; box-shadow:0 2px 8px rgba(0,0,0,0.15); }
-  .navbar h1 { font-size:20px; font-weight:700; flex:1; }
-  .navbar span { font-size:13px; opacity:0.85; margin-right:16px; }
-  .navbar button { background:rgba(255,255,255,0.2); border:none; color:white; padding:7px 16px; border-radius:6px; cursor:pointer; font-size:13px; }
-  .sidebar { position:fixed; left:0; top:58px; width:220px; height:calc(100vh - 58px); background:white; border-right:1px solid #e0e0e0; padding:16px 0; overflow-y:auto; }
-  .sidebar a { display:flex; align-items:center; gap:12px; padding:12px 20px; color:#444; text-decoration:none; font-size:14.5px; border-left:3px solid transparent; transition:all 0.2s; }
-  .sidebar a:hover, .sidebar a.active { background:#e8f0fe; color:#1a73e8; border-left-color:#1a73e8; }
-  .main { margin-left:220px; margin-top:58px; padding:24px; max-width:calc(100vw - 220px); }
-  .top-bar { display:flex; gap:12px; margin-bottom:20px; flex-wrap:wrap; align-items:center; }
-  .top-bar input { padding:10px 14px; border:1.5px solid #ddd; border-radius:8px; font-size:14px; width:300px; outline:none; }
-  .top-bar input:focus { border-color:#1a73e8; }
-  .btn { padding:10px 20px; border:none; border-radius:8px; cursor:pointer; font-size:14px; font-weight:600; transition:all 0.2s; }
-  .btn-primary { background:#1a73e8; color:white; }
-  .btn-primary:hover { background:#1557b0; }
-  .btn-danger { background:#ffebee; color:#c62828; }
-  .btn-edit { background:#e8f0fe; color:#1a73e8; }
-  .stat-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:14px; margin-bottom:24px; }
-  .stat-card { background:white; border-radius:12px; padding:16px 20px; box-shadow:0 2px 8px rgba(0,0,0,0.07); border-left:4px solid #1a73e8; }
-  .stat-card.green { border-left-color:#2e7d32; }
-  .stat-card.orange { border-left-color:#f57c00; }
-  .stat-card.purple { border-left-color:#6a1b9a; }
-  .stat-card .label { font-size:11px; color:#888; margin-bottom:5px; text-transform:uppercase; font-weight:600; }
-  .stat-card .value { font-size:24px; font-weight:700; color:#222; }
-  .card { background:white; border-radius:12px; padding:20px 24px; box-shadow:0 2px 8px rgba(0,0,0,0.07); margin-bottom:20px; }
-  table { width:100%; border-collapse:collapse; }
-  th { background:#f8f9fa; padding:11px 14px; text-align:left; font-size:12px; color:#666; font-weight:600; border-bottom:1px solid #eee; text-transform:uppercase; }
-  td { padding:11px 14px; font-size:13.5px; border-bottom:1px solid #f5f5f5; }
-  tr:hover td { background:#fafafa; }
-  .badge { padding:3px 10px; border-radius:20px; font-size:12px; font-weight:600; }
-  .badge-gold { background:#fff8e1; color:#f57f17; }
-  .badge-silver { background:#f5f5f5; color:#555; }
-  .badge-green { background:#e8f5e9; color:#2e7d32; }
-  .modal-bg { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:200; align-items:center; justify-content:center; }
-  .modal-bg.show { display:flex; }
-  .modal { background:white; border-radius:16px; padding:28px; width:560px; max-height:90vh; overflow-y:auto; }
-  .modal h2 { margin-bottom:20px; font-size:18px; color:#333; }
-  .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
-  .form-group { display:flex; flex-direction:column; gap:5px; }
-  .form-group.full { grid-column:1/-1; }
-  .form-group label { font-size:11px; color:#666; font-weight:600; text-transform:uppercase; }
-  .form-group input, .form-group select, .form-group textarea { padding:9px 12px; border:1.5px solid #ddd; border-radius:7px; font-size:14px; outline:none; font-family:inherit; }
-  .form-group input:focus, .form-group select:focus { border-color:#1a73e8; }
-  .form-group textarea { resize:vertical; min-height:70px; }
-  .section-label { grid-column:1/-1; font-size:12px; font-weight:700; color:#1a73e8; text-transform:uppercase; border-bottom:1.5px solid #e8f0fe; padding-bottom:6px; margin-top:6px; }
-  .modal-actions { display:flex; gap:10px; margin-top:20px; justify-content:flex-end; }
+  body { font-family:'Segoe UI',sans-serif; background:#eef2f7; }
 
-  /* Profile Modal */
-  .profile-modal { background:white; border-radius:16px; padding:0; width:700px; max-height:90vh; overflow-y:auto; }
-  .profile-header { background:linear-gradient(135deg,#1a73e8,#0d47a1); color:white; padding:24px 28px; border-radius:16px 16px 0 0; }
-  .profile-body { padding:24px 28px; }
-  .profile-stat { background:#f8f9fa; border-radius:10px; padding:14px; text-align:center; }
-  .profile-stat .ps-val { font-size:20px; font-weight:700; color:#1a73e8; }
-  .profile-stat .ps-label { font-size:11px; color:#888; margin-top:3px; text-transform:uppercase; }
-  .history-item { padding:10px 0; border-bottom:1px solid #f5f5f5; font-size:13px; }
+  .navbar { background:linear-gradient(135deg,#1B4F72,#154360); color:white; padding:0 24px; display:flex; align-items:center; height:60px; position:fixed; width:100%; top:0; z-index:100; box-shadow:0 4px 20px rgba(27,79,114,0.45); }
+  .navbar h1 { font-size:22px; font-weight:800; flex:1; }
+  .navbar h1 span { color:#85C1E9; }
+  .nav-right { display:flex; align-items:center; gap:10px; }
+  .nav-badge { background:rgba(255,255,255,0.15); padding:6px 14px; border-radius:20px; font-size:12px; }
+  .btn-logout { background:transparent; border:1.5px solid rgba(255,255,255,0.5); color:white; padding:7px 16px; border-radius:8px; cursor:pointer; font-size:13px; font-weight:600; }
+
+  .sidebar { position:fixed; left:0; top:60px; width:225px; height:calc(100vh - 60px); background:white; border-right:1px solid #e2e8f0; padding:16px 0; overflow-y:auto; }
+  .sidebar-section { padding:10px 20px 4px; font-size:10px; font-weight:800; color:#b0bec5; text-transform:uppercase; letter-spacing:1px; }
+  .sidebar a { display:flex; align-items:center; gap:10px; padding:10px 20px; color:#546e7a; text-decoration:none; font-size:13.5px; border-left:3px solid transparent; transition:all 0.2s; font-weight:500; }
+  .sidebar a:hover { background:#EBF5FB; color:#1B4F72; border-left-color:#1B4F72; }
+  .sidebar a.active { background:#EBF5FB; color:#1B4F72; border-left-color:#1B4F72; font-weight:700; }
+  .sidebar a .sicon { width:30px; height:30px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:15px; background:#f5f7fa; flex-shrink:0; }
+
+  .main { margin-left:225px; margin-top:60px; padding:24px; }
+
+  /* STAT STRIP */
+  .stat-strip { display:grid; grid-template-columns:repeat(5,1fr); gap:14px; margin-bottom:20px; }
+  .stat-mini { background:white; border-radius:14px; padding:16px 18px; box-shadow:0 2px 10px rgba(0,0,0,0.05); border:1px solid rgba(0,0,0,0.04); display:flex; align-items:center; gap:14px; transition:all 0.2s; }
+  .stat-mini:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(0,0,0,0.08); }
+  .stat-icon { width:46px; height:46px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
+  .stat-mini.navy .stat-icon { background:#EBF5FB; }
+  .stat-mini.green .stat-icon { background:#EAFAF1; }
+  .stat-mini.orange .stat-icon { background:#FEF9E7; }
+  .stat-mini.purple .stat-icon { background:#F4ECF7; }
+  .stat-mini.gold .stat-icon { background:#FEF9E7; }
+  .stat-info .lbl { font-size:11px; color:#90a4ae; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; }
+  .stat-info .val { font-size:22px; font-weight:800; color:#1a2332; margin-top:2px; line-height:1; }
+
+  /* TOP BAR */
+  .top-bar { background:white; border-radius:14px; padding:16px 20px; margin-bottom:16px; display:flex; gap:12px; align-items:center; flex-wrap:wrap; box-shadow:0 2px 10px rgba(0,0,0,0.05); border:1px solid rgba(0,0,0,0.04); }
+  .search-box { position:relative; flex:1; min-width:240px; }
+  .search-box input { width:100%; padding:10px 14px 10px 42px; border:1.5px solid #e2e8f0; border-radius:10px; font-size:14px; outline:none; transition:all 0.2s; background:#f8fafc; }
+  .search-box input:focus { border-color:#1B4F72; background:white; }
+  .search-box .si { position:absolute; left:13px; top:50%; transform:translateY(-50%); font-size:16px; pointer-events:none; }
+  .filter-tabs { display:flex; gap:6px; flex-wrap:wrap; }
+  .tab { padding:8px 16px; border:1.5px solid #e2e8f0; border-radius:10px; cursor:pointer; font-size:13px; background:white; color:#546e7a; font-weight:600; transition:all 0.2s; white-space:nowrap; }
+  .tab:hover { border-color:#1B4F72; color:#1B4F72; }
+  .tab.active { background:#1B4F72; color:white; border-color:#1B4F72; }
+  .btn-add { background:linear-gradient(135deg,#1B4F72,#154360); color:white; border:none; padding:10px 20px; border-radius:10px; font-size:14px; font-weight:700; cursor:pointer; white-space:nowrap; transition:all 0.2s; }
+  .btn-add:hover { transform:translateY(-1px); box-shadow:0 6px 20px rgba(27,79,114,0.3); }
+
+  /* LOYALTY INFO BANNER */
+  .loyalty-banner { background:linear-gradient(135deg,#1B4F72,#154360); border-radius:14px; padding:20px 24px; margin-bottom:16px; color:white; display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:16px; position:relative; overflow:hidden; }
+  .loyalty-banner::before { content:''; position:absolute; top:-20px; right:-20px; width:120px; height:120px; background:rgba(255,255,255,0.06); border-radius:50%; }
+  .loyalty-banner::after { content:''; position:absolute; bottom:-30px; right:80px; width:80px; height:80px; background:rgba(255,255,255,0.04); border-radius:50%; }
+  .lb-item { position:relative; z-index:1; }
+  .lb-item .lb-icon { font-size:24px; margin-bottom:6px; }
+  .lb-item .lb-val { font-size:20px; font-weight:800; color:#85C1E9; }
+  .lb-item .lb-lbl { font-size:11px; opacity:0.75; margin-top:2px; }
+  .lb-divider { width:1px; background:rgba(255,255,255,0.15); }
+
+  /* CUSTOMER GRID */
+  .cust-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:16px; }
+  .cust-card { background:white; border-radius:14px; padding:20px; box-shadow:0 2px 12px rgba(0,0,0,0.06); border:1px solid rgba(0,0,0,0.05); transition:all 0.2s; cursor:pointer; }
+  .cust-card:hover { transform:translateY(-3px); box-shadow:0 8px 24px rgba(27,79,114,0.12); border-color:#D6EAF8; }
+  .cust-avatar { width:52px; height:52px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:20px; font-weight:800; color:white; flex-shrink:0; }
+  .cust-header { display:flex; align-items:flex-start; gap:14px; margin-bottom:14px; }
+  .cust-info { flex:1; min-width:0; }
+  .cust-name { font-size:16px; font-weight:800; color:#1a2332; }
+  .cust-phone { font-size:12px; color:#78909c; margin-top:3px; }
+  .cust-badges { display:flex; gap:6px; margin-top:6px; flex-wrap:wrap; }
+  .cbadge { font-size:10.5px; padding:3px 9px; border-radius:12px; font-weight:700; }
+  .cbadge-gold { background:#FEF9E7; color:#B7770D; }
+  .cbadge-silver { background:#F2F3F4; color:#626567; }
+  .cbadge-bronze { background:#FDEBD0; color:#A04000; }
+  .cbadge-new { background:#EBF5FB; color:#1B4F72; }
+  .cbadge-regular { background:#EAFAF1; color:#1E8449; }
+  .cust-stats { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:14px; }
+  .cstat { background:#f8fafc; border-radius:8px; padding:8px 10px; text-align:center; }
+  .cstat .cv { font-size:15px; font-weight:800; color:#1B4F72; }
+  .cstat .cl { font-size:10px; color:#90a4ae; font-weight:600; text-transform:uppercase; margin-top:2px; }
+  .loyalty-bar-wrap { margin-bottom:14px; }
+  .lbar-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:5px; }
+  .lbar-pts { font-size:13px; font-weight:700; color:#B7770D; }
+  .lbar-worth { font-size:11px; color:#78909c; }
+  .lbar-bg { height:7px; background:#f0f4f8; border-radius:10px; overflow:hidden; }
+  .lbar-fill { height:100%; border-radius:10px; background:linear-gradient(90deg,#F39C12,#F1C40F); transition:width 0.5s ease; }
+  .lbar-next { font-size:10.5px; color:#78909c; margin-top:4px; }
+  .cust-actions { display:flex; gap:6px; }
+  .cact { flex:1; padding:7px 10px; border:none; border-radius:8px; cursor:pointer; font-size:12px; font-weight:700; transition:all 0.15s; text-align:center; }
+  .cact:hover { transform:translateY(-1px); }
+  .cact-view { background:#EBF5FB; color:#1B4F72; }
+  .cact-bill { background:linear-gradient(135deg,#1B4F72,#154360); color:white; }
+  .cact-pts { background:#FEF9E7; color:#B7770D; }
+  .cact-del { background:#FDEDEC; color:#C0392B; }
+  .empty-state { text-align:center; padding:60px 20px; color:#b0bec5; background:white; border-radius:14px; }
+  .empty-state .emoji { font-size:52px; margin-bottom:12px; }
+  .empty-state p { font-size:14px; }
+
+  /* TABLE VIEW */
+  .cust-table { width:100%; border-collapse:collapse; background:white; border-radius:14px; overflow:hidden; box-shadow:0 2px 12px rgba(0,0,0,0.06); }
+  .cust-table thead tr { background:linear-gradient(135deg,#1B4F72,#154360); }
+  .cust-table thead th { padding:12px 16px; text-align:left; font-size:11px; color:rgba(255,255,255,0.88); font-weight:700; text-transform:uppercase; letter-spacing:0.5px; }
+  .cust-table tbody tr { border-bottom:1px solid #f5f7fa; transition:background 0.12s; }
+  .cust-table tbody tr:hover { background:#f8fafd; }
+  .cust-table tbody td { padding:12px 16px; font-size:13px; color:#37474f; vertical-align:middle; }
+
+  /* MODALS */
+  .modal-bg { display:none; position:fixed; inset:0; background:rgba(21,67,96,0.55); z-index:300; align-items:flex-start; justify-content:center; overflow-y:auto; padding:20px 0; backdrop-filter:blur(3px); }
+  .modal-bg.open { display:flex; }
+  .modal { background:white; border-radius:18px; padding:28px; width:560px; max-width:96vw; margin:0 auto; box-shadow:0 24px 64px rgba(21,67,96,0.22); }
+  .modal-wide { width:720px; }
+  .modal-hdr { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; padding-bottom:14px; border-bottom:2px solid #EBF5FB; }
+  .modal-title { font-size:17px; font-weight:800; color:#1a2332; }
+  .modal-close { background:#f0f4f8; border:none; width:32px; height:32px; border-radius:8px; cursor:pointer; font-size:16px; }
+  .modal-close:hover { background:#FDEDEC; color:#C0392B; }
+  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .fgroup { display:flex; flex-direction:column; gap:5px; }
+  .fgroup label { font-size:10.5px; color:#78909c; font-weight:700; text-transform:uppercase; }
+  .fgroup input, .fgroup select { padding:9px 12px; border:1.5px solid #e2e8f0; border-radius:8px; font-size:14px; outline:none; transition:all 0.2s; background:#f8fafc; }
+  .fgroup input:focus, .fgroup select:focus { border-color:#1B4F72; background:white; }
+  .fgroup.full { grid-column:1/-1; }
+  .modal-footer { display:flex; gap:10px; margin-top:20px; padding-top:16px; border-top:1px solid #f0f4f8; }
+  .mbtn { flex:1; padding:12px; border:none; border-radius:10px; cursor:pointer; font-size:14px; font-weight:700; transition:all 0.2s; }
+  .mbtn-cancel { background:#f0f4f8; color:#546e7a; }
+  .mbtn-save { flex:2; background:linear-gradient(135deg,#1B4F72,#154360); color:white; }
+  .mbtn-save:hover { transform:translateY(-1px); box-shadow:0 6px 20px rgba(27,79,114,0.3); }
+
+  /* DETAIL MODAL */
+  .detail-section { margin-bottom:20px; }
+  .detail-section-title { font-size:12px; font-weight:800; color:#1B4F72; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:10px; padding-bottom:6px; border-bottom:2px solid #EBF5FB; }
+  .detail-row { display:flex; justify-content:space-between; align-items:center; padding:7px 0; border-bottom:1px solid #f8f9fb; font-size:13px; }
+  .detail-row:last-child { border-bottom:none; }
+  .detail-row .dl { color:#78909c; }
+  .detail-row .dv { font-weight:700; color:#1a2332; }
+  .hist-item { padding:10px 14px; background:#f8fafc; border-radius:10px; margin-bottom:8px; border-left:3px solid #1B4F72; }
+  .hist-item:last-child { margin-bottom:0; }
+
+  /* NOTIF */
+  .notif { position:fixed; top:74px; right:20px; padding:12px 20px; border-radius:10px; font-size:13px; font-weight:700; color:white; z-index:9999; box-shadow:0 4px 16px rgba(0,0,0,0.22); max-width:320px; }
+
+  /* LOYALTY MODAL */
+  .loyalty-tier { padding:14px 16px; border-radius:12px; border:2px solid transparent; margin-bottom:10px; transition:all 0.2s; }
+  .loyalty-tier.active-tier { border-color:#F39C12; }
+  .tier-bronze { background:#FEF5E7; }
+  .tier-silver { background:#F8F9FA; }
+  .tier-gold { background:#FFFDE7; }
+  .tier-platinum { background:#EAF2FF; }
+  .pts-slider-wrap { margin:16px 0; }
+  .pts-slider { width:100%; height:6px; border-radius:3px; -webkit-appearance:none; appearance:none; background:linear-gradient(90deg,#F39C12 var(--pct,50%),#e2e8f0 var(--pct,50%)); outline:none; cursor:pointer; }
+  .pts-slider::-webkit-slider-thumb { -webkit-appearance:none; width:20px; height:20px; border-radius:50%; background:#F39C12; cursor:pointer; border:2px solid white; box-shadow:0 2px 6px rgba(0,0,0,0.2); }
 </style>
 </head>
 <body>
 
 <div class="navbar">
-  <h1>💊 MedXpert Pharmacy</h1>
-  <span id="navUser"></span>
-  <button onclick="logout()">Logout</button>
+  <h1>💊 Dawa <span>Hisaab</span></h1>
+  <div class="nav-right">
+    <div class="nav-badge">👤 <span id="navUser"></span></div>
+    <button class="btn-logout" onclick="logout()">Logout</button>
+  </div>
 </div>
 
 <div class="sidebar">
-  <a href="index.html">🏠 Dashboard</a>
-  <a href="stock.html">📦 Stock / Inventory</a>
-  <a href="billing.html">🧾 Billing</a>
-  <a href="purchase.html">🛒 Purchase Entry</a>
-  <a href="customers.html" class="active">👥 Customers</a>
-  <a href="reports.html">📊 Reports</a>
-  <a href="prescriptions.html">📋 Prescriptions</a>
-  <a href="branches.html">🏪 Branches</a>
+  <div class="sidebar-section">Main Menu</div>
+  <a href="index.html"><div class="sicon">🏠</div> Dashboard</a>
+  <a href="stock.html"><div class="sicon">📦</div> Stock / Inventory</a>
+  <a href="billing.html"><div class="sicon">🧾</div> Billing</a>
+  <a href="purchase.html"><div class="sicon">🛒</div> Purchase Entry</a>
+  <div class="sidebar-section">Management</div>
+  <a href="customers.html" class="active"><div class="sicon">👥</div> Customers</a>
+  <a href="prescriptions.html"><div class="sicon">📋</div> Prescriptions</a>
+  <a href="branches.html"><div class="sicon">🏪</div> Branches</a>
+  <a href="reports.html"><div class="sicon">📊</div> Reports</a>
+  <div class="sidebar-section">Settings</div>
+  <a href="profile.html"><div class="sicon">⚙️</div> My Settings</a>
 </div>
 
 <div class="main">
 
-  <!-- Stats -->
-  <div class="stat-grid">
-    <div class="stat-card">
-      <div class="label">Total Customers</div>
-      <div class="value" id="st-total">0</div>
+  <!-- STAT STRIP -->
+  <div class="stat-strip">
+    <div class="stat-mini navy">
+      <div class="stat-icon">👥</div>
+      <div class="stat-info"><div class="lbl">Total Customers</div><div class="val" id="st-total">—</div></div>
     </div>
-    <div class="stat-card green">
-      <div class="label">Active This Month</div>
-      <div class="value" id="st-active">0</div>
+    <div class="stat-mini green">
+      <div class="stat-icon">💰</div>
+      <div class="stat-info"><div class="lbl">Total Revenue</div><div class="val" id="st-revenue">—</div></div>
     </div>
-    <div class="stat-card orange">
-      <div class="label">Total Loyalty Points</div>
-      <div class="value" id="st-points">0</div>
+    <div class="stat-mini orange">
+      <div class="stat-icon">🔄</div>
+      <div class="stat-info"><div class="lbl">Repeat Customers</div><div class="val" id="st-repeat">—</div></div>
     </div>
-    <div class="stat-card purple">
-      <div class="label">Total Revenue</div>
-      <div class="value" id="st-revenue">₹0</div>
+    <div class="stat-mini purple">
+      <div class="stat-icon">⭐</div>
+      <div class="stat-info"><div class="lbl">Total Points</div><div class="val" id="st-points">—</div></div>
+    </div>
+    <div class="stat-mini gold">
+      <div class="stat-icon">🏆</div>
+      <div class="stat-info"><div class="lbl">Gold Members</div><div class="val" id="st-gold">—</div></div>
     </div>
   </div>
 
-  <!-- Search + Add -->
+  <!-- LOYALTY INFO BANNER -->
+  <div class="loyalty-banner">
+    <div class="lb-item">
+      <div class="lb-icon">⭐</div>
+      <div class="lb-val">10 pts = ₹1</div>
+      <div class="lb-lbl">Redemption Rate</div>
+    </div>
+    <div class="lb-divider"></div>
+    <div class="lb-item">
+      <div class="lb-icon">🛍️</div>
+      <div class="lb-val">₹10 = 1 pt</div>
+      <div class="lb-lbl">Earn Rate</div>
+    </div>
+    <div class="lb-divider"></div>
+    <div class="lb-item">
+      <div class="lb-icon">🏆</div>
+      <div class="lb-val">Gold: 500+ pts</div>
+      <div class="lb-lbl">Top Tier</div>
+    </div>
+    <div class="lb-divider"></div>
+    <div class="lb-item">
+      <div class="lb-icon">💡</div>
+      <div class="lb-val">Auto Earn</div>
+      <div class="lb-lbl">On every bill</div>
+    </div>
+  </div>
+
+  <!-- TOP BAR -->
   <div class="top-bar">
-    <input type="text" id="searchInput" placeholder="🔍 Search by name or phone..." oninput="filterCustomers()" />
-    <button class="btn btn-primary" onclick="openModal()">+ Add Customer</button>
+    <div class="search-box">
+      <span class="si">🔍</span>
+      <input type="text" id="searchInput" placeholder="Search by name, phone, email..." oninput="filterCustomers()" />
+    </div>
+    <div class="filter-tabs">
+      <div class="tab active" onclick="setFilter('all',this)">All</div>
+      <div class="tab" onclick="setFilter('gold',this)">🏆 Gold</div>
+      <div class="tab" onclick="setFilter('silver',this)">🥈 Silver</div>
+      <div class="tab" onclick="setFilter('repeat',this)">🔄 Repeat</div>
+      <div class="tab" onclick="setFilter('new',this)">✨ New</div>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button onclick="toggleView()" style="padding:9px 14px;border:1.5px solid #e2e8f0;border-radius:10px;cursor:pointer;font-size:14px;background:white;color:#546e7a;font-weight:600;" id="viewToggleBtn">📋 Table</button>
+      <button class="btn-add" onclick="openAddModal()">+ Add Customer</button>
+    </div>
   </div>
 
-  <!-- Table -->
-  <div class="card">
-    <table>
-      <thead>
-        <tr>
-          <th>Customer</th><th>Phone</th><th>Blood Group</th>
-          <th>Total Visits</th><th>Total Spent</th><th>Loyalty Points</th>
-          <th>Last Visit</th><th>Actions</th>
-        </tr>
-      </thead>
-      <tbody id="customerTable"></tbody>
-    </table>
-  </div>
+  <!-- CUSTOMERS DISPLAY -->
+  <div id="custContainer"></div>
+
 </div>
 
-<!-- Add/Edit Modal -->
-<div class="modal-bg" id="modalBg">
+<!-- ══ ADD/EDIT CUSTOMER MODAL ══ -->
+<div class="modal-bg" id="addModal">
   <div class="modal">
-    <h2 id="modalTitle">Add Customer</h2>
-    <div class="form-grid">
-      <div class="section-label">Basic Information</div>
-      <div class="form-group full"><label>Full Name *</label><input id="f_name" placeholder="e.g. Rahul Sharma" /></div>
-      <div class="form-group"><label>Phone *</label><input id="f_phone" placeholder="e.g. 9876543210" /></div>
-      <div class="form-group"><label>Email</label><input id="f_email" placeholder="optional" /></div>
-      <div class="form-group"><label>Date of Birth</label><input id="f_dob" type="date" /></div>
-      <div class="form-group"><label>Gender</label>
-        <select id="f_gender">
-          <option value="">Select</option>
-          <option value="male">Male</option>
-          <option value="female">Female</option>
-          <option value="other">Other</option>
-        </select>
-      </div>
-      <div class="form-group full"><label>Address</label><input id="f_address" placeholder="optional" /></div>
-
-      <div class="section-label">Medical Information</div>
-      <div class="form-group"><label>Blood Group</label>
-        <select id="f_blood">
-          <option value="">Unknown</option>
-          <option value="A+">A+</option><option value="A-">A-</option>
-          <option value="B+">B+</option><option value="B-">B-</option>
-          <option value="O+">O+</option><option value="O-">O-</option>
-          <option value="AB+">AB+</option><option value="AB-">AB-</option>
-        </select>
-      </div>
-      <div class="form-group"><label>Doctor Name</label><input id="f_doctor" placeholder="e.g. Dr. Mehta" /></div>
-      <div class="form-group full"><label>Allergies</label><input id="f_allergies" placeholder="e.g. Penicillin, Aspirin" /></div>
-      <div class="form-group full"><label>Chronic Conditions</label><input id="f_chronic" placeholder="e.g. Diabetes, Hypertension" /></div>
-      <div class="form-group full"><label>Notes</label><textarea id="f_notes" placeholder="Any additional notes..."></textarea></div>
+    <div class="modal-hdr">
+      <div class="modal-title" id="addModalTitle">👤 Add New Customer</div>
+      <button class="modal-close" onclick="closeAddModal()">✕</button>
     </div>
-    <div class="modal-actions">
-      <button class="btn" style="background:#f5f5f5;color:#333;" onclick="closeModal()">Cancel</button>
-      <button class="btn btn-primary" onclick="saveCustomer()">Save Customer</button>
+    <div class="grid2">
+      <div class="fgroup full">
+        <label>Full Name *</label>
+        <input id="f-name" placeholder="e.g. Ramesh Kumar" />
+      </div>
+      <div class="fgroup">
+        <label>Phone *</label>
+        <input id="f-phone" placeholder="10-digit mobile" maxlength="10" />
+      </div>
+      <div class="fgroup">
+        <label>Email</label>
+        <input id="f-email" placeholder="email@example.com" />
+      </div>
+      <div class="fgroup">
+        <label>Date of Birth</label>
+        <input type="date" id="f-dob" />
+      </div>
+      <div class="fgroup">
+        <label>Blood Group</label>
+        <select id="f-blood">
+          <option value="">Select</option>
+          <option>A+</option><option>A-</option><option>B+</option><option>B-</option>
+          <option>O+</option><option>O-</option><option>AB+</option><option>AB-</option>
+        </select>
+      </div>
+      <div class="fgroup">
+        <label>Gender</label>
+        <select id="f-gender">
+          <option value="">Select</option>
+          <option>Male</option><option>Female</option><option>Other</option>
+        </select>
+      </div>
+      <div class="fgroup full">
+        <label>Address</label>
+        <input id="f-address" placeholder="Full address" />
+      </div>
+      <div class="fgroup full">
+        <label>Chronic Conditions / Allergies</label>
+        <input id="f-conditions" placeholder="e.g. Diabetic, BP patient, Penicillin allergy" />
+      </div>
+      <div class="fgroup">
+        <label>Loyalty Points (Manual)</label>
+        <input type="number" id="f-points" placeholder="0" min="0" />
+      </div>
+      <div class="fgroup">
+        <label>Doctor / Referred By</label>
+        <input id="f-doctor" placeholder="e.g. Dr. Sharma" />
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="mbtn mbtn-cancel" onclick="closeAddModal()">Cancel</button>
+      <button class="mbtn mbtn-save" onclick="saveCustomer()">💾 Save Customer</button>
     </div>
   </div>
 </div>
 
-<!-- Profile Modal -->
-<div class="modal-bg" id="profileBg">
-  <div class="profile-modal">
-    <div class="profile-header">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-        <div>
-          <div style="font-size:32px;margin-bottom:8px;" id="p-avatar">👤</div>
-          <div style="font-size:22px;font-weight:700;" id="p-name">-</div>
-          <div style="opacity:0.85;font-size:14px;margin-top:4px;" id="p-phone">-</div>
-          <div style="opacity:0.75;font-size:13px;margin-top:2px;" id="p-info">-</div>
+<!-- ══ CUSTOMER DETAIL MODAL ══ -->
+<div class="modal-bg" id="detailModal">
+  <div class="modal modal-wide">
+    <div class="modal-hdr">
+      <div class="modal-title">👤 Customer Profile</div>
+      <button class="modal-close" onclick="closeDetailModal()">✕</button>
+    </div>
+
+    <!-- PROFILE HEADER -->
+    <div style="display:flex;align-items:flex-start;gap:18px;margin-bottom:20px;padding:18px;background:linear-gradient(135deg,#EBF5FB,#f0f9ff);border-radius:12px;">
+      <div id="d-avatar" style="width:64px;height:64px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:800;color:white;flex-shrink:0;"></div>
+      <div style="flex:1;">
+        <div id="d-name" style="font-size:20px;font-weight:800;color:#1a2332;"></div>
+        <div id="d-phone" style="font-size:13px;color:#78909c;margin-top:3px;"></div>
+        <div id="d-badges" style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;"></div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-size:28px;font-weight:800;color:#B7770D;" id="d-points">0</div>
+        <div style="font-size:11px;color:#78909c;">Loyalty Points</div>
+        <div style="font-size:13px;color:#1E8449;font-weight:700;margin-top:2px;" id="d-worth">= ₹0</div>
+      </div>
+    </div>
+
+    <!-- LOYALTY PROGRESS -->
+    <div id="d-loyalty-section" style="margin-bottom:20px;padding:16px;background:#FEF9E7;border-radius:12px;border:1px solid #F9E79F;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <div style="font-size:13px;font-weight:700;color:#B7770D;">⭐ Loyalty Progress</div>
+        <div id="d-tier-badge" style="font-size:12px;font-weight:700;padding:4px 12px;border-radius:20px;"></div>
+      </div>
+      <div style="height:8px;background:#f0f4f8;border-radius:10px;overflow:hidden;margin-bottom:6px;">
+        <div id="d-loyalty-bar" style="height:100%;border-radius:10px;background:linear-gradient(90deg,#F39C12,#F1C40F);transition:width 0.6s ease;"></div>
+      </div>
+      <div id="d-tier-next" style="font-size:12px;color:#78909c;"></div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+
+      <!-- LEFT: DETAILS -->
+      <div>
+        <div class="detail-section">
+          <div class="detail-section-title">📋 Personal Info</div>
+          <div class="detail-row"><span class="dl">Phone</span><span class="dv" id="d-phone2">—</span></div>
+          <div class="detail-row"><span class="dl">Email</span><span class="dv" id="d-email">—</span></div>
+          <div class="detail-row"><span class="dl">Blood Group</span><span class="dv" id="d-blood">—</span></div>
+          <div class="detail-row"><span class="dl">Gender</span><span class="dv" id="d-gender">—</span></div>
+          <div class="detail-row"><span class="dl">Date of Birth</span><span class="dv" id="d-dob">—</span></div>
+          <div class="detail-row"><span class="dl">Address</span><span class="dv" id="d-address" style="max-width:180px;text-align:right;">—</span></div>
+          <div class="detail-row"><span class="dl">Doctor</span><span class="dv" id="d-doctor">—</span></div>
         </div>
-        <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end;">
-          <button onclick="closeProfile()" style="background:rgba(255,255,255,0.2);border:none;color:white;padding:7px 14px;border-radius:6px;cursor:pointer;font-size:13px;">✕ Close</button>
-          <button onclick="editCurrentCustomer()" style="background:rgba(255,255,255,0.2);border:none;color:white;padding:7px 14px;border-radius:6px;cursor:pointer;font-size:13px;">✏️ Edit</button>
+        <div class="detail-section">
+          <div class="detail-section-title">⚠️ Medical Info</div>
+          <div id="d-conditions" style="font-size:13px;color:#C0392B;background:#FDEDEC;padding:10px 12px;border-radius:8px;font-weight:600;">—</div>
         </div>
       </div>
 
-      <!-- Stats -->
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:20px;">
-        <div class="profile-stat" style="background:rgba(255,255,255,0.15);">
-          <div class="ps-val" style="color:white;" id="p-visits">0</div>
-          <div class="ps-label" style="color:rgba(255,255,255,0.8);">Visits</div>
-        </div>
-        <div class="profile-stat" style="background:rgba(255,255,255,0.15);">
-          <div class="ps-val" style="color:white;" id="p-spent">₹0</div>
-          <div class="ps-label" style="color:rgba(255,255,255,0.8);">Total Spent</div>
-        </div>
-        <div class="profile-stat" style="background:rgba(255,255,255,0.15);">
-          <div class="ps-val" style="color:white;" id="p-points">0</div>
-          <div class="ps-label" style="color:rgba(255,255,255,0.8);">Points</div>
-        </div>
-        <div class="profile-stat" style="background:rgba(255,255,255,0.15);">
-          <div class="ps-val" style="color:white;" id="p-lastvisit">-</div>
-          <div class="ps-label" style="color:rgba(255,255,255,0.8);">Last Visit</div>
+      <!-- RIGHT: PURCHASE STATS -->
+      <div>
+        <div class="detail-section">
+          <div class="detail-section-title">📊 Purchase Stats</div>
+          <div class="detail-row"><span class="dl">Total Visits</span><span class="dv" id="d-visits">0</span></div>
+          <div class="detail-row"><span class="dl">Total Spent</span><span class="dv" id="d-spent">₹0</span></div>
+          <div class="detail-row"><span class="dl">Avg per Visit</span><span class="dv" id="d-avg">₹0</span></div>
+          <div class="detail-row"><span class="dl">Last Visit</span><span class="dv" id="d-lastvisit">—</span></div>
+          <div class="detail-row"><span class="dl">Points Earned</span><span class="dv" id="d-earned">0</span></div>
+          <div class="detail-row"><span class="dl">Points Value</span><span class="dv" id="d-ptval" style="color:#1E8449;">₹0</span></div>
         </div>
       </div>
     </div>
 
-    <div class="profile-body">
-      <!-- Medical Info -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
-        <div class="card" style="margin:0;padding:16px;">
-          <h3 style="font-size:14px;margin-bottom:12px;">🏥 Medical Info</h3>
-          <div style="font-size:13px;display:flex;flex-direction:column;gap:8px;">
-            <div><span style="color:#888;">Blood Group:</span> <strong id="p-blood">-</strong></div>
-            <div><span style="color:#888;">Doctor:</span> <strong id="p-doctor">-</strong></div>
-            <div><span style="color:#888;">Allergies:</span> <span id="p-allergies" style="color:#c62828;">-</span></div>
-            <div><span style="color:#888;">Conditions:</span> <span id="p-chronic">-</span></div>
-          </div>
-        </div>
-        <div class="card" style="margin:0;padding:16px;">
-          <h3 style="font-size:14px;margin-bottom:12px;">⭐ Loyalty Points</h3>
-          <div style="font-size:28px;font-weight:700;color:#f57f17;" id="p-loyalty-pts">0</div>
-          <div style="font-size:12px;color:#888;margin-top:4px;">= ₹<span id="p-loyalty-val">0</span> discount value</div>
-          <div style="margin-top:12px;display:flex;gap:8px;">
-            <button onclick="redeemPoints()" style="flex:1;padding:8px;background:#fff8e1;color:#f57f17;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;">🎁 Redeem</button>
-            <button onclick="addManualPoints()" style="flex:1;padding:8px;background:#e8f0fe;color:#1a73e8;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;">+ Add Points</button>
-          </div>
-        </div>
-      </div>
+    <!-- ACTION BUTTONS -->
+    <div style="display:flex;gap:10px;margin-top:16px;padding-top:16px;border-top:1px solid #f0f4f8;flex-wrap:wrap;">
+      <button onclick="goToBilling()" style="flex:1;padding:11px;background:linear-gradient(135deg,#1B4F72,#154360);color:white;border:none;border-radius:10px;cursor:pointer;font-size:13px;font-weight:700;">🧾 New Bill</button>
+      <button onclick="openEditFromDetail()" style="flex:1;padding:11px;background:#EBF5FB;color:#1B4F72;border:none;border-radius:10px;cursor:pointer;font-size:13px;font-weight:700;">✏️ Edit Profile</button>
+      <button onclick="openAdjustPoints()" style="flex:1;padding:11px;background:#FEF9E7;color:#B7770D;border:none;border-radius:10px;cursor:pointer;font-size:13px;font-weight:700;">⭐ Adjust Points</button>
+      <button onclick="deleteCurrentCustomer()" style="flex:1;padding:11px;background:#FDEDEC;color:#C0392B;border:none;border-radius:10px;cursor:pointer;font-size:13px;font-weight:700;">🗑️ Delete</button>
+    </div>
+  </div>
+</div>
 
-      <!-- Notes -->
-      <div id="p-notes-section" style="display:none;margin-bottom:20px;">
-        <div class="card" style="margin:0;padding:16px;">
-          <h3 style="font-size:14px;margin-bottom:8px;">📝 Notes</h3>
-          <p id="p-notes" style="font-size:13px;color:#555;"></p>
+<!-- ══ LOYALTY INFO MODAL ══ -->
+<div class="modal-bg" id="loyaltyModal">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div class="modal-title">⭐ Loyalty Points System</div>
+      <button class="modal-close" onclick="closeLoyaltyModal()">✕</button>
+    </div>
+
+    <div style="margin-bottom:16px;padding:14px;background:linear-gradient(135deg,#1B4F72,#154360);border-radius:12px;color:white;">
+      <div style="font-size:13px;opacity:0.8;margin-bottom:8px;">🧮 Points Calculator</div>
+      <div style="font-size:13px;opacity:0.75;margin-bottom:8px;">Bill Amount: ₹<span id="calc-bill" style="font-weight:700;color:#85C1E9;">0</span></div>
+      <input type="range" class="pts-slider" id="billSlider" min="0" max="10000" value="1000" oninput="updateCalc()" style="width:100%;margin:8px 0;" />
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px;">
+        <div style="background:rgba(255,255,255,0.1);border-radius:8px;padding:10px;text-align:center;">
+          <div style="font-size:20px;font-weight:800;color:#F1C40F;" id="calc-earn">100</div>
+          <div style="font-size:11px;opacity:0.75;">Points Earned</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.1);border-radius:8px;padding:10px;text-align:center;">
+          <div style="font-size:20px;font-weight:800;color:#85C1E9;" id="calc-value">₹10</div>
+          <div style="font-size:11px;opacity:0.75;">Discount Value</div>
         </div>
       </div>
+    </div>
 
-      <!-- Purchase History -->
-      <div class="card" style="margin:0;padding:16px;">
-        <h3 style="font-size:14px;margin-bottom:14px;">🧾 Purchase History</h3>
-        <div id="p-history"><p style="color:#aaa;font-size:13px;">Loading...</p></div>
+    <div style="margin-bottom:16px;">
+      <div style="font-size:12px;font-weight:800;color:#1B4F72;text-transform:uppercase;margin-bottom:10px;">📈 How to Earn</div>
+      <div style="background:#f8fafc;border-radius:10px;padding:12px 14px;">
+        <div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #f0f4f8;">
+          <span style="font-size:18px;">🛍️</span>
+          <div><div style="font-size:13px;font-weight:700;">₹10 spend = 1 Point</div><div style="font-size:11px;color:#78909c;">Automatically on every bill</div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #f0f4f8;">
+          <span style="font-size:18px;">🎂</span>
+          <div><div style="font-size:13px;font-weight:700;">Birthday Bonus</div><div style="font-size:11px;color:#78909c;">Extra 50 points on birthday month</div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:7px 0;">
+          <span style="font-size:18px;">✏️</span>
+          <div><div style="font-size:13px;font-weight:700;">Manual Adjustment</div><div style="font-size:11px;color:#78909c;">Admin can add/deduct points anytime</div></div>
+        </div>
       </div>
+    </div>
+
+    <div style="margin-bottom:16px;">
+      <div style="font-size:12px;font-weight:800;color:#1B4F72;text-transform:uppercase;margin-bottom:10px;">🏆 Membership Tiers</div>
+      <div class="loyalty-tier tier-bronze">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div><span style="font-size:16px;">🥉</span> <strong style="color:#A04000;">Bronze</strong></div>
+          <div style="font-size:12px;color:#78909c;">0 – 199 points</div>
+        </div>
+        <div style="font-size:12px;color:#78909c;margin-top:4px;">Basic member — Earn points on every purchase</div>
+      </div>
+      <div class="loyalty-tier tier-silver">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div><span style="font-size:16px;">🥈</span> <strong style="color:#626567;">Silver</strong></div>
+          <div style="font-size:12px;color:#78909c;">200 – 499 points</div>
+        </div>
+        <div style="font-size:12px;color:#78909c;margin-top:4px;">Regular member — Priority billing + points bonus</div>
+      </div>
+      <div class="loyalty-tier tier-gold active-tier">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div><span style="font-size:16px;">🏆</span> <strong style="color:#B7770D;">Gold</strong></div>
+          <div style="font-size:12px;color:#78909c;">500+ points</div>
+        </div>
+        <div style="font-size:12px;color:#78909c;margin-top:4px;">VIP member — Maximum benefits + special discounts</div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:16px;">
+      <div style="font-size:12px;font-weight:800;color:#1B4F72;text-transform:uppercase;margin-bottom:10px;">💳 How to Redeem</div>
+      <div style="background:#EAFAF1;border-radius:10px;padding:14px;border-left:4px solid #1E8449;">
+        <div style="font-size:13px;font-weight:700;color:#1E8449;margin-bottom:6px;">10 Points = ₹1 Discount</div>
+        <div style="font-size:12px;color:#546e7a;line-height:1.7;">
+          1. Billing page pe customer ka naam/phone enter karo<br>
+          2. Customer ka loyalty points automatically dikhega<br>
+          3. <strong>"Use Points"</strong> button click karo<br>
+          4. Kitne points use karne hain woh enter karo<br>
+          5. Discount automatically bill mein add ho jaayega
+        </div>
+      </div>
+    </div>
+    <button onclick="closeLoyaltyModal()" style="width:100%;padding:12px;background:linear-gradient(135deg,#1B4F72,#154360);color:white;border:none;border-radius:10px;cursor:pointer;font-size:14px;font-weight:700;">Got It! ✅</button>
+  </div>
+</div>
+
+<!-- ══ ADJUST POINTS MODAL ══ -->
+<div class="modal-bg" id="adjustModal">
+  <div class="modal" style="width:400px;">
+    <div class="modal-hdr">
+      <div class="modal-title">⭐ Adjust Loyalty Points</div>
+      <button class="modal-close" onclick="closeAdjustModal()">✕</button>
+    </div>
+    <p id="adj-cust" style="font-size:13px;color:#78909c;margin-bottom:16px;"></p>
+    <div style="background:#FEF9E7;border-radius:10px;padding:14px;margin-bottom:16px;text-align:center;">
+      <div style="font-size:12px;color:#78909c;margin-bottom:4px;">Current Points</div>
+      <div style="font-size:32px;font-weight:800;color:#B7770D;" id="adj-current">0</div>
+      <div style="font-size:12px;color:#78909c;margin-top:2px;">= ₹<span id="adj-worth">0</span> discount value</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:16px;">
+      <div class="fgroup">
+        <label>Action</label>
+        <select id="adj-action" style="padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:14px;outline:none;" onchange="updateAdjPreview()">
+          <option value="add">➕ Add Points</option>
+          <option value="deduct">➖ Deduct Points</option>
+          <option value="set">🔄 Set to specific value</option>
+        </select>
+      </div>
+      <div class="fgroup">
+        <label>Points <span id="adj-action-lbl">(to add)</span></label>
+        <input type="number" id="adj-pts" min="0" placeholder="Enter points" oninput="updateAdjPreview()"
+          style="padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:15px;outline:none;" />
+      </div>
+      <div class="fgroup">
+        <label>Reason</label>
+        <input id="adj-reason" placeholder="e.g. Birthday bonus / Correction"
+          style="padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:14px;outline:none;" />
+      </div>
+    </div>
+    <div style="background:#f8fafc;border-radius:10px;padding:12px 14px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-size:13px;color:#546e7a;">New Points Total</span>
+      <span style="font-size:20px;font-weight:800;color:#1B4F72;" id="adj-preview">0</span>
+    </div>
+    <div style="display:flex;gap:10px;">
+      <button onclick="closeAdjustModal()" style="flex:1;padding:12px;background:#f0f4f8;color:#333;border:none;border-radius:10px;cursor:pointer;font-size:14px;font-weight:700;">Cancel</button>
+      <button onclick="submitAdjust()" style="flex:2;padding:12px;background:linear-gradient(135deg,#B7770D,#D4AC0D);color:white;border:none;border-radius:10px;cursor:pointer;font-size:14px;font-weight:700;">⭐ Update Points</button>
     </div>
   </div>
 </div>
 
 <script>
-let allCustomers = [];
-let editingId = null;
-let currentCustomer = null;
+let allCustomers=[], filteredCustomers=[], currentFilter='all', viewMode='grid';
+let editingId=null, detailCustomer=null;
 
-function checkAuth() {
-  const user = JSON.parse(localStorage.getItem('user') || 'null');
-  if (!localStorage.getItem('token')) { location.href='index.html'; return; }
-  document.getElementById('navUser').textContent = '👤 ' + (user?.name || '');
+// ── TOKEN ──
+function getToken(){return localStorage.getItem('tenantToken')||localStorage.getItem('token')||'';}
+function authH(extra){const t=getToken();return t?{'Authorization':'Bearer '+t,...(extra||{})}:{...(extra||{})};}
+
+// ── AUTH ──
+function checkAuth(){
+  const user=JSON.parse(localStorage.getItem('user')||'null');
+  if(!getToken()){location.href='index.html';return;}
+  document.getElementById('navUser').textContent=user?.name||'';
+}
+function logout(){localStorage.clear();location.href='index.html';}
+function notif(msg,ok=true){
+  const el=document.createElement('div');el.className='notif';
+  el.style.background=ok?'#1E8449':'#C0392B';el.textContent=msg;
+  document.body.appendChild(el);
+  setTimeout(()=>{el.style.opacity='0';el.style.transition='opacity 0.3s';setTimeout(()=>el.remove(),300);},2800);
 }
 
-function logout() { localStorage.clear(); location.href='index.html'; }
-
-async function loadCustomers() {
-  const res = await fetch('/api/customers');
-  allCustomers = await res.json();
-  renderStats();
-  renderTable(allCustomers);
+// ── TIER SYSTEM ──
+function getTier(pts){
+  if(pts>=500)return{name:'Gold',icon:'🏆',color:'#B7770D',bg:'#FEF9E7',badgeClass:'cbadge-gold',next:null,nextPts:0};
+  if(pts>=200)return{name:'Silver',icon:'🥈',color:'#626567',bg:'#F8F9FA',badgeClass:'cbadge-silver',next:'Gold',nextPts:500};
+  return{name:'Bronze',icon:'🥉',color:'#A04000',bg:'#FDEBD0',badgeClass:'cbadge-bronze',next:'Silver',nextPts:200};
+}
+function getAvatarColor(name){
+  const colors=['#1B4F72','#1E8449','#7D3C98','#B7770D','#C0392B','#2E86C1','#117A65'];
+  return colors[name.charCodeAt(0)%colors.length];
+}
+function getCustomerType(c){
+  if((c.totalPurchases||0)>=10)return{label:'VIP',cls:'cbadge-gold'};
+  if((c.totalPurchases||0)>=3)return{label:'Regular',cls:'cbadge-regular'};
+  return{label:'New',cls:'cbadge-new'};
 }
 
-function renderStats() {
-  const now = new Date();
-  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-  const active = allCustomers.filter(c => c.lastVisit && new Date(c.lastVisit) >= monthStart);
-  const totalPoints = allCustomers.reduce((a,c) => a+(c.loyaltyPoints||0), 0);
-  const totalRevenue = allCustomers.reduce((a,c) => a+(c.totalSpent||0), 0);
-
-  document.getElementById('st-total').textContent = allCustomers.length;
-  document.getElementById('st-active').textContent = active.length;
-  document.getElementById('st-points').textContent = totalPoints.toLocaleString();
-  document.getElementById('st-revenue').textContent = '₹' + totalRevenue.toFixed(0);
-}
-
-function renderTable(customers) {
-  const tbody = document.getElementById('customerTable');
-  if (!customers.length) {
-    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:30px;color:#aaa;">No customers yet. Add your first customer!</td></tr>';
-    return;
+// ── LOAD CUSTOMERS ──
+async function loadCustomers(){
+  try{
+    const res=await fetch('/api/customers',{headers:authH()});
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    const data=await res.json();
+    allCustomers=Array.isArray(data)?data:[];
+    updateStats();
+    filterCustomers();
+  }catch(e){
+    document.getElementById('custContainer').innerHTML='<div class="empty-state"><div class="emoji">❌</div><p>Error loading: '+e.message+'</p></div>';
   }
-
-  tbody.innerHTML = customers.map(c => {
-    const tier = c.loyaltyPoints >= 500 ? '🥇 Gold' : c.loyaltyPoints >= 200 ? '🥈 Silver' : '🥉 Bronze';
-    const tierClass = c.loyaltyPoints >= 500 ? 'badge-gold' : c.loyaltyPoints >= 200 ? 'badge-silver' : 'badge-green';
-
-    return `<tr>
-      <td>
-        <div style="font-weight:600;">${c.name}</div>
-        ${c.chronicConditions ? `<div style="font-size:11px;color:#e65100;">${c.chronicConditions}</div>` : ''}
-      </td>
-      <td>${c.phone||'-'}</td>
-      <td>${c.bloodGroup ? `<span style="background:#ffebee;color:#c62828;padding:2px 8px;border-radius:10px;font-size:12px;font-weight:600;">${c.bloodGroup}</span>` : '-'}</td>
-      <td style="text-align:center;">${c.totalPurchases||0}</td>
-      <td>₹${(c.totalSpent||0).toFixed(0)}</td>
-      <td><span class="badge ${tierClass}">${c.loyaltyPoints||0} pts · ${tier}</span></td>
-      <td>${c.lastVisit ? new Date(c.lastVisit).toLocaleDateString('en-IN') : 'Never'}</td>
-      <td>
-        <button class="btn btn-edit" style="padding:5px 12px;font-size:12px;margin-right:5px;" onclick="viewProfile('${c._id}')">👁️ View</button>
-        <button class="btn btn-edit" style="padding:5px 12px;font-size:12px;margin-right:5px;" onclick="editCustomer('${c._id}')">✏️ Edit</button>
-        <button class="btn btn-danger" style="padding:5px 12px;font-size:12px;" onclick="deleteCustomer('${c._id}')">Delete</button>
-      </td>
-    </tr>`;
-  }).join('');
 }
 
-function filterCustomers() {
-  const q = document.getElementById('searchInput').value.toLowerCase();
-  renderTable(allCustomers.filter(c =>
-    c.name.toLowerCase().includes(q) ||
-    (c.phone||'').includes(q)
-  ));
+// ── STATS ──
+function updateStats(){
+  const total=allCustomers.length;
+  const revenue=allCustomers.reduce((a,c)=>a+(c.totalSpent||0),0);
+  const repeat=allCustomers.filter(c=>(c.totalPurchases||0)>1).length;
+  const totalPts=allCustomers.reduce((a,c)=>a+(c.loyaltyPoints||0),0);
+  const gold=allCustomers.filter(c=>(c.loyaltyPoints||0)>=500).length;
+  document.getElementById('st-total').textContent=total;
+  document.getElementById('st-revenue').textContent='₹'+(revenue>=1000?(revenue/1000).toFixed(1)+'K':revenue.toFixed(0));
+  document.getElementById('st-repeat').textContent=repeat;
+  document.getElementById('st-points').textContent=totalPts>=1000?(totalPts/1000).toFixed(1)+'K':totalPts;
+  document.getElementById('st-gold').textContent=gold;
 }
 
-// ── ADD/EDIT MODAL ──
-function openModal(reset=true) {
-  if (reset) {
-    editingId = null;
-    document.getElementById('modalTitle').textContent = 'Add Customer';
-    ['f_name','f_phone','f_email','f_address','f_doctor','f_allergies','f_chronic','f_notes'].forEach(id => document.getElementById(id).value='');
-    document.getElementById('f_gender').value='';
-    document.getElementById('f_blood').value='';
-    document.getElementById('f_dob').value='';
+// ── FILTER ──
+function setFilter(f,el){currentFilter=f;document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');filterCustomers();}
+function filterCustomers(){
+  const q=document.getElementById('searchInput').value.toLowerCase().trim();
+  filteredCustomers=allCustomers.filter(c=>{
+    if(q&&!(c.name||'').toLowerCase().includes(q)&&!(c.phone||'').toLowerCase().includes(q)&&!(c.email||'').toLowerCase().includes(q))return false;
+    if(currentFilter==='gold')return(c.loyaltyPoints||0)>=500;
+    if(currentFilter==='silver')return(c.loyaltyPoints||0)>=200&&(c.loyaltyPoints||0)<500;
+    if(currentFilter==='repeat')return(c.totalPurchases||0)>1;
+    if(currentFilter==='new')return(c.totalPurchases||0)<=1;
+    return true;
+  });
+  renderCustomers();
+}
+
+// ── TOGGLE VIEW ──
+function toggleView(){
+  viewMode=viewMode==='grid'?'table':'grid';
+  document.getElementById('viewToggleBtn').textContent=viewMode==='grid'?'📋 Table':'🃏 Cards';
+  renderCustomers();
+}
+
+// ── RENDER ──
+function renderCustomers(){
+  const container=document.getElementById('custContainer');
+  if(!filteredCustomers.length){
+    container.innerHTML='<div class="empty-state"><div class="emoji">👥</div><p>No customers found</p></div>';return;
   }
-  document.getElementById('modalBg').classList.add('show');
+  if(viewMode==='table'){renderTable(container);return;}
+  renderGrid(container);
 }
 
-function closeModal() { document.getElementById('modalBg').classList.remove('show'); }
-
-function editCustomer(id) {
-  const c = allCustomers.find(x => x._id === id);
-  if (!c) return;
-  editingId = id;
-  document.getElementById('modalTitle').textContent = 'Edit Customer';
-  document.getElementById('f_name').value = c.name;
-  document.getElementById('f_phone').value = c.phone||'';
-  document.getElementById('f_email').value = c.email||'';
-  document.getElementById('f_dob').value = c.dob||'';
-  document.getElementById('f_gender').value = c.gender||'';
-  document.getElementById('f_address').value = c.address||'';
-  document.getElementById('f_blood').value = c.bloodGroup||'';
-  document.getElementById('f_doctor').value = c.doctor||'';
-  document.getElementById('f_allergies').value = c.allergies||'';
-  document.getElementById('f_chronic').value = c.chronicConditions||'';
-  document.getElementById('f_notes').value = c.notes||'';
-  openModal(false);
+function renderGrid(container){
+  container.innerHTML=`<div class="cust-grid">${filteredCustomers.map(c=>{
+    const tier=getTier(c.loyaltyPoints||0);
+    const type=getCustomerType(c);
+    const pts=c.loyaltyPoints||0;
+    const worth=Math.floor(pts/10);
+    const visits=c.totalPurchases||0;
+    const spent=c.totalSpent||0;
+    const avg=visits>0?(spent/visits).toFixed(0):0;
+    const lastVisit=c.lastVisit?new Date(c.lastVisit).toLocaleDateString('en-IN'):'Never';
+    // Tier progress
+    let barW=0;
+    if(tier.next==='Silver')barW=Math.min(100,(pts/200)*100);
+    else if(tier.next==='Gold')barW=Math.min(100,((pts-200)/300)*100);
+    else barW=100;
+    const ptsLeft=tier.next?(tier.nextPts-pts):0;
+    const initial=(c.name||'?')[0].toUpperCase();
+    const bgColor=getAvatarColor(c.name||'?');
+    return `<div class="cust-card" onclick="openDetailModal('${c._id}')">
+      <div class="cust-header">
+        <div class="cust-avatar" style="background:${bgColor};">${initial}</div>
+        <div class="cust-info">
+          <div class="cust-name">${c.name}</div>
+          <div class="cust-phone">${c.phone?'📞 '+c.phone:'No phone'} ${c.email?'· ✉️ '+c.email:''}</div>
+          <div class="cust-badges">
+            <span class="cbadge ${tier.badgeClass}">${tier.icon} ${tier.name}</span>
+            <span class="cbadge ${type.cls}">${type.label}</span>
+            ${c.chronicConditions?'<span class="cbadge" style="background:#FDEDEC;color:#C0392B;">⚠️ Medical</span>':''}
+            ${c.bloodGroup?`<span class="cbadge" style="background:#FDEDEC;color:#C0392B;">🩸 ${c.bloodGroup}</span>`:''}
+          </div>
+        </div>
+      </div>
+      <div class="cust-stats">
+        <div class="cstat"><div class="cv">${visits}</div><div class="cl">Visits</div></div>
+        <div class="cstat"><div class="cv">₹${spent>=1000?(spent/1000).toFixed(1)+'K':spent.toFixed(0)}</div><div class="cl">Total Spent</div></div>
+        <div class="cstat"><div class="cv">₹${avg}</div><div class="cl">Avg Bill</div></div>
+      </div>
+      <div class="loyalty-bar-wrap">
+        <div class="lbar-top">
+          <div class="lbar-pts">⭐ ${pts} pts</div>
+          <div class="lbar-worth">= ₹${worth} discount</div>
+        </div>
+        <div class="lbar-bg"><div class="lbar-fill" style="width:${barW}%;"></div></div>
+        <div class="lbar-next">${tier.next?ptsLeft+' more pts for '+tier.icon+' '+tier.next:'🏆 Gold Member! VIP status'}</div>
+      </div>
+      <div class="cust-actions" onclick="event.stopPropagation()">
+        <button class="cact cact-view" onclick="openDetailModal('${c._id}')">👁️ View</button>
+        <button class="cact cact-bill" onclick="goToBillingFor('${c.name}','${c.phone||''}')">🧾 Bill</button>
+        <button class="cact cact-pts" onclick="openAdjustFor('${c._id}')">⭐ Points</button>
+        <button class="cact cact-del" onclick="deleteCustomer('${c._id}','${(c.name||'').replace(/'/g,"\\'")}')">🗑️</button>
+      </div>
+    </div>`;
+  }).join('')}</div>`;
 }
 
-async function saveCustomer() {
-  const name = document.getElementById('f_name').value.trim();
-  const phone = document.getElementById('f_phone').value.trim();
-  if (!name) { alert('Name zaroori hai!'); return; }
+function renderTable(container){
+  container.innerHTML=`<div style="overflow-x:auto;border-radius:14px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
+  <table class="cust-table">
+    <thead><tr>
+      <th>Customer</th><th>Phone</th><th>Tier</th><th>Visits</th>
+      <th>Total Spent</th><th>Loyalty Points</th><th>Last Visit</th><th>Actions</th>
+    </tr></thead>
+    <tbody>
+    ${filteredCustomers.map(c=>{
+      const tier=getTier(c.loyaltyPoints||0);
+      const pts=c.loyaltyPoints||0;
+      const visits=c.totalPurchases||0;
+      const spent=c.totalSpent||0;
+      const lastVisit=c.lastVisit?new Date(c.lastVisit).toLocaleDateString('en-IN'):'Never';
+      const initial=(c.name||'?')[0].toUpperCase();
+      const bgColor=getAvatarColor(c.name||'?');
+      return `<tr>
+        <td>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="width:36px;height:36px;border-radius:10px;background:${bgColor};display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:white;flex-shrink:0;">${initial}</div>
+            <div><div style="font-weight:700;color:#1a2332;">${c.name}</div>${c.chronicConditions?'<div style="font-size:11px;color:#C0392B;">⚠️ '+c.chronicConditions+'</div>':''}</div>
+          </div>
+        </td>
+        <td>${c.phone||'—'}</td>
+        <td><span class="cbadge ${tier.badgeClass}">${tier.icon} ${tier.name}</span></td>
+        <td style="font-weight:700;">${visits}</td>
+        <td style="font-weight:700;color:#1B4F72;">₹${spent>=1000?(spent/1000).toFixed(1)+'K':spent.toFixed(0)}</td>
+        <td>
+          <div style="font-weight:700;color:#B7770D;">⭐ ${pts}</div>
+          <div style="font-size:11px;color:#78909c;">= ₹${Math.floor(pts/10)}</div>
+        </td>
+        <td style="font-size:12px;color:#78909c;">${lastVisit}</td>
+        <td>
+          <div style="display:flex;gap:5px;">
+            <button onclick="openDetailModal('${c._id}')" style="background:#EBF5FB;color:#1B4F72;border:none;padding:5px 10px;border-radius:6px;cursor:pointer;font-size:11px;font-weight:700;">View</button>
+            <button onclick="goToBillingFor('${c.name}','${c.phone||''}')" style="background:#1B4F72;color:white;border:none;padding:5px 10px;border-radius:6px;cursor:pointer;font-size:11px;font-weight:700;">Bill</button>
+            <button onclick="deleteCustomer('${c._id}','${(c.name||'').replace(/'/g,"\\'")}');event.stopPropagation();" style="background:#FDEDEC;color:#C0392B;border:none;padding:5px 10px;border-radius:6px;cursor:pointer;font-size:11px;font-weight:700;">Del</button>
+          </div>
+        </td>
+      </tr>`;
+    }).join('')}
+    </tbody>
+  </table></div>`;
+}
 
-  const data = {
-    name, phone,
-    email: document.getElementById('f_email').value,
-    dob: document.getElementById('f_dob').value,
-    gender: document.getElementById('f_gender').value,
-    address: document.getElementById('f_address').value,
-    bloodGroup: document.getElementById('f_blood').value,
-    doctor: document.getElementById('f_doctor').value,
-    allergies: document.getElementById('f_allergies').value,
-    chronicConditions: document.getElementById('f_chronic').value,
-    notes: document.getElementById('f_notes').value
+// ── ADD / EDIT MODAL ──
+function openAddModal(){
+  editingId=null;
+  document.getElementById('addModalTitle').textContent='👤 Add New Customer';
+  ['f-name','f-phone','f-email','f-address','f-conditions','f-doctor'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('f-blood').value='';
+  document.getElementById('f-gender').value='';
+  document.getElementById('f-dob').value='';
+  document.getElementById('f-points').value='0';
+  document.getElementById('addModal').classList.add('open');
+}
+function closeAddModal(){document.getElementById('addModal').classList.remove('open');editingId=null;}
+
+function openEditModal(c){
+  editingId=c._id;
+  document.getElementById('addModalTitle').textContent='✏️ Edit Customer';
+  document.getElementById('f-name').value=c.name||'';
+  document.getElementById('f-phone').value=c.phone||'';
+  document.getElementById('f-email').value=c.email||'';
+  document.getElementById('f-blood').value=c.bloodGroup||'';
+  document.getElementById('f-gender').value=c.gender||'';
+  document.getElementById('f-dob').value=c.dob?new Date(c.dob).toISOString().split('T')[0]:'';
+  document.getElementById('f-address').value=c.address||'';
+  document.getElementById('f-conditions').value=c.chronicConditions||'';
+  document.getElementById('f-points').value=c.loyaltyPoints||0;
+  document.getElementById('f-doctor').value=c.doctor||'';
+  document.getElementById('addModal').classList.add('open');
+}
+
+async function saveCustomer(){
+  const name=document.getElementById('f-name').value.trim();
+  const phone=document.getElementById('f-phone').value.trim();
+  if(!name){notif('⚠️ Name zaroori hai!',false);return;}
+  const data={
+    name,phone,
+    email:document.getElementById('f-email').value,
+    bloodGroup:document.getElementById('f-blood').value,
+    gender:document.getElementById('f-gender').value,
+    dob:document.getElementById('f-dob').value||null,
+    address:document.getElementById('f-address').value,
+    chronicConditions:document.getElementById('f-conditions').value,
+    loyaltyPoints:parseInt(document.getElementById('f-points').value)||0,
+    doctor:document.getElementById('f-doctor').value
   };
-
-  const url = editingId ? `/api/customers/${editingId}` : '/api/customers';
-  const method = editingId ? 'PUT' : 'POST';
-
-  try {
-    const res = await fetch(url, { method, headers:{'Content-Type':'application/json'}, body:JSON.stringify(data) });
-    const result = await res.json();
-    if (result.success) { closeModal(); loadCustomers(); }
-    else alert('Error: ' + result.message);
-  } catch(e) { alert('Server error!'); }
+  try{
+    const url=editingId?'/api/customers/'+editingId:'/api/customers';
+    const method=editingId?'PUT':'POST';
+    const res=await fetch(url,{method,headers:authH({'Content-Type':'application/json'}),body:JSON.stringify(data)});
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    const result=await res.json();
+    if(result._id||result.success||result.name){
+      notif(editingId?'✅ Customer updated!':'✅ Customer added!');
+      closeAddModal();loadCustomers();
+    }else notif('❌ '+(result.message||'Error'),false);
+  }catch(e){notif('❌ '+e.message,false);}
 }
 
-async function deleteCustomer(id) {
-  if (!confirm('Customer delete karna chahte ho?')) return;
-  await fetch(`/api/customers/${id}`, { method:'DELETE' });
-  loadCustomers();
+// ── DETAIL MODAL ──
+function openDetailModal(id){
+  const c=allCustomers.find(x=>x._id===id);if(!c)return;
+  detailCustomer=c;
+  const tier=getTier(c.loyaltyPoints||0);
+  const pts=c.loyaltyPoints||0;
+  const visits=c.totalPurchases||0;
+  const spent=c.totalSpent||0;
+  const initial=(c.name||'?')[0].toUpperCase();
+  const bgColor=getAvatarColor(c.name||'?');
+
+  document.getElementById('d-avatar').style.background=bgColor;
+  document.getElementById('d-avatar').textContent=initial;
+  document.getElementById('d-name').textContent=c.name;
+  document.getElementById('d-phone').textContent=c.phone?'📞 '+c.phone:(c.email?'✉️ '+c.email:'No contact');
+  document.getElementById('d-points').textContent=pts;
+  document.getElementById('d-worth').textContent='= ₹'+Math.floor(pts/10)+' discount';
+
+  // Badges
+  const type=getCustomerType(c);
+  document.getElementById('d-badges').innerHTML=`
+    <span class="cbadge ${tier.badgeClass}">${tier.icon} ${tier.name}</span>
+    <span class="cbadge ${type.cls}">${type.label}</span>
+    ${c.bloodGroup?`<span class="cbadge" style="background:#FDEDEC;color:#C0392B;">🩸 ${c.bloodGroup}</span>`:''}
+  `;
+
+  // Tier progress bar
+  let barW=0;
+  if(tier.next==='Silver')barW=Math.min(100,(pts/200)*100);
+  else if(tier.next==='Gold')barW=Math.min(100,((pts-200)/300)*100);
+  else barW=100;
+  document.getElementById('d-loyalty-bar').style.width=barW+'%';
+  document.getElementById('d-tier-badge').textContent=tier.icon+' '+tier.name+' Member';
+  document.getElementById('d-tier-badge').style.background=tier.bg;
+  document.getElementById('d-tier-badge').style.color=tier.color;
+  const ptsLeft=tier.next?(tier.nextPts-pts):0;
+  document.getElementById('d-tier-next').textContent=tier.next?ptsLeft+' more points for '+tier.icon+' '+tier.next:'🏆 You are a Gold VIP Member!';
+
+  // Details
+  document.getElementById('d-phone2').textContent=c.phone||'—';
+  document.getElementById('d-email').textContent=c.email||'—';
+  document.getElementById('d-blood').textContent=c.bloodGroup||'—';
+  document.getElementById('d-gender').textContent=c.gender||'—';
+  document.getElementById('d-dob').textContent=c.dob?new Date(c.dob).toLocaleDateString('en-IN'):'—';
+  document.getElementById('d-address').textContent=c.address||'—';
+  document.getElementById('d-doctor').textContent=c.doctor||'—';
+  document.getElementById('d-conditions').textContent=c.chronicConditions||'No known conditions';
+  document.getElementById('d-conditions').style.color=c.chronicConditions?'#C0392B':'#1E8449';
+  document.getElementById('d-conditions').style.background=c.chronicConditions?'#FDEDEC':'#EAFAF1';
+
+  // Stats
+  document.getElementById('d-visits').textContent=visits;
+  document.getElementById('d-spent').textContent='₹'+(spent>=1000?(spent/1000).toFixed(1)+'K':spent.toFixed(2));
+  document.getElementById('d-avg').textContent='₹'+(visits>0?(spent/visits).toFixed(0):0);
+  document.getElementById('d-lastvisit').textContent=c.lastVisit?new Date(c.lastVisit).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}):'Never';
+  document.getElementById('d-earned').textContent=pts;
+  document.getElementById('d-ptval').textContent='₹'+Math.floor(pts/10);
+
+  document.getElementById('detailModal').classList.add('open');
+}
+function closeDetailModal(){document.getElementById('detailModal').classList.remove('open');detailCustomer=null;}
+function openEditFromDetail(){if(!detailCustomer)return;closeDetailModal();openEditModal(detailCustomer);}
+function deleteCurrentCustomer(){if(!detailCustomer)return;closeDetailModal();deleteCustomer(detailCustomer._id,detailCustomer.name);}
+
+// ── DELETE ──
+async function deleteCustomer(id,name){
+  if(!confirm('Delete "'+name+'"?\nYeh action undo nahi ho sakta.'))return;
+  try{
+    const res=await fetch('/api/customers/'+id,{method:'DELETE',headers:authH()});
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    notif('✅ Customer deleted!');loadCustomers();
+  }catch(e){notif('❌ '+e.message,false);}
 }
 
-// ── PROFILE ──
-async function viewProfile(id) {
-  try {
-    const res = await fetch(`/api/customers/${id}`);
-    const { customer: c, sales } = await res.json();
-    currentCustomer = c;
+// ── BILLING REDIRECT ──
+function goToBilling(){
+  if(!detailCustomer)return;
+  location.href='billing.html?patient='+encodeURIComponent(detailCustomer.name)+'&phone='+encodeURIComponent(detailCustomer.phone||'');
+}
+function goToBillingFor(name,phone){
+  location.href='billing.html?patient='+encodeURIComponent(name)+'&phone='+encodeURIComponent(phone);
+}
 
-    document.getElementById('p-name').textContent = c.name;
-    document.getElementById('p-phone').textContent = c.phone||'No phone';
-    document.getElementById('p-info').textContent = [c.gender, c.dob?'DOB: '+c.dob:'', c.address].filter(Boolean).join(' · ');
-    document.getElementById('p-visits').textContent = c.totalPurchases||sales.length||0;
-    document.getElementById('p-spent').textContent = '₹'+(c.totalSpent||0).toFixed(0);
-    document.getElementById('p-points').textContent = c.loyaltyPoints||0;
-    document.getElementById('p-lastvisit').textContent = c.lastVisit ? new Date(c.lastVisit).toLocaleDateString('en-IN') : 'Never';
-    document.getElementById('p-blood').textContent = c.bloodGroup||'-';
-    document.getElementById('p-doctor').textContent = c.doctor||'-';
-    document.getElementById('p-allergies').textContent = c.allergies||'None';
-    document.getElementById('p-chronic').textContent = c.chronicConditions||'None';
-    document.getElementById('p-loyalty-pts').textContent = c.loyaltyPoints||0;
-    document.getElementById('p-loyalty-val').textContent = Math.floor((c.loyaltyPoints||0)/10);
+// ── LOYALTY MODAL ──
+function openLoyaltyModal(){document.getElementById('loyaltyModal').classList.add('open');updateCalc();}
+function closeLoyaltyModal(){document.getElementById('loyaltyModal').classList.remove('open');}
+function updateCalc(){
+  const bill=parseInt(document.getElementById('billSlider').value)||0;
+  const earn=Math.floor(bill/10);
+  const worth='₹'+Math.floor(earn/10);
+  document.getElementById('calc-bill').textContent=bill;
+  document.getElementById('calc-earn').textContent=earn;
+  document.getElementById('calc-value').textContent=worth;
+  const pct=(bill/10000)*100;
+  document.getElementById('billSlider').style.setProperty('--pct',pct+'%');
+}
 
-    if (c.notes) {
-      document.getElementById('p-notes-section').style.display='block';
-      document.getElementById('p-notes').textContent = c.notes;
+// ── ADJUST POINTS ──
+function openAdjustFor(id){
+  const c=allCustomers.find(x=>x._id===id);if(!c)return;
+  detailCustomer=c;
+  openAdjustPoints();
+}
+function openAdjustPoints(){
+  if(!detailCustomer)return;
+  const pts=detailCustomer.loyaltyPoints||0;
+  document.getElementById('adj-cust').textContent=detailCustomer.name+' · '+detailCustomer.phone;
+  document.getElementById('adj-current').textContent=pts;
+  document.getElementById('adj-worth').textContent=Math.floor(pts/10);
+  document.getElementById('adj-pts').value='';
+  document.getElementById('adj-reason').value='';
+  document.getElementById('adj-action').value='add';
+  document.getElementById('adj-preview').textContent=pts;
+  document.getElementById('adjustModal').classList.add('open');
+}
+function closeAdjustModal(){document.getElementById('adjustModal').classList.remove('open');}
+function updateAdjPreview(){
+  const action=document.getElementById('adj-action').value;
+  const pts=parseInt(document.getElementById('adj-pts').value)||0;
+  const current=detailCustomer?.loyaltyPoints||0;
+  let newPts=current;
+  if(action==='add')newPts=current+pts;
+  else if(action==='deduct')newPts=Math.max(0,current-pts);
+  else newPts=pts;
+  document.getElementById('adj-preview').textContent=newPts;
+  const lbls={add:'(to add)',deduct:'(to deduct)',set:'(new total)'};
+  document.getElementById('adj-action-lbl').textContent=lbls[action]||'';
+}
+async function submitAdjust(){
+  const action=document.getElementById('adj-action').value;
+  const pts=parseInt(document.getElementById('adj-pts').value)||0;
+  const reason=document.getElementById('adj-reason').value;
+  const current=detailCustomer?.loyaltyPoints||0;
+  let newPts=current;
+  if(action==='add')newPts=current+pts;
+  else if(action==='deduct')newPts=Math.max(0,current-pts);
+  else newPts=pts;
+  if(newPts<0){notif('⚠️ Points negative nahi ho sakta!',false);return;}
+  try{
+    const res=await fetch('/api/customers/'+detailCustomer._id,{method:'PUT',headers:authH({'Content-Type':'application/json'}),body:JSON.stringify({...detailCustomer,loyaltyPoints:newPts})});
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    notif('✅ Points updated to '+newPts+'!');
+    closeAdjustModal();
+    loadCustomers();
+    if(document.getElementById('detailModal').classList.contains('open')){
+      const updated={...detailCustomer,loyaltyPoints:newPts};
+      detailCustomer=updated;
+      openDetailModal(updated._id);
     }
-
-    // Purchase History
-    const histEl = document.getElementById('p-history');
-    if (!sales.length) {
-      histEl.innerHTML = '<p style="color:#aaa;font-size:13px;">No purchase history yet.</p>';
-    } else {
-      histEl.innerHTML = sales.map(s => `
-        <div class="history-item">
-          <div style="display:flex;justify-content:space-between;">
-            <div>
-              <strong>${s.billNo||'-'}</strong>
-              <span style="color:#888;font-size:12px;margin-left:8px;">${new Date(s.date).toLocaleDateString('en-IN')}</span>
-            </div>
-            <strong style="color:#1a73e8;">₹${(s.totalAmount||0).toFixed(0)}</strong>
-          </div>
-          <div style="color:#888;font-size:12px;margin-top:3px;">
-            ${s.items?.length||0} items · ${s.paymentMode||'cash'}
-            ${(s.totalAmount-s.paidAmount)>0.01?`<span style="color:#c62828;"> · Due: ₹${((s.totalAmount||0)-(s.paidAmount||0)).toFixed(0)}</span>`:''}
-          </div>
-        </div>`).join('');
-    }
-
-    document.getElementById('profileBg').classList.add('show');
-  } catch(e) { alert('Error loading profile!'); }
+  }catch(e){notif('❌ '+e.message,false);}
 }
 
-function closeProfile() { document.getElementById('profileBg').classList.remove('show'); currentCustomer=null; }
-
-function editCurrentCustomer() { closeProfile(); editCustomer(currentCustomer._id); }
-
-async function redeemPoints() {
-  if (!currentCustomer) return;
-  const pts = parseInt(prompt(`Kitne points redeem karne hain?\nAvailable: ${currentCustomer.loyaltyPoints} points\n(10 points = ₹1 discount)`));
-  if (!pts || pts <= 0) return;
-  if (pts > currentCustomer.loyaltyPoints) { alert('Insufficient points!'); return; }
-
-  const res = await fetch(`/api/customers/${currentCustomer._id}/redeem`, {
-    method:'PATCH', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({ points: pts })
-  });
-  const data = await res.json();
-  if (data.success) { alert(`✅ ${pts} points redeemed! ₹${Math.floor(pts/10)} discount milega.`); closeProfile(); loadCustomers(); }
-}
-
-async function addManualPoints() {
-  if (!currentCustomer) return;
-  const pts = parseInt(prompt('Kitne points add karne hain?'));
-  if (!pts || pts <= 0) return;
-
-  const res = await fetch(`/api/customers/${currentCustomer._id}/loyalty`, {
-    method:'PATCH', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({ points: pts, spent: 0 })
-  });
-  const data = await res.json();
-  if (data.success) { alert(`✅ ${pts} points added!`); closeProfile(); loadCustomers(); }
-}
-
-// Close modals on outside click
-document.getElementById('modalBg').addEventListener('click', e => { if(e.target===document.getElementById('modalBg')) closeModal(); });
-document.getElementById('profileBg').addEventListener('click', e => { if(e.target===document.getElementById('profileBg')) closeProfile(); });
+// Loyalty button in navbar area
+document.addEventListener('DOMContentLoaded',()=>{
+  const topBar=document.querySelector('.top-bar');
+  if(topBar){
+    const loyaltyBtn=document.createElement('button');
+    loyaltyBtn.innerHTML='⭐ Loyalty Info';
+    loyaltyBtn.style.cssText='padding:9px 14px;border:1.5px solid #F9E79F;border-radius:10px;cursor:pointer;font-size:13px;background:#FEF9E7;color:#B7770D;font-weight:700;white-space:nowrap;';
+    loyaltyBtn.onclick=openLoyaltyModal;
+    topBar.insertBefore(loyaltyBtn,topBar.querySelector('.btn-add'));
+  }
+});
 
 checkAuth();
 loadCustomers();

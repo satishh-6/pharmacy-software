@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dawa Hisaab — Super Admin</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Segoe UI',sans-serif; background:#eef2f7; }
+
+  /* NAVBAR */
+  .navbar { background:linear-gradient(135deg,#1B4F72,#154360); color:white; padding:0 24px; display:flex; align-items:center; height:60px; position:fixed; width:100%; top:0; z-index:100; box-shadow:0 4px 20px rgba(27,79,114,0.45); }
+  .navbar h1 { font-size:20px; font-weight:800; flex:1; }
+  .navbar h1 span { color:#85C1E9; }
+  .navbar h1 .sa { font-size:11px; font-weight:700; background:rgba(16,185,129,0.25); color:#6ee7b7; padding:3px 10px; border-radius:20px; margin-left:10px; border:1px solid rgba(16,185,129,0.3); }
+  .nav-right { display:flex; align-items:center; gap:10px; }
+  .nav-user { background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.25); color:white; padding:6px 14px; border-radius:20px; font-size:12px; font-weight:600; }
+  .nav-logout { background:transparent; border:1.5px solid rgba(255,255,255,0.4); color:white; padding:7px 16px; border-radius:8px; cursor:pointer; font-size:13px; font-weight:600; transition:all 0.2s; }
+  .nav-logout:hover { border-color:#ef4444; color:#fca5a5; }
+
+  /* SIDEBAR */
+  .sidebar { position:fixed; left:0; top:60px; width:225px; height:calc(100vh - 60px); background:white; border-right:1px solid #e2e8f0; padding:16px 0; overflow-y:auto; box-shadow:2px 0 10px rgba(0,0,0,0.04); }
+  .sidebar-section { padding:10px 20px 4px; font-size:10px; font-weight:800; color:#b0bec5; text-transform:uppercase; letter-spacing:1px; }
+  .sidebar a { display:flex; align-items:center; gap:10px; padding:10px 20px; color:#546e7a; text-decoration:none; font-size:13.5px; border-left:3px solid transparent; transition:all 0.2s; font-weight:500; cursor:pointer; }
+  .sidebar a:hover { background:#EBF5FB; color:#1B4F72; border-left-color:#1B4F72; }
+  .sidebar a.active { background:#EBF5FB; color:#1B4F72; border-left-color:#1B4F72; font-weight:700; }
+  .sidebar a .sicon { width:30px; height:30px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:15px; background:#f5f7fa; flex-shrink:0; }
+  .sidebar a.active .sicon { background:#D6EAF8; }
+
+  /* MAIN */
+  .main { margin-left:225px; margin-top:60px; padding:24px; }
+
+  /* LOGIN */
+  .login-screen { display:flex; align-items:center; justify-content:center; min-height:100vh; background:linear-gradient(135deg,#eef2f7,#e3eaf2); }
+  .login-card { background:white; border-radius:20px; padding:40px; width:420px; border:1px solid #e2e8f0; box-shadow:0 20px 60px rgba(27,79,114,0.12); }
+  .login-logo { text-align:center; margin-bottom:28px; }
+  .login-logo .icon { font-size:52px; display:block; margin-bottom:10px; }
+  .login-logo h2 { font-size:22px; font-weight:800; color:#1B4F72; }
+  .login-logo p { font-size:13px; color:#78909c; margin-top:5px; }
+  .login-badge { background:#EBF5FB; color:#1B4F72; border:1px solid #D6EAF8; padding:5px 16px; border-radius:20px; font-size:11px; font-weight:700; display:inline-block; margin-top:8px; }
+  .fgroup { display:flex; flex-direction:column; gap:5px; margin-bottom:16px; }
+  .fgroup label { font-size:10.5px; color:#78909c; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; }
+  .fgroup input { padding:11px 14px; background:#f8fafc; border:1.5px solid #e2e8f0; border-radius:9px; color:#1a2332; font-size:14px; outline:none; transition:all 0.2s; }
+  .fgroup input:focus { border-color:#1B4F72; background:white; box-shadow:0 0 0 3px rgba(27,79,114,0.08); }
+  .login-btn { width:100%; padding:13px; background:linear-gradient(135deg,#1B4F72,#154360); color:white; border:none; border-radius:10px; font-size:15px; font-weight:700; cursor:pointer; transition:all 0.2s; margin-top:4px; }
+  .login-btn:hover { transform:translateY(-1px); box-shadow:0 8px 24px rgba(27,79,114,0.3); }
+
+  /* KPI CARDS */
+  .kpi-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:20px; }
+  .kpi-card { background:white; border-radius:14px; padding:20px; border:1px solid rgba(0,0,0,0.04); position:relative; overflow:hidden; transition:all 0.2s; box-shadow:0 2px 12px rgba(0,0,0,0.05); }
+  .kpi-card:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,0.09); }
+  .kpi-card::after { content:''; position:absolute; top:-10px; right:-10px; width:80px; height:80px; border-radius:50%; opacity:0.07; }
+  .kpi-card.blue::after { background:#1B4F72; }
+  .kpi-card.green::after { background:#1E8449; }
+  .kpi-card.orange::after { background:#E67E22; }
+  .kpi-card.red::after { background:#C0392B; }
+  .kpi-card.purple::after { background:#7D3C98; }
+  .kpi-card.teal::after { background:#0E6655; }
+  .kpi-icon { width:46px; height:46px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:20px; margin-bottom:14px; }
+  .kpi-card.blue .kpi-icon { background:#EBF5FB; }
+  .kpi-card.green .kpi-icon { background:#EAFAF1; }
+  .kpi-card.orange .kpi-icon { background:#FEF9E7; }
+  .kpi-card.red .kpi-icon { background:#FDEDEC; }
+  .kpi-card.purple .kpi-icon { background:#F4ECF7; }
+  .kpi-card.teal .kpi-icon { background:#E8F8F5; }
+  .kpi-label { font-size:11px; color:#90a4ae; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:5px; }
+  .kpi-value { font-size:26px; font-weight:800; color:#1a2332; line-height:1; }
+  .kpi-sub { font-size:12px; color:#b0bec5; margin-top:6px; }
+
+  /* CARDS */
+  .card { background:white; border-radius:14px; padding:20px 24px; border:1px solid rgba(0,0,0,0.04); margin-bottom:18px; box-shadow:0 2px 12px rgba(0,0,0,0.05); }
+  .card-hdr { display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; padding-bottom:14px; border-bottom:1px solid #f0f4f8; flex-wrap:wrap; gap:10px; }
+  .card-title { font-size:15px; font-weight:800; color:#1a2332; }
+  .card-sub { font-size:12px; color:#78909c; margin-top:2px; }
+
+  /* SEARCH */
+  .search-bar { position:relative; }
+  .search-bar input { padding:9px 14px 9px 38px; background:#f8fafc; border:1.5px solid #e2e8f0; border-radius:9px; color:#1a2332; font-size:13px; outline:none; width:240px; transition:all 0.2s; }
+  .search-bar input:focus { border-color:#1B4F72; background:white; }
+  .search-bar .si { position:absolute; left:12px; top:50%; transform:translateY(-50%); font-size:14px; }
+  .filter-sel { padding:9px 12px; background:#f8fafc; border:1.5px solid #e2e8f0; border-radius:9px; color:#546e7a; font-size:13px; outline:none; cursor:pointer; }
+  .filter-sel:focus { border-color:#1B4F72; }
+
+  /* TABLE */
+  .table-wrap { overflow-x:auto; }
+  .data-table { width:100%; border-collapse:collapse; min-width:900px; }
+  .data-table thead tr { background:linear-gradient(135deg,#1B4F72,#154360); }
+  .data-table thead th { padding:11px 14px; text-align:left; font-size:10.5px; color:rgba(255,255,255,0.88); font-weight:700; text-transform:uppercase; letter-spacing:0.5px; white-space:nowrap; }
+  .data-table tbody tr { border-bottom:1px solid #f5f7fa; transition:background 0.12s; }
+  .data-table tbody tr:hover { background:#f8fafd; }
+  .data-table tbody td { padding:12px 14px; font-size:13px; color:#546e7a; vertical-align:middle; }
+  .data-table tfoot tr { background:#f8fafc; border-top:2px solid #e2e8f0; }
+  .data-table tfoot td { padding:10px 14px; font-size:12px; font-weight:800; color:#1a2332; }
+
+  /* TENANT */
+  .tenant-name { font-weight:700; color:#1a2332; font-size:14px; }
+  .tenant-id { font-size:10px; color:#b0bec5; margin-top:2px; font-family:monospace; }
+
+  /* BADGES */
+  .badge { padding:3px 10px; border-radius:20px; font-size:11px; font-weight:700; display:inline-block; }
+  .badge-trial { background:#FEF9E7; color:#B7770D; border:1px solid #F9E79F; }
+  .badge-basic { background:#EBF5FB; color:#1B4F72; border:1px solid #D6EAF8; }
+  .badge-pro { background:#F4ECF7; color:#7D3C98; border:1px solid #E8DAEF; }
+  .badge-enterprise { background:#EAFAF1; color:#1E8449; border:1px solid #A9DFBF; }
+  .badge-suspended { background:#FDEDEC; color:#C0392B; border:1px solid #F1948A; }
+  .badge-active { background:#EAFAF1; color:#1E8449; border:1px solid #A9DFBF; }
+
+  /* BUTTONS */
+  .btn { padding:7px 14px; border:none; border-radius:7px; cursor:pointer; font-size:12px; font-weight:700; transition:all 0.18s; display:inline-flex; align-items:center; gap:5px; white-space:nowrap; }
+  .btn:hover { transform:translateY(-1px); }
+  .btn-navy { background:#EBF5FB; color:#1B4F72; border:1px solid #D6EAF8; }
+  .btn-navy:hover { background:#1B4F72; color:white; }
+  .btn-green { background:#EAFAF1; color:#1E8449; border:1px solid #A9DFBF; }
+  .btn-green:hover { background:#1E8449; color:white; }
+  .btn-red { background:#FDEDEC; color:#C0392B; border:1px solid #F1948A; }
+  .btn-red:hover { background:#C0392B; color:white; }
+  .btn-orange { background:#FEF9E7; color:#B7770D; border:1px solid #F9E79F; }
+  .btn-orange:hover { background:#B7770D; color:white; }
+  .btn-purple { background:#F4ECF7; color:#7D3C98; border:1px solid #E8DAEF; }
+  .btn-purple:hover { background:#7D3C98; color:white; }
+  .btn-primary { background:linear-gradient(135deg,#1B4F72,#154360); color:white; padding:10px 20px; font-size:13px; }
+  .btn-primary:hover { box-shadow:0 6px 20px rgba(27,79,114,0.3); }
+
+  /* SECTION */
+  .section { display:none; }
+  .section.active { display:block; }
+
+  /* MODALS */
+  .modal-bg { display:none; position:fixed; inset:0; background:rgba(27,79,114,0.45); z-index:300; align-items:flex-start; justify-content:center; overflow-y:auto; padding:20px 0; backdrop-filter:blur(3px); }
+  .modal-bg.open { display:flex; }
+  .modal { background:white; border-radius:18px; padding:28px; width:920px; max-width:96vw; margin:0 auto; box-shadow:0 24px 64px rgba(27,79,114,0.18); border:1px solid #e2e8f0; }
+  .modal-sm { width:480px; }
+  .modal-hdr { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; padding-bottom:14px; border-bottom:2px solid #EBF5FB; }
+  .modal-title { font-size:18px; font-weight:800; color:#1a2332; }
+  .modal-close { background:#FDEDEC; border:1px solid #F1948A; color:#C0392B; width:34px; height:34px; border-radius:8px; cursor:pointer; font-size:16px; }
+  .modal-close:hover { background:#C0392B; color:white; }
+
+  /* DETAIL TABS */
+  .detail-tabs { display:flex; gap:4px; background:#f8fafc; border-radius:10px; padding:4px; margin-bottom:20px; overflow-x:auto; border:1px solid #e2e8f0; }
+  .dtab { padding:8px 16px; border-radius:8px; cursor:pointer; font-size:12px; font-weight:700; color:#78909c; background:transparent; border:none; transition:all 0.2s; white-space:nowrap; }
+  .dtab.active { background:linear-gradient(135deg,#1B4F72,#154360); color:white; box-shadow:0 3px 10px rgba(27,79,114,0.2); }
+
+  /* INFO GRID */
+  .info-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:16px; }
+  .info-item { background:#f8fafc; border-radius:10px; padding:12px 14px; border:1px solid #e2e8f0; }
+  .info-item .il { font-size:10px; color:#90a4ae; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:5px; }
+  .info-item .iv { font-size:14px; font-weight:700; color:#1a2332; }
+  .info-item .iv.green { color:#1E8449; }
+  .info-item .iv.amber { color:#B7770D; }
+  .info-item .iv.red { color:#C0392B; }
+  .info-item .iv.blue { color:#1B4F72; }
+
+  /* MINI TABLE */
+  .mini-table { width:100%; border-collapse:collapse; }
+  .mini-table thead tr { background:#EBF5FB; }
+  .mini-table thead th { padding:9px 12px; text-align:left; font-size:10.5px; color:#1B4F72; font-weight:700; text-transform:uppercase; border-bottom:1px solid #D6EAF8; }
+  .mini-table tbody tr { border-bottom:1px solid #f5f7fa; }
+  .mini-table tbody tr:hover { background:#f8fafd; }
+  .mini-table tbody td { padding:9px 12px; font-size:12.5px; color:#546e7a; }
+
+  /* PLAN CARDS */
+  .plan-card { border-radius:14px; padding:20px; text-align:center; border:2px solid transparent; transition:all 0.2s; }
+  .plan-card.basic { background:#EBF5FB; border-color:#D6EAF8; }
+  .plan-card.pro { background:#F4ECF7; border-color:#E8DAEF; }
+  .plan-card.enterprise { background:#EAFAF1; border-color:#A9DFBF; }
+
+  /* NOTIF */
+  .notif { position:fixed; top:74px; right:20px; padding:12px 20px; border-radius:10px; font-size:13px; font-weight:700; color:white; z-index:9999; box-shadow:0 4px 16px rgba(0,0,0,0.18); display:none; max-width:320px; }
+
+  /* ACTIVITY */
+  .activity-item { display:flex; align-items:flex-start; gap:12px; padding:12px 0; border-bottom:1px solid #f5f7fa; }
+  .activity-item:last-child { border-bottom:none; }
+  .activity-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; margin-top:5px; }
+
+  /* EMPTY */
+  .empty-state { text-align:center; padding:40px; color:#b0bec5; }
+  .empty-state .emoji { font-size:36px; margin-bottom:8px; }
+
+  @media(max-width:1200px){ .kpi-grid{grid-template-columns:repeat(2,1fr);} .info-grid{grid-template-columns:1fr 1fr;} }
+</style>
+</head>
+<body>
+
+<div class="notif" id="notifEl"></div>
+
+<!-- ══ LOGIN ══ -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">
+      <span class="icon">🔐</span>
+      <h2>Dawa Hisaab</h2>
+      <p>Super Admin Control Panel</p>
+      <span class="login-badge">🛡️ Restricted Access</span>
+    </div>
+    <div class="fgroup">
+      <label>Admin Email</label>
+      <input type="email" id="adminEmail" placeholder="admin@dawahisaab.com" />
+    </div>
+    <div class="fgroup">
+      <label>Password</label>
+      <input type="password" id="adminPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')adminLogin()" />
+    </div>
+    <button class="login-btn" onclick="adminLogin()">🔐 Login to Admin Panel</button>
+    <p id="loginError" style="color:#C0392B;font-size:13px;margin-top:12px;display:none;text-align:center;"></p>
+  </div>
+</div>
+
+<!-- ══ MAIN APP ══ -->
+<div id="mainApp" style="display:none;">
+
+  <div class="navbar">
+    <h1>💊 Dawa <span>Hisaab</span> <span class="sa">SUPER ADMIN</span></h1>
+    <div class="nav-right">
+      <div class="nav-user">🛡️ <span id="adminName">Admin</span></div>
+      <button class="nav-logout" onclick="adminLogout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="sidebar">
+    <div class="sidebar-section">Overview</div>
+    <a class="active" onclick="showSection('dashboard',this)"><div class="sicon">📊</div> Dashboard</a>
+    <a onclick="showSection('tenants',this)"><div class="sicon">🏥</div> All Tenants</a>
+    <div class="sidebar-section">Finance</div>
+    <a onclick="showSection('plans',this)"><div class="sicon">💰</div> Plans & Revenue</a>
+    <a onclick="showSection('activity',this)"><div class="sicon">📋</div> Activity Log</a>
+  </div>
+
+  <div class="main">
+
+    <!-- ══ DASHBOARD ══ -->
+    <div class="section active" id="sec-dashboard">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
+        <div>
+          <div style="font-size:22px;font-weight:800;color:#1a2332;">📊 Super Admin Dashboard</div>
+          <div style="font-size:13px;color:#78909c;margin-top:3px;">All tenants ka overview — real-time data</div>
+        </div>
+        <button class="btn btn-primary" onclick="refreshAll()">🔄 Refresh</button>
+      </div>
+
+      <div class="kpi-grid">
+        <div class="kpi-card blue"><div class="kpi-icon">🏥</div><div class="kpi-label">Total Pharmacies</div><div class="kpi-value" id="st-total">—</div><div class="kpi-sub">Registered tenants</div></div>
+        <div class="kpi-card green"><div class="kpi-icon">✅</div><div class="kpi-label">Active</div><div class="kpi-value" id="st-active">—</div><div class="kpi-sub">Paying + Trial</div></div>
+        <div class="kpi-card orange"><div class="kpi-icon">⏳</div><div class="kpi-label">On Trial</div><div class="kpi-value" id="st-trial">—</div><div class="kpi-sub">Free 14 days</div></div>
+        <div class="kpi-card purple"><div class="kpi-icon">💰</div><div class="kpi-label">Paid Users</div><div class="kpi-value" id="st-paid">—</div><div class="kpi-sub">Subscribed</div></div>
+        <div class="kpi-card teal"><div class="kpi-icon">📈</div><div class="kpi-label">Monthly Revenue</div><div class="kpi-value" id="st-revenue">—</div><div class="kpi-sub">MRR estimate</div></div>
+        <div class="kpi-card red"><div class="kpi-icon">⚠️</div><div class="kpi-label">Expiring Soon</div><div class="kpi-value" id="st-expiring">—</div><div class="kpi-sub">In next 3 days</div></div>
+        <div class="kpi-card blue"><div class="kpi-icon">🧾</div><div class="kpi-label">Total Bills Today</div><div class="kpi-value" id="st-bills">—</div><div class="kpi-sub">Across all tenants</div></div>
+        <div class="kpi-card green"><div class="kpi-icon">👥</div><div class="kpi-label">Total Customers</div><div class="kpi-value" id="st-customers">—</div><div class="kpi-sub">All pharmacies</div></div>
+      </div>
+
+      <div class="card">
+        <div class="card-hdr">
+          <div><div class="card-title">🆕 Recent Signups</div><div class="card-sub">Latest registered pharmacies</div></div>
+          <button class="btn btn-navy" onclick="showSection('tenants',document.querySelector('.sidebar a:nth-child(3)'))">View All →</button>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>Pharmacy</th><th>Owner</th><th>Email</th><th>Plan</th><th>Joined</th><th>Trial Ends</th><th>Action</th></tr></thead>
+            <tbody id="recentSignups"><tr><td colspan="7" class="empty-state"><div class="emoji">⏳</div><p>Loading...</p></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-hdr">
+          <div><div class="card-title">🏆 Top Performing Pharmacies</div><div class="card-sub">By sales revenue</div></div>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>Pharmacy</th><th>Owner</th><th>Total Sales</th><th>Revenue</th><th>Customers</th><th>Plan</th><th>Action</th></tr></thead>
+            <tbody id="topPharmacies"><tr><td colspan="7" class="empty-state"><div class="emoji">⏳</div><p>Loading...</p></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ ALL TENANTS ══ -->
+    <div class="section" id="sec-tenants">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
+        <div>
+          <div style="font-size:22px;font-weight:800;color:#1a2332;">🏥 All Tenants</div>
+          <div style="font-size:13px;color:#78909c;margin-top:3px;" id="tenantCountLine">Loading...</div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+          <div class="search-bar">
+            <span class="si">🔍</span>
+            <input type="text" id="tenantSearch" placeholder="Search pharmacy, owner, email..." oninput="filterTenants()" />
+          </div>
+          <select class="filter-sel" id="planFilter" onchange="filterTenants()">
+            <option value="">All Plans</option>
+            <option value="trial">Trial</option>
+            <option value="basic">Basic</option>
+            <option value="pro">Pro</option>
+            <option value="enterprise">Enterprise</option>
+          </select>
+          <select class="filter-sel" id="statusFilter" onchange="filterTenants()">
+            <option value="">All Status</option>
+            <option value="active">Active</option>
+            <option value="suspended">Suspended</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr>
+              <th>#</th><th>Pharmacy</th><th>Owner / Contact</th><th>Login Info</th>
+              <th>Plan</th><th>Status</th><th>Data Summary</th><th>Last Login</th><th>Actions</th>
+            </tr></thead>
+            <tbody id="tenantTable"><tr><td colspan="9" class="empty-state"><div class="emoji">⏳</div><p>Loading...</p></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ PLANS & REVENUE ══ -->
+    <div class="section" id="sec-plans">
+      <div style="font-size:22px;font-weight:800;color:#1a2332;margin-bottom:20px;">💰 Plans & Revenue</div>
+
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px;">
+        <div class="kpi-card teal"><div class="kpi-icon">💰</div><div class="kpi-label">Monthly Revenue</div><div class="kpi-value" id="pr-mrr">—</div><div class="kpi-sub">MRR estimate</div></div>
+        <div class="kpi-card blue"><div class="kpi-icon">📅</div><div class="kpi-label">Annual Run Rate</div><div class="kpi-value" id="pr-arr">—</div><div class="kpi-sub">ARR estimate</div></div>
+        <div class="kpi-card purple"><div class="kpi-icon">📊</div><div class="kpi-label">Avg Revenue/User</div><div class="kpi-value" id="pr-arpu">—</div><div class="kpi-sub">ARPU</div></div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px;">
+        <div class="plan-card basic">
+          <div style="font-size:16px;font-weight:800;color:#1B4F72;margin-bottom:8px;">🔵 Basic</div>
+          <div style="font-size:32px;font-weight:800;color:#1a2332;" id="pr-basic-count">0</div>
+          <div style="font-size:13px;color:#78909c;margin-top:4px;">₹499/month</div>
+          <div style="font-size:15px;font-weight:800;color:#1B4F72;margin-top:8px;" id="pr-basic-rev">₹0/mo</div>
+        </div>
+        <div class="plan-card pro">
+          <div style="font-size:16px;font-weight:800;color:#7D3C98;margin-bottom:8px;">⭐ Pro</div>
+          <div style="font-size:32px;font-weight:800;color:#1a2332;" id="pr-pro-count">0</div>
+          <div style="font-size:13px;color:#78909c;margin-top:4px;">₹999/month</div>
+          <div style="font-size:15px;font-weight:800;color:#7D3C98;margin-top:8px;" id="pr-pro-rev">₹0/mo</div>
+        </div>
+        <div class="plan-card enterprise">
+          <div style="font-size:16px;font-weight:800;color:#1E8449;margin-bottom:8px;">🚀 Enterprise</div>
+          <div style="font-size:32px;font-weight:800;color:#1a2332;" id="pr-ent-count">0</div>
+          <div style="font-size:13px;color:#78909c;margin-top:4px;">₹1999/month</div>
+          <div style="font-size:15px;font-weight:800;color:#1E8449;margin-top:8px;" id="pr-ent-rev">₹0/mo</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-hdr"><div class="card-title">📋 All Subscriptions</div></div>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>Pharmacy</th><th>Owner</th><th>Plan</th><th>Amount</th><th>Since</th><th>Expires</th><th>Actions</th></tr></thead>
+            <tbody id="subsTable"><tr><td colspan="7" class="empty-state"><div class="emoji">⏳</div><p>Loading...</p></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ ACTIVITY LOG ══ -->
+    <div class="section" id="sec-activity">
+      <div style="font-size:22px;font-weight:800;color:#1a2332;margin-bottom:20px;">📋 Activity Log</div>
+      <div class="card">
+        <div class="card-hdr"><div class="card-title">🔍 Recent System Activity</div></div>
+        <div id="activityLog"><div class="empty-state"><div class="emoji">📋</div><p>Loading...</p></div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══ TENANT DETAIL MODAL ══ -->
+<div class="modal-bg" id="tenantModal">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div>
+        <div class="modal-title" id="tm-name">Pharmacy Details</div>
+        <div id="tm-id" style="font-size:11px;color:#78909c;font-family:monospace;margin-top:3px;"></div>
+      </div>
+      <button class="modal-close" onclick="closeTenantModal()">✕</button>
+    </div>
+
+    <div class="detail-tabs">
+      <button class="dtab active" onclick="showDTab('overview',this)">📋 Overview</button>
+      <button class="dtab" onclick="showDTab('credentials',this)">🔐 Credentials</button>
+      <button class="dtab" onclick="showDTab('sales',this)">🧾 Sales Data</button>
+      <button class="dtab" onclick="showDTab('stock',this)">📦 Stock</button>
+      <button class="dtab" onclick="showDTab('customers',this)">👥 Customers</button>
+      <button class="dtab" onclick="showDTab('purchases',this)">🛒 Purchases</button>
+    </div>
+
+    <!-- OVERVIEW -->
+    <div class="dtab-content active" id="dtab-overview">
+      <div class="info-grid">
+        <div class="info-item"><div class="il">🏥 Pharmacy</div><div class="iv" id="tm-pharma">—</div></div>
+        <div class="info-item"><div class="il">👤 Owner</div><div class="iv" id="tm-owner">—</div></div>
+        <div class="info-item"><div class="il">✉️ Email</div><div class="iv blue" id="tm-email">—</div></div>
+        <div class="info-item"><div class="il">📞 Phone</div><div class="iv" id="tm-phone">—</div></div>
+        <div class="info-item"><div class="il">📅 Joined</div><div class="iv" id="tm-joined">—</div></div>
+        <div class="info-item"><div class="il">🕒 Last Login</div><div class="iv" id="tm-lastlogin">—</div></div>
+        <div class="info-item"><div class="il">💰 Plan</div><div class="iv amber" id="tm-plan">—</div></div>
+        <div class="info-item"><div class="il">✅ Status</div><div class="iv green" id="tm-status">—</div></div>
+        <div class="info-item"><div class="il">⏰ Trial Ends</div><div class="iv" id="tm-trial">—</div></div>
+      </div>
+      <div class="info-grid">
+        <div class="info-item"><div class="il">🧾 Total Bills</div><div class="iv green" id="tm-bills">—</div></div>
+        <div class="info-item"><div class="il">💰 Total Revenue</div><div class="iv blue" id="tm-revenue">—</div></div>
+        <div class="info-item"><div class="il">👥 Customers</div><div class="iv" id="tm-custs">—</div></div>
+        <div class="info-item"><div class="il">📦 Products</div><div class="iv" id="tm-prods">—</div></div>
+        <div class="info-item"><div class="il">🛒 Purchases</div><div class="iv" id="tm-purch">—</div></div>
+        <div class="info-item"><div class="il">📋 Prescriptions</div><div class="iv" id="tm-rx">—</div></div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;padding-top:16px;border-top:1px solid #f0f4f8;">
+        <button class="btn btn-navy" onclick="openPlanModalForCurrent()">💰 Update Plan</button>
+        <button class="btn btn-purple" id="tm-toggle-btn" onclick="toggleCurrentTenant()">🚫 Suspend</button>
+        <button class="btn btn-orange" onclick="resetCurrentPassword()">🔑 Reset Password</button>
+        <button class="btn btn-green" onclick="impersonateTenant()">🔑 Login as Tenant</button>
+        <button class="btn btn-red" onclick="deleteCurrentTenant()">🗑️ Delete</button>
+      </div>
+    </div>
+
+    <!-- CREDENTIALS -->
+    <div class="dtab-content" id="dtab-credentials" style="display:none;">
+      <div style="background:#FEF9E7;border:1px solid #F9E79F;border-radius:10px;padding:14px;margin-bottom:16px;">
+        <div style="font-size:13px;color:#B7770D;font-weight:700;">⚠️ Sensitive — Handle with care. Do not share.</div>
+      </div>
+      <div class="info-grid">
+        <div class="info-item"><div class="il">✉️ Login Email</div><div class="iv blue" id="cred-email">—</div></div>
+        <div class="info-item"><div class="il">🔑 Username</div><div class="iv" id="cred-username">—</div></div>
+        <div class="info-item"><div class="il">🆔 Tenant ID</div><div class="iv" style="font-size:11px;font-family:monospace;" id="cred-tenantid">—</div></div>
+        <div class="info-item"><div class="il">📅 Created</div><div class="iv" id="cred-created">—</div></div>
+        <div class="info-item"><div class="il">👥 Staff</div><div class="iv" id="cred-staff">—</div></div>
+        <div class="info-item"><div class="il">🔒 Password</div><div class="iv amber">●●●●●● (Hashed — BCrypt)</div></div>
+      </div>
+      <div style="margin-top:16px;">
+        <div style="font-size:13px;font-weight:700;color:#1a2332;margin-bottom:10px;">👥 Staff Members</div>
+        <div id="staffListDetail"></div>
+      </div>
+      <div style="margin-top:16px;display:flex;gap:10px;">
+        <button class="btn btn-orange" onclick="resetCurrentPassword()">🔑 Reset Owner Password</button>
+        <button class="btn btn-green" onclick="impersonateTenant()">🚀 Login as This Tenant</button>
+      </div>
+    </div>
+
+    <!-- SALES -->
+    <div class="dtab-content" id="dtab-sales" style="display:none;">
+      <div class="info-grid" style="margin-bottom:14px;">
+        <div class="info-item"><div class="il">Total Bills</div><div class="iv green" id="sd-bills">—</div></div>
+        <div class="info-item"><div class="il">Total Revenue</div><div class="iv blue" id="sd-rev">—</div></div>
+        <div class="info-item"><div class="il">Pending Dues</div><div class="iv red" id="sd-dues">—</div></div>
+        <div class="info-item"><div class="il">Avg Bill Value</div><div class="iv" id="sd-avg">—</div></div>
+        <div class="info-item"><div class="il">Today's Bills</div><div class="iv green" id="sd-today">—</div></div>
+        <div class="info-item"><div class="il">This Month</div><div class="iv amber" id="sd-month">—</div></div>
+      </div>
+      <div style="font-size:13px;font-weight:700;color:#1a2332;margin-bottom:10px;">📋 Recent Bills</div>
+      <div class="table-wrap"><table class="mini-table">
+        <thead><tr><th>Bill No</th><th>Customer</th><th>Date</th><th>Amount</th><th>Paid</th><th>Mode</th><th>Status</th></tr></thead>
+        <tbody id="sd-table"></tbody>
+      </table></div>
+    </div>
+
+    <!-- STOCK -->
+    <div class="dtab-content" id="dtab-stock" style="display:none;">
+      <div class="info-grid" style="margin-bottom:14px;">
+        <div class="info-item"><div class="il">Total Products</div><div class="iv" id="sk-total">—</div></div>
+        <div class="info-item"><div class="il">Stock Value</div><div class="iv green" id="sk-value">—</div></div>
+        <div class="info-item"><div class="il">Low Stock</div><div class="iv red" id="sk-low">—</div></div>
+        <div class="info-item"><div class="il">Expiring Soon</div><div class="iv amber" id="sk-exp">—</div></div>
+        <div class="info-item"><div class="il">Out of Stock</div><div class="iv red" id="sk-out">—</div></div>
+        <div class="info-item"><div class="il">Medicine Items</div><div class="iv blue" id="sk-med">—</div></div>
+      </div>
+      <div style="font-size:13px;font-weight:700;color:#1a2332;margin-bottom:10px;">📦 Products</div>
+      <div class="table-wrap"><table class="mini-table">
+        <thead><tr><th>Product</th><th>Category</th><th>MRP</th><th>Sale Price</th><th>Stock</th><th>Status</th></tr></thead>
+        <tbody id="sk-table"></tbody>
+      </table></div>
+    </div>
+
+    <!-- CUSTOMERS -->
+    <div class="dtab-content" id="dtab-customers" style="display:none;">
+      <div class="info-grid" style="margin-bottom:14px;">
+        <div class="info-item"><div class="il">Total</div><div class="iv" id="cu-total">—</div></div>
+        <div class="info-item"><div class="il">Repeat</div><div class="iv green" id="cu-repeat">—</div></div>
+        <div class="info-item"><div class="il">Gold Members</div><div class="iv amber" id="cu-gold">—</div></div>
+        <div class="info-item"><div class="il">Total Points</div><div class="iv blue" id="cu-pts">—</div></div>
+        <div class="info-item"><div class="il">Total Spent</div><div class="iv green" id="cu-spent">—</div></div>
+        <div class="info-item"><div class="il">Avg/Customer</div><div class="iv" id="cu-avg">—</div></div>
+      </div>
+      <div style="font-size:13px;font-weight:700;color:#1a2332;margin-bottom:10px;">👥 Customers</div>
+      <div class="table-wrap"><table class="mini-table">
+        <thead><tr><th>Name</th><th>Phone</th><th>Visits</th><th>Total Spent</th><th>Points</th><th>Last Visit</th></tr></thead>
+        <tbody id="cu-table"></tbody>
+      </table></div>
+    </div>
+
+    <!-- PURCHASES -->
+    <div class="dtab-content" id="dtab-purchases" style="display:none;">
+      <div class="info-grid" style="margin-bottom:14px;">
+        <div class="info-item"><div class="il">Total Purchases</div><div class="iv" id="pu-total">—</div></div>
+        <div class="info-item"><div class="il">Total Spent</div><div class="iv red" id="pu-spent">—</div></div>
+        <div class="info-item"><div class="il">Pending Dues</div><div class="iv amber" id="pu-dues">—</div></div>
+        <div class="info-item"><div class="il">This Month</div><div class="iv blue" id="pu-month">—</div></div>
+        <div class="info-item"><div class="il">Suppliers</div><div class="iv" id="pu-suppliers">—</div></div>
+        <div class="info-item"><div class="il">Avg Purchase</div><div class="iv" id="pu-avg">—</div></div>
+      </div>
+      <div style="font-size:13px;font-weight:700;color:#1a2332;margin-bottom:10px;">🛒 Recent Purchases</div>
+      <div class="table-wrap"><table class="mini-table">
+        <thead><tr><th>Date</th><th>Supplier</th><th>Invoice</th><th>Items</th><th>Total</th><th>Status</th></tr></thead>
+        <tbody id="pu-table"></tbody>
+      </table></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PLAN MODAL ══ -->
+<div class="modal-bg" id="planModal">
+  <div class="modal modal-sm">
+    <div class="modal-hdr">
+      <div class="modal-title">💰 Update Subscription Plan</div>
+      <button class="modal-close" onclick="closePlanModal()">✕</button>
+    </div>
+    <p id="plan-tenant-name" style="color:#78909c;font-size:13px;margin-bottom:16px;"></p>
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div class="fgroup">
+        <label>Plan</label>
+        <select id="plan-select" style="padding:10px 12px;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:8px;color:#1a2332;font-size:14px;outline:none;">
+          <option value="trial">⏳ Trial (Free — 14 days)</option>
+          <option value="basic">🔵 Basic — ₹499/month</option>
+          <option value="pro">⭐ Pro — ₹999/month</option>
+          <option value="enterprise">🚀 Enterprise — ₹1999/month</option>
+        </select>
+      </div>
+      <div class="fgroup">
+        <label>Months</label>
+        <input type="number" id="plan-months" value="1" min="1" max="12" style="padding:10px 12px;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:8px;color:#1a2332;font-size:14px;outline:none;" />
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:20px;">
+      <button onclick="closePlanModal()" style="flex:1;padding:11px;background:#f0f4f8;color:#546e7a;border:none;border-radius:9px;cursor:pointer;font-size:14px;font-weight:700;">Cancel</button>
+      <button onclick="updatePlan()" style="flex:2;padding:11px;background:linear-gradient(135deg,#1B4F72,#154360);color:white;border:none;border-radius:9px;cursor:pointer;font-size:14px;font-weight:700;">✅ Update Plan</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let adminToken=localStorage.getItem('adminToken');
+let allTenants=[],selectedTenantId=null,currentTenantData=null;
+
+function notif(msg,ok=true){
+  const el=document.getElementById('notifEl');
+  el.textContent=msg;el.style.background=ok?'#1E8449':'#C0392B';
+  el.style.display='block';
+  setTimeout(()=>{el.style.opacity='0';el.style.transition='opacity 0.3s';setTimeout(()=>{el.style.display='none';el.style.opacity='1';},300);},2800);
+}
+function fmtMoney(v){return '₹'+(parseFloat(v)||0).toLocaleString('en-IN',{maximumFractionDigits:0});}
+function fmtDate(d){return d?new Date(d).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}):'—';}
+function fmtTime(d){return d?new Date(d).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}):'—';}
+
+// ── LOGIN ──
+async function adminLogin(){
+  const email=document.getElementById('adminEmail').value.trim();
+  const pass=document.getElementById('adminPass').value;
+  if(!email||!pass){showLoginError('Email aur password zaroori!');return;}
+  try{
+    const res=await fetch('/api/superadmin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:pass})});
+    const data=await res.json();
+    if(data.success){
+      localStorage.setItem('adminToken',data.token);
+      adminToken=data.token;
+      document.getElementById('adminName').textContent=data.admin?.name||'Admin';
+      document.getElementById('loginScreen').style.display='none';
+      document.getElementById('mainApp').style.display='block';
+      loadDashboard();loadTenants();
+    }else showLoginError(data.message||'Login failed!');
+  }catch(e){showLoginError('Server error: '+e.message);}
+}
+function showLoginError(msg){const el=document.getElementById('loginError');el.textContent=msg;el.style.display='block';}
+function adminLogout(){localStorage.removeItem('adminToken');location.reload();}
+
+// ── SECTIONS ──
+function showSection(name,el){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.sidebar a').forEach(a=>a.classList.remove('active'));
+  document.getElementById('sec-'+name).classList.add('active');
+  if(el)el.classList.add('active');
+  if(name==='plans')loadPlansSection();
+  if(name==='activity')loadActivity();
+}
+function refreshAll(){loadDashboard();loadTenants();notif('✅ Refreshed!');}
+
+// ── DASHBOARD ──
+async function loadDashboard(){
+  try{
+    const res=await fetch('/api/superadmin/dashboard',{headers:{'Authorization':'Bearer '+adminToken}});
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    const data=await res.json();
+    const s=data.stats||{};
+    const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+    set('st-total',s.totalTenants||0);set('st-active',s.activeTenants||0);
+    set('st-trial',s.trialTenants||0);set('st-paid',s.paidTenants||0);
+    set('st-revenue',fmtMoney(s.monthlyRevenue||0));set('st-expiring',s.expiringTrials||0);
+    set('st-bills',s.totalBillsToday||'—');set('st-customers',s.totalCustomers||'—');
+
+    const recent=data.recentTenants||[];
+    document.getElementById('recentSignups').innerHTML=recent.length?recent.map(t=>`<tr>
+      <td><div class="tenant-name">${t.pharmacyName}</div><div class="tenant-id">${t.tenantId}</div></td>
+      <td style="font-weight:600;color:#1a2332;">${t.ownerName}</td>
+      <td style="color:#1B4F72;">${t.email}</td>
+      <td><span class="badge badge-${t.plan||'trial'}">${(t.plan||'trial').toUpperCase()}</span></td>
+      <td>${fmtDate(t.createdAt)}</td>
+      <td>${t.trialEnds?fmtDate(t.trialEnds):'—'}</td>
+      <td><button class="btn btn-navy" onclick="openTenantModal('${t.tenantId}')">👁️ View</button></td>
+    </tr>`).join(''):'<tr><td colspan="7" class="empty-state"><div class="emoji">✅</div><p>No recent signups</p></td></tr>';
+
+    const top=data.topPharmacies||[];
+    document.getElementById('topPharmacies').innerHTML=top.length?top.map((t,i)=>`<tr>
+      <td><div class="tenant-name">${i===0?'🥇':i===1?'🥈':i===2?'🥉':'  '} ${t.pharmacyName}</div></td>
+      <td>${t.ownerName}</td>
+      <td style="font-weight:700;color:#1a2332;">${t.totalSales||0}</td>
+      <td style="font-weight:700;color:#1E8449;">${fmtMoney(t.totalRevenue||0)}</td>
+      <td>${t.totalCustomers||0}</td>
+      <td><span class="badge badge-${t.plan||'trial'}">${(t.plan||'trial').toUpperCase()}</span></td>
+      <td><button class="btn btn-navy" onclick="openTenantModal('${t.tenantId}')">👁️ View</button></td>
+    </tr>`).join(''):'<tr><td colspan="7" class="empty-state"><div class="emoji">📊</div><p>No data yet</p></td></tr>';
+  }catch(e){console.error('Dashboard:',e);}
+}
+
+// ── TENANTS ──
+async function loadTenants(){
+  try{
+    const res=await fetch('/api/superadmin/tenants',{headers:{'Authorization':'Bearer '+adminToken}});
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    allTenants=await res.json();
+    if(!Array.isArray(allTenants))allTenants=[];
+    document.getElementById('tenantCountLine').textContent=allTenants.length+' pharmacies registered';
+    renderTenants(allTenants);
+  }catch(e){console.error('Tenants:',e);}
+}
+
+function renderTenants(tenants){
+  const tbody=document.getElementById('tenantTable');
+  if(!tenants.length){tbody.innerHTML='<tr><td colspan="9" class="empty-state"><div class="emoji">🏥</div><p>No tenants</p></td></tr>';return;}
+  tbody.innerHTML=tenants.map((t,i)=>`<tr>
+    <td style="color:#b0bec5;font-weight:700;">${i+1}</td>
+    <td>
+      <div class="tenant-name">${t.pharmacyName}</div>
+      <div class="tenant-id">${t.tenantId}</div>
+    </td>
+    <td>
+      <div style="font-weight:600;color:#1a2332;">${t.ownerName}</div>
+      <div style="font-size:11px;color:#78909c;">📞 ${t.phone||'—'}</div>
+      <div style="font-size:11px;color:#1B4F72;">✉️ ${t.email}</div>
+    </td>
+    <td>
+      <div style="font-size:11px;color:#1B4F72;font-weight:600;">Login: ${t.email}</div>
+      <div style="font-size:10px;color:#b0bec5;font-family:monospace;margin-top:2px;">${t.tenantId}</div>
+    </td>
+    <td><span class="badge badge-${t.plan||'trial'}">${(t.plan||'trial').toUpperCase()}</span></td>
+    <td><span class="badge ${t.isActive?'badge-active':'badge-suspended'}">${t.isActive?'● Active':'● Suspended'}</span></td>
+    <td>
+      <div style="font-size:12px;color:#546e7a;">Bills: <strong style="color:#1E8449;">${t.totalSales||0}</strong></div>
+      <div style="font-size:12px;color:#546e7a;">Rev: <strong style="color:#1B4F72;">${fmtMoney(t.totalRevenue||0)}</strong></div>
+      <div style="font-size:12px;color:#546e7a;">Custs: <strong>${t.totalCustomers||0}</strong></div>
+    </td>
+    <td style="font-size:12px;color:#78909c;">${t.lastLogin?fmtDate(t.lastLogin):'Never'}</td>
+    <td>
+      <div style="display:flex;flex-direction:column;gap:4px;">
+        <button class="btn btn-navy" onclick="openTenantModal('${t.tenantId}')">👁️ View All</button>
+        <button class="btn btn-orange" onclick="openPlanModal('${t.tenantId}','${(t.pharmacyName||'').replace(/'/g,"\\'")}','${t.plan||'trial'}')">💰 Plan</button>
+        <button class="btn ${t.isActive?'btn-red':'btn-green'}" onclick="toggleStatus('${t.tenantId}',${!t.isActive})">${t.isActive?'🚫 Suspend':'✅ Activate'}</button>
+      </div>
+    </td>
+  </tr>`).join('');
+}
+
+function filterTenants(){
+  const q=document.getElementById('tenantSearch').value.toLowerCase();
+  const plan=document.getElementById('planFilter').value;
+  const status=document.getElementById('statusFilter').value;
+  renderTenants(allTenants.filter(t=>{
+    const mq=!q||(t.pharmacyName||'').toLowerCase().includes(q)||(t.ownerName||'').toLowerCase().includes(q)||(t.email||'').toLowerCase().includes(q)||(t.tenantId||'').toLowerCase().includes(q);
+    const mp=!plan||(t.plan||'trial')===plan;
+    const ms=!status||(status==='active'?t.isActive:!t.isActive);
+    return mq&&mp&&ms;
+  }));
+}
+
+// ── TENANT DETAIL MODAL ──
+async function openTenantModal(tenantId){
+  selectedTenantId=tenantId;
+  const tenant=allTenants.find(t=>t.tenantId===tenantId)||{};
+  currentTenantData=tenant;
+  document.getElementById('tenantModal').classList.add('open');
+  document.getElementById('tm-name').textContent=tenant.pharmacyName||'Loading...';
+  document.getElementById('tm-id').textContent='ID: '+tenantId;
+  showDTab('overview',document.querySelector('.dtab'));
+  await loadTenantDetail(tenantId);
+}
+
+async function loadTenantDetail(tenantId){
+  try{
+    const res=await fetch('/api/superadmin/tenants/'+tenantId+'/detail',{headers:{'Authorization':'Bearer '+adminToken}});
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    const d=await res.json();
+    currentTenantData=d;
+    const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v||'—';};
+
+    // Overview
+    set('tm-pharma',d.pharmacyName);set('tm-owner',d.ownerName);
+    set('tm-email',d.email);set('tm-phone',d.phone);
+    set('tm-joined',fmtDate(d.createdAt));
+    set('tm-lastlogin',d.lastLogin?fmtDate(d.lastLogin)+' '+fmtTime(d.lastLogin):'Never');
+    set('tm-plan',(d.plan||'trial').toUpperCase());
+    set('tm-status',d.isActive?'✅ Active':'🚫 Suspended');
+    set('tm-trial',d.trialEnds?fmtDate(d.trialEnds):'—');
+    set('tm-bills',d.stats?.totalSales||0);
+    set('tm-revenue',fmtMoney(d.stats?.totalRevenue||0));
+    set('tm-custs',d.stats?.totalCustomers||0);
+    set('tm-prods',d.stats?.totalProducts||0);
+    set('tm-purch',d.stats?.totalPurchases||0);
+    set('tm-rx',d.stats?.totalPrescriptions||0);
+
+    const toggleBtn=document.getElementById('tm-toggle-btn');
+    if(toggleBtn){toggleBtn.textContent=d.isActive?'🚫 Suspend':'✅ Activate';toggleBtn.className='btn '+(d.isActive?'btn-red':'btn-green');}
+
+    // Credentials
+    set('cred-email',d.email);set('cred-username',d.username||d.email);
+    set('cred-tenantid',d.tenantId);set('cred-created',fmtDate(d.createdAt));
+    set('cred-staff',(d.staff?.length||0)+' members');
+    document.getElementById('staffListDetail').innerHTML=(d.staff||[]).length?
+      d.staff.map(s=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 12px;background:#f8fafc;border-radius:8px;margin-bottom:6px;border:1px solid #e2e8f0;">
+        <div><div style="font-weight:600;font-size:13px;color:#1a2332;">${s.name}</div><div style="font-size:11px;color:#78909c;">@${s.username} · ${s.role}</div></div>
+        <span class="badge ${s.isActive?'badge-active':'badge-suspended'}">${s.isActive?'Active':'Inactive'}</span>
+      </div>`).join(''):
+      '<div style="color:#b0bec5;font-size:13px;text-align:center;padding:16px;">No staff members</div>';
+
+    // Sales
+    const sales=d.recentSales||[];
+    const totalRev=d.stats?.totalRevenue||0;
+    const dues=sales.reduce((a,s)=>a+Math.max(0,(s.totalAmount||0)-(s.paidAmount||0)),0);
+    const today=new Date().toDateString();
+    const todaySales=sales.filter(s=>new Date(s.date).toDateString()===today);
+    const now=new Date();
+    const monthSales=sales.filter(s=>{const d=new Date(s.date);return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();});
+    set('sd-bills',d.stats?.totalSales||0);set('sd-rev',fmtMoney(totalRev));
+    set('sd-dues',fmtMoney(dues));set('sd-avg',sales.length?fmtMoney(totalRev/sales.length):'₹0');
+    set('sd-today',todaySales.length);set('sd-month',monthSales.length);
+    document.getElementById('sd-table').innerHTML=sales.slice(0,15).map(s=>{
+      const due=Math.max(0,(s.totalAmount||0)-(s.paidAmount||0));
+      return `<tr>
+        <td style="font-weight:700;color:#1B4F72;">${s.billNo||'—'}</td>
+        <td>${s.customer||'Walk-in'}</td>
+        <td>${fmtDate(s.date)} ${fmtTime(s.date)}</td>
+        <td style="font-weight:700;color:#1a2332;">${fmtMoney(s.totalAmount)}</td>
+        <td style="color:#1E8449;">${fmtMoney(s.paidAmount)}</td>
+        <td><span class="badge badge-basic">${s.paymentMode||'cash'}</span></td>
+        <td><span class="badge ${due>0.01?'badge-suspended':'badge-active'}">${due>0.01?'Due':'Paid'}</span></td>
+      </tr>`;
+    }).join('')||'<tr><td colspan="7" style="text-align:center;color:#b0bec5;padding:20px;">No sales data</td></tr>';
+
+    // Stock
+    const products=d.recentProducts||[];
+    const in90=new Date();in90.setDate(in90.getDate()+90);
+    const stockVal=products.reduce((a,p)=>{const q=p.sellType==='loose'?(p.stripStock||0)*(p.unitsPerStrip||10)+(p.looseStock||0):(p.stock||0);return a+q*(p.purchasePrice||0);},0);
+    const lowStock=products.filter(p=>{const q=p.sellType==='loose'?(p.stripStock||0)*(p.unitsPerStrip||10)+(p.looseStock||0):(p.stock||0);return q<=(p.minStock||10)&&q>0;});
+    const outStock=products.filter(p=>{const q=p.sellType==='loose'?(p.stripStock||0)*(p.unitsPerStrip||10)+(p.looseStock||0):(p.stock||0);return q===0;});
+    const expiring=products.filter(p=>{if(!p.expiry)return false;const parts=p.expiry.split('/');if(parts.length<2)return false;const exp=new Date(parseInt('20'+parts[1]),parseInt(parts[0])-1,28);return exp>=new Date()&&exp<=in90;});
+    set('sk-total',products.length);set('sk-value',fmtMoney(stockVal));
+    set('sk-low',lowStock.length);set('sk-exp',expiring.length);
+    set('sk-out',outStock.length);set('sk-med',products.filter(p=>p.category==='medicine').length);
+    document.getElementById('sk-table').innerHTML=products.slice(0,15).map(p=>{
+      const qty=p.sellType==='loose'?(p.stripStock||0)*(p.unitsPerStrip||10)+(p.looseStock||0):(p.stock||0);
+      return `<tr>
+        <td><div style="font-weight:600;color:#1a2332;">${p.name}</div><div style="font-size:11px;color:#b0bec5;">${p.company||''}</div></td>
+        <td><span class="badge badge-basic">${p.category||'other'}</span></td>
+        <td>₹${p.mrp||0}</td><td style="color:#1B4F72;">₹${p.salePrice||0}</td>
+        <td style="font-weight:700;">${qty}</td>
+        <td><span class="badge ${qty===0?'badge-suspended':qty<=(p.minStock||10)?'badge-trial':'badge-active'}">${qty===0?'Out':qty<=(p.minStock||10)?'Low':'OK'}</span></td>
+      </tr>`;
+    }).join('')||'<tr><td colspan="6" style="text-align:center;color:#b0bec5;padding:20px;">No products</td></tr>';
+
+    // Customers
+    const customers=d.recentCustomers||[];
+    const totalSpent=customers.reduce((a,c)=>a+(c.totalSpent||0),0);
+    set('cu-total',customers.length);set('cu-repeat',customers.filter(c=>(c.totalPurchases||0)>1).length);
+    set('cu-gold',customers.filter(c=>(c.loyaltyPoints||0)>=500).length);
+    set('cu-pts',customers.reduce((a,c)=>a+(c.loyaltyPoints||0),0));
+    set('cu-spent',fmtMoney(totalSpent));set('cu-avg',customers.length?fmtMoney(totalSpent/customers.length):'₹0');
+    document.getElementById('cu-table').innerHTML=customers.slice(0,15).map(c=>`<tr>
+      <td style="font-weight:600;color:#1a2332;">${c.name}</td>
+      <td style="color:#1B4F72;">${c.phone||'—'}</td>
+      <td style="text-align:center;">${c.totalPurchases||0}</td>
+      <td style="color:#1E8449;">${fmtMoney(c.totalSpent)}</td>
+      <td style="color:#B7770D;">⭐ ${c.loyaltyPoints||0}</td>
+      <td style="color:#78909c;">${c.lastVisit?fmtDate(c.lastVisit):'—'}</td>
+    </tr>`).join('')||'<tr><td colspan="6" style="text-align:center;color:#b0bec5;padding:20px;">No customers</td></tr>';
+
+    // Purchases
+    const purchases=d.recentPurchases||[];
+    const purchaseTotal=purchases.reduce((a,p)=>a+(p.totalAmount||0),0);
+    const purchaseDues=purchases.reduce((a,p)=>a+Math.max(0,(p.totalAmount||0)-(p.paidAmount||0)),0);
+    const suppliers=[...new Set(purchases.map(p=>p.supplier).filter(Boolean))];
+    const monthPurch=purchases.filter(p=>{const d=new Date(p.date||p.createdAt);return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();});
+    set('pu-total',purchases.length);set('pu-spent',fmtMoney(purchaseTotal));
+    set('pu-dues',fmtMoney(purchaseDues));set('pu-month',monthPurch.length);
+    set('pu-suppliers',suppliers.length);set('pu-avg',purchases.length?fmtMoney(purchaseTotal/purchases.length):'₹0');
+    document.getElementById('pu-table').innerHTML=purchases.slice(0,15).map(p=>`<tr>
+      <td>${fmtDate(p.date||p.createdAt)}</td>
+      <td style="font-weight:600;color:#1a2332;">${p.supplier||'—'}</td>
+      <td style="color:#1B4F72;">${p.invoiceNo||'—'}</td>
+      <td style="text-align:center;">${p.items?.length||0}</td>
+      <td style="font-weight:700;">${fmtMoney(p.totalAmount)}</td>
+      <td><span class="badge ${p.paymentStatus==='paid'?'badge-active':p.paymentStatus==='partial'?'badge-trial':'badge-suspended'}">${p.paymentStatus||'paid'}</span></td>
+    </tr>`).join('')||'<tr><td colspan="6" style="text-align:center;color:#b0bec5;padding:20px;">No purchases</td></tr>';
+
+  }catch(e){console.error('Detail error:',e);notif('❌ Error: '+e.message,false);}
+}
+
+function closeTenantModal(){document.getElementById('tenantModal').classList.remove('open');selectedTenantId=null;currentTenantData=null;}
+
+function showDTab(name,el){
+  document.querySelectorAll('.dtab-content').forEach(t=>t.style.display='none');
+  document.querySelectorAll('.dtab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('dtab-'+name).style.display='block';
+  if(el)el.classList.add('active');
+}
+
+// ── PLAN ──
+function openPlanModal(tenantId,name,plan){
+  selectedTenantId=tenantId;
+  document.getElementById('plan-tenant-name').textContent='Pharmacy: '+name;
+  document.getElementById('plan-select').value=plan||'trial';
+  document.getElementById('plan-months').value=1;
+  document.getElementById('planModal').classList.add('open');
+}
+function openPlanModalForCurrent(){if(currentTenantData)openPlanModal(currentTenantData.tenantId,currentTenantData.pharmacyName,currentTenantData.plan);}
+function closePlanModal(){document.getElementById('planModal').classList.remove('open');}
+
+async function updatePlan(){
+  const plan=document.getElementById('plan-select').value;
+  const months=parseInt(document.getElementById('plan-months').value)||1;
+  try{
+    const res=await fetch('/api/superadmin/tenants/'+selectedTenantId+'/plan',{method:'PATCH',headers:{'Authorization':'Bearer '+adminToken,'Content-Type':'application/json'},body:JSON.stringify({plan,months})});
+    const data=await res.json();
+    if(data.success){closePlanModal();loadTenants();loadDashboard();notif('✅ Plan updated!');}
+    else notif('❌ '+(data.message||'Error'),false);
+  }catch(e){notif('❌ '+e.message,false);}
+}
+
+// ── STATUS ──
+async function toggleStatus(tenantId,isActive){
+  if(!confirm((isActive?'Activate':'Suspend')+' karna chahte ho?'))return;
+  try{
+    await fetch('/api/superadmin/tenants/'+tenantId+'/status',{method:'PATCH',headers:{'Authorization':'Bearer '+adminToken,'Content-Type':'application/json'},body:JSON.stringify({isActive})});
+    loadTenants();loadDashboard();notif('✅ Status updated!');
+  }catch(e){notif('❌ '+e.message,false);}
+}
+async function toggleCurrentTenant(){
+  if(!currentTenantData)return;
+  await toggleStatus(currentTenantData.tenantId,!currentTenantData.isActive);
+  closeTenantModal();
+}
+
+// ── RESET PASSWORD ──
+async function resetCurrentPassword(){
+  if(!currentTenantData)return;
+  const newPass=prompt('New password for "'+currentTenantData.pharmacyName+'":\n(Min 6 characters)');
+  if(!newPass||newPass.length<6){notif('⚠️ Min 6 characters!',false);return;}
+  try{
+    const res=await fetch('/api/superadmin/tenants/'+currentTenantData.tenantId+'/reset-password',{method:'PATCH',headers:{'Authorization':'Bearer '+adminToken,'Content-Type':'application/json'},body:JSON.stringify({newPassword:newPass})});
+    const data=await res.json();
+    if(data.success)notif('✅ Password reset! New: '+newPass);
+    else notif('❌ '+(data.message||'Error'),false);
+  }catch(e){notif('❌ '+e.message,false);}
+}
+
+// ── IMPERSONATE ──
+async function impersonateTenant(){
+  if(!currentTenantData)return;
+  if(!confirm('Login as "'+currentTenantData.pharmacyName+'" karna chahte ho?'))return;
+  try{
+    const res=await fetch('/api/superadmin/tenants/'+currentTenantData.tenantId+'/impersonate',{method:'POST',headers:{'Authorization':'Bearer '+adminToken}});
+    const data=await res.json();
+    if(data.success){
+      localStorage.setItem('tenantToken',data.token);
+      localStorage.setItem('user',JSON.stringify({name:data.tenant.ownerName,pharmacyName:data.tenant.pharmacyName,role:'owner',tenantId:currentTenantData.tenantId}));
+      notif('✅ Opening '+data.tenant.pharmacyName+'...');
+      setTimeout(()=>window.open('/index.html','_blank'),1000);
+    }else notif('❌ '+(data.message||'Error'),false);
+  }catch(e){notif('❌ '+e.message,false);}
+}
+
+// ── DELETE ──
+async function deleteCurrentTenant(){
+  if(!currentTenantData)return;
+  if(!confirm('⚠️ DELETE "'+currentTenantData.pharmacyName+'"?\nYeh PERMANENT hai!'))return;
+  const conf=prompt('Type DELETE to confirm:');
+  if(conf!=='DELETE'){notif('❌ Cancelled',false);return;}
+  try{
+    const res=await fetch('/api/superadmin/tenants/'+currentTenantData.tenantId,{method:'DELETE',headers:{'Authorization':'Bearer '+adminToken}});
+    const data=await res.json();
+    if(data.success){closeTenantModal();loadTenants();loadDashboard();notif('✅ Tenant deleted!');}
+    else notif('❌ '+(data.message||'Error'),false);
+  }catch(e){notif('❌ '+e.message,false);}
+}
+
+// ── PLANS SECTION ──
+async function loadPlansSection(){
+  if(!allTenants.length)await loadTenants();
+  const basic=allTenants.filter(t=>t.plan==='basic');
+  const pro=allTenants.filter(t=>t.plan==='pro');
+  const ent=allTenants.filter(t=>t.plan==='enterprise');
+  const mrr=basic.length*499+pro.length*999+ent.length*1999;
+  const paid=basic.length+pro.length+ent.length;
+  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+  set('pr-mrr',fmtMoney(mrr));set('pr-arr',fmtMoney(mrr*12));
+  set('pr-arpu',paid?fmtMoney(mrr/paid):'₹0');
+  set('pr-basic-count',basic.length);set('pr-pro-count',pro.length);set('pr-ent-count',ent.length);
+  set('pr-basic-rev',fmtMoney(basic.length*499)+'/mo');
+  set('pr-pro-rev',fmtMoney(pro.length*999)+'/mo');
+  set('pr-ent-rev',fmtMoney(ent.length*1999)+'/mo');
+  document.getElementById('subsTable').innerHTML=allTenants.filter(t=>t.plan!=='trial').map(t=>`<tr>
+    <td><div class="tenant-name">${t.pharmacyName}</div></td>
+    <td>${t.ownerName}</td>
+    <td><span class="badge badge-${t.plan}">${(t.plan||'').toUpperCase()}</span></td>
+    <td style="font-weight:700;color:#1E8449;">${fmtMoney(t.plan==='basic'?499:t.plan==='pro'?999:1999)}/mo</td>
+    <td>${fmtDate(t.planStartDate||t.createdAt)}</td>
+    <td>${t.planExpiry?fmtDate(t.planExpiry):'—'}</td>
+    <td><button class="btn btn-navy" onclick="openPlanModal('${t.tenantId}','${(t.pharmacyName||'').replace(/'/g,"\\'")}','${t.plan}')">💰 Update</button></td>
+  </tr>`).join('')||'<tr><td colspan="7" style="text-align:center;color:#b0bec5;padding:24px;">No paid subscriptions yet</td></tr>';
+}
+
+// ── ACTIVITY ──
+async function loadActivity(){
+  const el=document.getElementById('activityLog');
+  const activities=allTenants.filter(t=>t.lastLogin).map(t=>({pharmacy:t.pharmacyName,time:t.lastLogin,plan:t.plan})).sort((a,b)=>new Date(b.time)-new Date(a.time));
+  el.innerHTML=activities.length?activities.map(a=>`
+    <div class="activity-item">
+      <div class="activity-dot" style="background:#1E8449;"></div>
+      <div style="flex:1;">
+        <div style="font-size:13px;font-weight:600;color:#1a2332;">${a.pharmacy}</div>
+        <div style="font-size:12px;color:#78909c;">Last login: ${fmtDate(a.time)} at ${fmtTime(a.time)}</div>
+      </div>
+      <span class="badge badge-${a.plan||'trial'}">${(a.plan||'trial').toUpperCase()}</span>
+    </div>`).join(''):'<div class="empty-state"><div class="emoji">📋</div><p>No recent activity</p></div>';
+}
+
+// ── AUTO LOGIN ──
+if(adminToken){
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('mainApp').style.display='block';
+  fetch('/api/superadmin/dashboard',{headers:{'Authorization':'Bearer '+adminToken}})
+    .then(r=>r.json()).then(data=>{
+      if(data.message==='Unauthorized'||data.message==='Invalid token'){localStorage.removeItem('adminToken');location.reload();}
+      else{loadDashboard();loadTenants();}
+    }).catch(()=>{localStorage.removeItem('adminToken');location.reload();});
+}
+</script>
+</body>
+</html>

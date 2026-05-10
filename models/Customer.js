@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 const customerSchema = new mongoose.Schema({
+  tenantId: { type: String, required: true, index: true },
   name: { type: String, required: true },
   phone: { type: String, unique: true, sparse: true },
   email: { type: String },

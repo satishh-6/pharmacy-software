@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 const productSchema = new mongoose.Schema({
+  tenantId: { type: String, required: true, index: true },
   name: { type: String, required: true },
   category: { type: String, enum: ['medicine', 'fmcg', 'other'], default: 'medicine' },
   generic: { type: String },

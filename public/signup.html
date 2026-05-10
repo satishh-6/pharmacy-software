@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dawa Hisaab — Start Your Journey</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #0f2744;
+  --navy2: #162f52;
+  --blue: #1B4F72;
+  --blue2: #154360;
+  --accent: #00d4aa;
+  --accent2: #00b894;
+  --gold: #f4c430;
+  --white: #ffffff;
+  --glass: rgba(255,255,255,0.06);
+  --glass2: rgba(255,255,255,0.1);
+  --border: rgba(255,255,255,0.12);
+  --text-dim: rgba(255,255,255,0.55);
+  --error: #ff6b6b;
+  --success: #00d4aa;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'Sora', sans-serif;
+  background: var(--navy);
+  min-height: 100vh;
+  display: flex;
+  overflow: hidden;
+}
+
+/* ── ANIMATED BACKGROUND ── */
+.bg-orbs {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  animation: drift 12s ease-in-out infinite;
+}
+.orb1 { width:500px; height:500px; background:rgba(0,212,170,0.12); top:-100px; left:-100px; animation-delay:0s; }
+.orb2 { width:400px; height:400px; background:rgba(27,79,114,0.3); bottom:-80px; right:-60px; animation-delay:-4s; }
+.orb3 { width:300px; height:300px; background:rgba(244,196,48,0.06); top:40%; left:30%; animation-delay:-8s; }
+@keyframes drift {
+  0%,100% { transform: translate(0,0) scale(1); }
+  33% { transform: translate(30px,-20px) scale(1.05); }
+  66% { transform: translate(-20px,30px) scale(0.95); }
+}
+
+/* Grid lines overlay */
+.grid-overlay {
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(0,212,170,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,212,170,0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ── LEFT PANEL ── */
+.left-panel {
+  width: 48%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 60px 56px;
+  position: relative;
+  z-index: 1;
+}
+
+.brand-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 56px;
+  animation: slideIn 0.7s ease both;
+}
+.brand-icon {
+  width: 52px;
+  height: 52px;
+  background: linear-gradient(135deg, var(--accent), #0099ff);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  box-shadow: 0 0 30px rgba(0,212,170,0.35);
+}
+.brand-name {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--white);
+  letter-spacing: -0.5px;
+}
+.brand-name span { color: var(--accent); }
+
+.headline {
+  animation: slideIn 0.7s 0.1s ease both;
+}
+.headline h1 {
+  font-size: 48px;
+  font-weight: 800;
+  color: var(--white);
+  line-height: 1.1;
+  letter-spacing: -1.5px;
+  margin-bottom: 18px;
+}
+.headline h1 em {
+  font-style: normal;
+  background: linear-gradient(90deg, var(--accent), #85C1E9);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.headline p {
+  font-size: 16px;
+  color: var(--text-dim);
+  line-height: 1.7;
+  max-width: 400px;
+}
+
+.features {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 44px;
+  animation: slideIn 0.7s 0.2s ease both;
+}
+.feat-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 16px 18px;
+  background: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  transition: all 0.25s;
+  cursor: default;
+}
+.feat-item:hover {
+  background: var(--glass2);
+  border-color: rgba(0,212,170,0.25);
+  transform: translateX(4px);
+}
+.feat-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.fi-green { background: rgba(0,212,170,0.15); }
+.fi-blue { background: rgba(133,193,233,0.15); }
+.fi-gold { background: rgba(244,196,48,0.12); }
+.fi-purple { background: rgba(167,139,250,0.15); }
+.feat-text .ft-title { font-size: 14px; font-weight: 700; color: var(--white); margin-bottom: 3px; }
+.feat-text .ft-sub { font-size: 12px; color: var(--text-dim); line-height: 1.5; }
+
+.badges {
+  display: flex;
+  gap: 10px;
+  margin-top: 36px;
+  animation: slideIn 0.7s 0.3s ease both;
+  flex-wrap: wrap;
+}
+.badge {
+  padding: 7px 16px;
+  border-radius: 50px;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  background: var(--glass);
+  letter-spacing: 0.2px;
+}
+.badge.highlight { border-color: rgba(0,212,170,0.4); color: var(--accent); background: rgba(0,212,170,0.08); }
+
+@keyframes slideIn {
+  from { opacity:0; transform:translateY(24px); }
+  to { opacity:1; transform:translateY(0); }
+}
+
+/* ── RIGHT PANEL ── */
+.right-panel {
+  width: 52%;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 52px;
+  position: relative;
+  z-index: 1;
+}
+.right-panel::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 10%;
+  height: 80%;
+  width: 1px;
+  background: linear-gradient(to bottom, transparent, var(--border), transparent);
+}
+
+.form-card {
+  width: 100%;
+  max-width: 460px;
+  background: rgba(15,39,68,0.7);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 40px;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 40px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04) inset;
+  animation: cardIn 0.8s 0.2s ease both;
+}
+@keyframes cardIn {
+  from { opacity:0; transform:translateY(30px) scale(0.98); }
+  to { opacity:1; transform:translateY(0) scale(1); }
+}
+
+/* TABS */
+.tabs {
+  display: flex;
+  background: rgba(255,255,255,0.05);
+  border-radius: 12px;
+  padding: 4px;
+  margin-bottom: 32px;
+  border: 1px solid var(--border);
+}
+.tab-btn {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  background: transparent;
+  border-radius: 9px;
+  font-family: 'Sora', sans-serif;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: all 0.25s;
+}
+.tab-btn.active {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: var(--navy);
+  box-shadow: 0 4px 16px rgba(0,212,170,0.35);
+}
+
+/* FORM */
+.form-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--white);
+  margin-bottom: 6px;
+  letter-spacing: -0.5px;
+}
+.form-sub {
+  font-size: 13px;
+  color: var(--text-dim);
+  margin-bottom: 28px;
+}
+
+.form-section { display: none; }
+.form-section.active { display: block; }
+
+.frow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.frow.full { grid-template-columns: 1fr; }
+
+.fgroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.fgroup label {
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+}
+.fgroup input, .fgroup select {
+  padding: 12px 16px;
+  background: rgba(255,255,255,0.06);
+  border: 1.5px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  font-family: 'Sora', sans-serif;
+  font-size: 14px;
+  color: var(--white);
+  outline: none;
+  transition: all 0.2s;
+}
+.fgroup input::placeholder { color: rgba(255,255,255,0.25); }
+.fgroup input:focus, .fgroup select:focus {
+  border-color: var(--accent);
+  background: rgba(0,212,170,0.06);
+  box-shadow: 0 0 0 3px rgba(0,212,170,0.1);
+}
+.fgroup select option { background: #0f2744; color: white; }
+
+.pw-wrap { position: relative; }
+.pw-wrap input { padding-right: 44px; width: 100%; }
+.pw-eye {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  font-size: 16px;
+  padding: 4px;
+}
+
+.plan-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.plan-card {
+  padding: 14px;
+  border: 1.5px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: rgba(255,255,255,0.04);
+}
+.plan-card:hover { border-color: rgba(0,212,170,0.4); background: rgba(0,212,170,0.05); }
+.plan-card.selected { border-color: var(--accent); background: rgba(0,212,170,0.1); }
+.plan-card input { display: none; }
+.pc-name { font-size: 13px; font-weight: 700; color: var(--white); margin-bottom: 3px; }
+.pc-price { font-size: 11px; color: var(--text-dim); }
+.pc-badge { font-size: 10px; color: var(--accent); font-weight: 700; margin-top: 4px; }
+
+.err-msg {
+  background: rgba(255,107,107,0.12);
+  border: 1px solid rgba(255,107,107,0.3);
+  color: #ff6b6b;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  margin-bottom: 14px;
+  display: none;
+}
+.success-msg {
+  background: rgba(0,212,170,0.12);
+  border: 1px solid rgba(0,212,170,0.3);
+  color: var(--accent);
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  margin-bottom: 14px;
+  display: none;
+}
+
+.submit-btn {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--accent) 0%, #00a8ff 100%);
+  color: var(--navy);
+  font-family: 'Sora', sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.25s;
+  position: relative;
+  overflow: hidden;
+  margin-top: 4px;
+  letter-spacing: 0.2px;
+}
+.submit-btn:hover { transform: translateY(-1px); box-shadow: 0 12px 30px rgba(0,212,170,0.4); }
+.submit-btn:active { transform: translateY(0); }
+.submit-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+.submit-btn .spinner {
+  display: none;
+  width: 18px;
+  height: 18px;
+  border: 2.5px solid rgba(15,39,68,0.4);
+  border-top-color: var(--navy);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  margin: 0 auto;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 18px 0;
+  color: var(--text-dim);
+  font-size: 12px;
+}
+.divider::before, .divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.terms {
+  font-size: 11.5px;
+  color: var(--text-dim);
+  text-align: center;
+  margin-top: 16px;
+  line-height: 1.7;
+}
+.terms a { color: var(--accent); text-decoration: none; }
+
+.stats-row {
+  display: flex;
+  justify-content: center;
+  gap: 28px;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+.stat-item { text-align: center; }
+.stat-num { font-size: 18px; font-weight: 800; color: var(--accent); font-variant-numeric: tabular-nums; }
+.stat-lbl { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+
+/* ── FORGOT PASSWORD ── */
+.forgot-link {
+  font-size: 12px;
+  color: var(--accent);
+  text-decoration: none;
+  float: right;
+  margin-bottom: 4px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.forgot-link:hover { text-decoration: underline; }
+
+/* ── PULSE DOT ── */
+.live-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background: var(--accent);
+  border-radius: 50%;
+  margin-right: 6px;
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(0,212,170,0.6); }
+  50% { box-shadow: 0 0 0 6px rgba(0,212,170,0); }
+}
+
+/* ── OTP SECTION ── */
+.otp-inputs {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin: 20px 0;
+}
+.otp-inputs input {
+  width: 52px;
+  height: 58px;
+  text-align: center;
+  font-size: 22px;
+  font-weight: 700;
+  background: rgba(255,255,255,0.06);
+  border: 1.5px solid rgba(255,255,255,0.12);
+  border-radius: 12px;
+  color: white;
+  outline: none;
+  font-family: 'JetBrains Mono', monospace;
+  transition: all 0.2s;
+}
+.otp-inputs input:focus {
+  border-color: var(--accent);
+  background: rgba(0,212,170,0.08);
+  box-shadow: 0 0 0 3px rgba(0,212,170,0.12);
+}
+
+/* ── TOAST ── */
+.toast {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  padding: 14px 20px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  color: white;
+  z-index: 9999;
+  transform: translateX(120%);
+  transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 320px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+  font-family: 'Sora', sans-serif;
+}
+.toast.show { transform: translateX(0); }
+.toast.success { background: linear-gradient(135deg, #00d4aa, #00a8ff); color: var(--navy); }
+.toast.error { background: linear-gradient(135deg, #ff6b6b, #ff4757); }
+
+/* Strength bar */
+.strength-bar {
+  height: 3px;
+  border-radius: 2px;
+  margin-top: 6px;
+  background: rgba(255,255,255,0.1);
+  overflow: hidden;
+}
+.strength-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: all 0.3s;
+  width: 0%;
+}
+
+/* Mobile */
+@media (max-width: 900px) {
+  .left-panel { display: none; }
+  .right-panel { width: 100%; padding: 30px 20px; }
+}
+</style>
+</head>
+<body>
+
+<div class="bg-orbs">
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
+</div>
+<div class="grid-overlay"></div>
+
+<!-- LEFT PANEL -->
+<div class="left-panel">
+  <div class="brand-row">
+    <div class="brand-icon">💊</div>
+    <div class="brand-name">Dawa <span>Hisaab</span></div>
+  </div>
+
+  <div class="headline">
+    <h1>Pharmacy ka<br>future hai<br><em>digital.</em></h1>
+    <p>India ka #1 pharmacy management platform — billing, inventory, GST, reports, customers — sab ek jagah.</p>
+  </div>
+
+  <div class="features">
+    <div class="feat-item">
+      <div class="feat-icon fi-green">🧾</div>
+      <div class="feat-text">
+        <div class="ft-title">Smart Billing Engine</div>
+        <div class="ft-sub">GST invoice, WhatsApp share, print — 10 seconds mein</div>
+      </div>
+    </div>
+    <div class="feat-item">
+      <div class="feat-icon fi-blue">📦</div>
+      <div class="feat-text">
+        <div class="ft-title">Live Inventory Tracking</div>
+        <div class="ft-sub">Strip/loose, expiry alerts, low-stock notifications</div>
+      </div>
+    </div>
+    <div class="feat-item">
+      <div class="feat-icon fi-gold">📊</div>
+      <div class="feat-text">
+        <div class="ft-title">P&L + GST Reports</div>
+        <div class="ft-sub">7 types of reports — Excel, PDF, print ready</div>
+      </div>
+    </div>
+    <div class="feat-item">
+      <div class="feat-icon fi-purple">👥</div>
+      <div class="feat-text">
+        <div class="ft-title">Customer Loyalty System</div>
+        <div class="ft-sub">Points, purchase history, credit management</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="badges">
+    <div class="badge highlight"><span class="live-dot"></span>14 Days FREE Trial</div>
+    <div class="badge">✓ No Card Required</div>
+    <div class="badge">✓ Cancel Anytime</div>
+    <div class="badge">🔒 100% Secure</div>
+  </div>
+</div>
+
+<!-- RIGHT PANEL -->
+<div class="right-panel">
+  <div class="form-card">
+
+    <!-- TABS -->
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('register')" id="tabReg">🚀 Free Trial</button>
+      <button class="tab-btn" onclick="switchTab('login')" id="tabLogin">🔑 Login</button>
+    </div>
+
+    <!-- ── REGISTER FORM ── -->
+    <div class="form-section active" id="secRegister">
+      <div class="form-title">Shuru karo aaj hi</div>
+      <div class="form-sub">14 din free — koi credit card nahi chahiye</div>
+
+      <div id="regErr" class="err-msg"></div>
+      <div id="regSuccess" class="success-msg"></div>
+
+      <div class="frow">
+        <div class="fgroup">
+          <label>Pharmacy Name *</label>
+          <input id="rPharmacy" placeholder="MedXpert Pharmacy" />
+        </div>
+        <div class="fgroup">
+          <label>Owner Name *</label>
+          <input id="rOwner" placeholder="Satish Kumar" />
+        </div>
+      </div>
+      <div class="frow full">
+        <div class="fgroup">
+          <label>Email Address *</label>
+          <input id="rEmail" type="email" placeholder="owner@pharmacy.com" />
+        </div>
+      </div>
+      <div class="frow">
+        <div class="fgroup">
+          <label>Phone Number *</label>
+          <input id="rPhone" maxlength="10" placeholder="9XXXXXXXXX" oninput="this.value=this.value.replace(/\D/,'')" />
+        </div>
+        <div class="fgroup">
+          <label>City</label>
+          <input id="rCity" placeholder="Bhopal" />
+        </div>
+      </div>
+      <div class="frow full" style="margin-bottom:6px;">
+        <div class="fgroup">
+          <label>Password *</label>
+          <div class="pw-wrap">
+            <input id="rPass" type="password" placeholder="Min 8 characters" oninput="checkStrength(this.value)" />
+            <button class="pw-eye" onclick="togglePw('rPass',this)" type="button">👁️</button>
+          </div>
+          <div class="strength-bar"><div class="strength-fill" id="strengthBar"></div></div>
+        </div>
+      </div>
+
+      <button class="submit-btn" id="regBtn" onclick="doRegister()">
+        <span id="regBtnTxt">🚀 Start Free Trial — 14 Days</span>
+        <div class="spinner" id="regSpinner"></div>
+      </button>
+
+      <div class="terms">
+        Register karke aap hamare Terms se agree karte ho.<br>
+        Already registered? <a onclick="switchTab('login')" style="cursor:pointer;">Login karein →</a>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-item"><div class="stat-num">500+</div><div class="stat-lbl">Pharmacies</div></div>
+        <div class="stat-item"><div class="stat-num">2L+</div><div class="stat-lbl">Bills Generated</div></div>
+        <div class="stat-item"><div class="stat-num">99.9%</div><div class="stat-lbl">Uptime</div></div>
+      </div>
+    </div>
+
+    <!-- ── LOGIN FORM ── -->
+    <div class="form-section" id="secLogin">
+      <div class="form-title">Wapas aaye! 👋</div>
+      <div class="form-sub">Apni pharmacy mein login karo</div>
+
+      <div id="loginErr" class="err-msg"></div>
+      <div id="loginSuccess" class="success-msg"></div>
+
+      <div class="frow full">
+        <div class="fgroup">
+          <label>Email Address</label>
+          <input id="lEmail" type="email" placeholder="owner@pharmacy.com" onkeydown="if(event.key==='Enter')document.getElementById('lPass').focus()" />
+        </div>
+      </div>
+      <div class="frow full" style="margin-bottom:18px;">
+        <div class="fgroup">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <label>Password</label>
+            <span class="forgot-link" onclick="showForgot()">Forgot password?</span>
+          </div>
+          <div class="pw-wrap">
+            <input id="lPass" type="password" placeholder="Enter your password" onkeydown="if(event.key==='Enter')doLogin()" />
+            <button class="pw-eye" onclick="togglePw('lPass',this)" type="button">👁️</button>
+          </div>
+        </div>
+      </div>
+
+      <button class="submit-btn" id="loginBtn" onclick="doLogin()">
+        <span id="loginBtnTxt">🔑 Login to Dashboard</span>
+        <div class="spinner" id="loginSpinner"></div>
+      </button>
+
+      <div class="divider">or</div>
+
+      <div class="terms">
+        Naya account? <a onclick="switchTab('register')" style="cursor:pointer;">Free mein start karo →</a>
+      </div>
+
+      <div style="margin-top:20px;padding:14px;background:rgba(0,212,170,0.06);border:1px solid rgba(0,212,170,0.15);border-radius:10px;">
+        <div style="font-size:11px;color:var(--text-dim);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Demo Accounts</div>
+        <div onclick="fillDemo('satish@medxpert.com','MedXpert@123')" style="padding:8px 10px;border-radius:7px;cursor:pointer;transition:all 0.15s;margin-bottom:4px;" onmouseover="this.style.background='rgba(0,212,170,0.1)'" onmouseout="this.style.background='transparent'">
+          <span style="font-size:12.5px;color:white;font-weight:600;">💊 MedXpert</span>
+          <span style="font-family:'JetBrains Mono';font-size:11px;color:var(--text-dim);margin-left:8px;">MedXpert@123</span>
+        </div>
+        <div onclick="fillDemo('satish01tiwari@gmail.com','Test@123')" style="padding:8px 10px;border-radius:7px;cursor:pointer;transition:all 0.15s;" onmouseover="this.style.background='rgba(0,212,170,0.1)'" onmouseout="this.style.background='transparent'">
+          <span style="font-size:12.5px;color:white;font-weight:600;">🏪 DawaZone</span>
+          <span style="font-family:'JetBrains Mono';font-size:11px;color:var(--text-dim);margin-left:8px;">Test@123</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── FORGOT PASSWORD SECTION ── -->
+    <div class="form-section" id="secForgot">
+      <div style="margin-bottom:20px;">
+        <button onclick="switchTab('login')" style="background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:13px;padding:0;font-family:'Sora',sans-serif;">← Back to Login</button>
+      </div>
+      <div class="form-title">Reset Password</div>
+      <div class="form-sub">Email enter karo — naya password set karo</div>
+      <div id="fpErr" class="err-msg"></div>
+      <div id="fpSuccess" class="success-msg"></div>
+      <div class="frow full">
+        <div class="fgroup">
+          <label>Registered Email</label>
+          <input id="fpEmail" type="email" placeholder="owner@pharmacy.com" />
+        </div>
+      </div>
+      <div class="frow full" id="fpPassRow" style="display:none;">
+        <div class="fgroup">
+          <label>New Password</label>
+          <div class="pw-wrap">
+            <input id="fpPass" type="password" placeholder="New password (min 8 chars)" />
+            <button class="pw-eye" onclick="togglePw('fpPass',this)" type="button">👁️</button>
+          </div>
+        </div>
+      </div>
+      <button class="submit-btn" id="fpBtn" onclick="doReset()">
+        <span id="fpBtnTxt">🔄 Reset Password</span>
+        <div class="spinner" id="fpSpinner"></div>
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── TAB SWITCH ──
+function switchTab(tab){
+  ['register','login','forgot'].forEach(t=>{
+    document.getElementById('sec'+t.charAt(0).toUpperCase()+t.slice(1)).classList.remove('active');
+  });
+  document.getElementById('tabReg').classList.remove('active');
+  document.getElementById('tabLogin').classList.remove('active');
+  clearMsgs();
+
+  if(tab==='register'){
+    document.getElementById('secRegister').classList.add('active');
+    document.getElementById('tabReg').classList.add('active');
+  } else if(tab==='login'){
+    document.getElementById('secLogin').classList.add('active');
+    document.getElementById('tabLogin').classList.add('active');
+  } else if(tab==='forgot'){
+    document.getElementById('secForgot').classList.add('active');
+  }
+}
+
+function showForgot(){ switchTab('forgot'); }
+function clearMsgs(){
+  ['regErr','regSuccess','loginErr','loginSuccess','fpErr','fpSuccess'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){el.style.display='none';el.textContent='';}
+  });
+}
+
+// ── TOAST ──
+function showToast(msg, type='success'){
+  const t=document.getElementById('toast');
+  t.textContent='';
+  t.className='toast '+type;
+  t.textContent=(type==='success'?'✅ ':'❌ ')+msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),4000);
+}
+
+function showErr(id, msg){ const el=document.getElementById(id); if(el){el.textContent='⚠️ '+msg;el.style.display='block';} }
+function showOk(id, msg){ const el=document.getElementById(id); if(el){el.textContent='✅ '+msg;el.style.display='block';} }
+
+function setLoading(btnId, txtId, spinnerId, loading){
+  const btn=document.getElementById(btnId);
+  const txt=document.getElementById(txtId);
+  const sp=document.getElementById(spinnerId);
+  if(loading){btn.disabled=true;txt.style.display='none';sp.style.display='block';}
+  else{btn.disabled=false;txt.style.display='block';sp.style.display='none';}
+}
+
+// ── PASSWORD TOGGLE ──
+function togglePw(id, btn){
+  const el=document.getElementById(id);
+  el.type=el.type==='password'?'text':'password';
+  btn.textContent=el.type==='password'?'👁️':'🙈';
+}
+
+// ── PASSWORD STRENGTH ──
+function checkStrength(pw){
+  const bar=document.getElementById('strengthBar');
+  if(!bar)return;
+  let score=0;
+  if(pw.length>=8)score++;
+  if(/[A-Z]/.test(pw))score++;
+  if(/[0-9]/.test(pw))score++;
+  if(/[^A-Za-z0-9]/.test(pw))score++;
+  const colors=['#ff6b6b','#ffa502','#f4c430','#00d4aa'];
+  const widths=['25%','50%','75%','100%'];
+  bar.style.width=pw?widths[score-1]||'10%':'0%';
+  bar.style.background=pw?colors[score-1]||'#ff6b6b':'transparent';
+}
+
+// ── FILL DEMO ──
+function fillDemo(email, pass){
+  document.getElementById('lEmail').value=email;
+  document.getElementById('lPass').value=pass;
+  showToast('Demo credentials filled! Login karo.','success');
+}
+
+// ── REGISTER ──
+async function doRegister(){
+  const pharmacy=document.getElementById('rPharmacy').value.trim();
+  const owner=document.getElementById('rOwner').value.trim();
+  const email=document.getElementById('rEmail').value.trim();
+  const phone=document.getElementById('rPhone').value.trim();
+  const city=document.getElementById('rCity').value.trim();
+  const pass=document.getElementById('rPass').value;
+
+  clearMsgs();
+
+  // Validation
+  if(!pharmacy){showErr('regErr','Pharmacy name enter karo!');return;}
+  if(!owner){showErr('regErr','Owner name enter karo!');return;}
+  if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){showErr('regErr','Valid email enter karo!');return;}
+  if(!phone||phone.length!==10){showErr('regErr','10-digit phone number enter karo!');return;}
+  if(!pass||pass.length<8){showErr('regErr','Password kam se kam 8 characters ka hona chahiye!');return;}
+
+  setLoading('regBtn','regBtnTxt','regSpinner',true);
+
+  try{
+    const res=await fetch('/api/tenant-auth/register',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({pharmacyName:pharmacy,ownerName:owner,email,phone,city,password:pass})
+    });
+    const data=await res.json();
+
+    if(res.ok&&data.success){
+      showOk('regSuccess',`Account create ho gaya! Redirecting...`);
+      showToast('Welcome to Dawa Hisaab! 🎉','success');
+      // Save token and redirect
+      if(data.token){
+        localStorage.setItem('tenantToken',data.token);
+        localStorage.setItem('user',JSON.stringify({name:owner,pharmacyName:pharmacy,role:'owner',tenantId:data.tenantId||''}));
+      }
+      setTimeout(()=>location.href='index.html',1800);
+    } else {
+      const msg=data.message||data.error||'Registration failed. Try again!';
+      showErr('regErr', msg);
+      showToast(msg,'error');
+    }
+  }catch(e){
+    showErr('regErr','Server se connect nahi ho pa raha. Server chal raha hai?');
+    showToast('Connection error!','error');
+  }
+
+  setLoading('regBtn','regBtnTxt','regSpinner',false);
+}
+
+// ── LOGIN ──
+async function doLogin(){
+  const email=document.getElementById('lEmail').value.trim();
+  const pass=document.getElementById('lPass').value;
+
+  clearMsgs();
+
+  if(!email){showErr('loginErr','Email enter karo!');return;}
+  if(!pass){showErr('loginErr','Password enter karo!');return;}
+
+  setLoading('loginBtn','loginBtnTxt','loginSpinner',true);
+
+  try{
+    const res=await fetch('/api/tenant-auth/login',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({email,password:pass})
+    });
+    const data=await res.json();
+
+    // Trial expired handle karo
+    if(data.trialExpired){
+      showErr('loginErr','⏰ Trial expire ho gaya! Plan upgrade karo ya contact karo: support@dawahisaab.com');
+      showToast('Trial expired!','error');
+      setLoading('loginBtn','loginBtnTxt','loginSpinner',false);
+      return;
+    }
+
+    if(res.ok&&(data.token||data.success)){
+      const token=data.token||data.tenantToken;
+      localStorage.setItem('tenantToken',token);
+      localStorage.removeItem('token'); // old token clear
+      const u=data.tenant||data.user||{};
+      localStorage.setItem('user',JSON.stringify({
+        name:u.ownerName||u.name||'Owner',
+        pharmacyName:u.pharmacyName||'My Pharmacy',
+        role:u.role||'owner',
+        tenantId:u.tenantId||u._id||''
+      }));
+      // Logo save karo agar hai
+      if(u.logo) localStorage.setItem('tenantLogo',u.logo);
+      showOk('loginSuccess','Login successful! Dashboard mein ja rahe hain...');
+      showToast('Welcome back! 🎉','success');
+      setTimeout(()=>location.href='index.html',1200);
+    } else {
+      const msg=data.message||data.error||'Invalid email ya password!';
+      showErr('loginErr',msg);
+      showToast(msg,'error');
+    }
+  }catch(e){
+    showErr('loginErr','Server se connect nahi ho pa raha. Server chal raha hai?');
+    showToast('Connection error!','error');
+  }
+
+  setLoading('loginBtn','loginBtnTxt','loginSpinner',false);
+}
+
+// ── RESET PASSWORD ──
+let fpStep=1;
+async function doReset(){
+  clearMsgs();
+  const email=document.getElementById('fpEmail').value.trim();
+
+  if(fpStep===1){
+    if(!email){showErr('fpErr','Email enter karo!');return;}
+    setLoading('fpBtn','fpBtnTxt','fpSpinner',true);
+    try{
+      // Try to find tenant by email
+      const res=await fetch('/api/tenant-auth/check-email',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({email})
+      });
+      // If endpoint doesn't exist, go to step 2 directly
+      document.getElementById('fpPassRow').style.display='block';
+      document.getElementById('fpBtnTxt').textContent='✅ Set New Password';
+      fpStep=2;
+      showOk('fpSuccess','Email verified! Naya password enter karo.');
+    }catch(e){
+      document.getElementById('fpPassRow').style.display='block';
+      document.getElementById('fpBtnTxt').textContent='✅ Set New Password';
+      fpStep=2;
+    }
+    setLoading('fpBtn','fpBtnTxt','fpSpinner',false);
+  } else {
+    const newPass=document.getElementById('fpPass').value;
+    if(!newPass||newPass.length<8){showErr('fpErr','Password kam se kam 8 characters ka hona chahiye!');return;}
+    setLoading('fpBtn','fpBtnTxt','fpSpinner',true);
+    try{
+      const res=await fetch('/api/tenant-auth/reset-password',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({email,newPassword:newPass})
+      });
+      const data=await res.json();
+      if(res.ok&&data.success){
+        showToast('Password reset ho gaya! Login karo.','success');
+        fpStep=1;
+        document.getElementById('fpPassRow').style.display='none';
+        document.getElementById('fpBtnTxt').textContent='🔄 Reset Password';
+        setTimeout(()=>switchTab('login'),1500);
+      } else {
+        showErr('fpErr',data.message||'Reset failed. Try again!');
+      }
+    }catch(e){
+      showErr('fpErr','Server error. Try again!');
+    }
+    setLoading('fpBtn','fpBtnTxt','fpSpinner',false);
+  }
+}
+
+// Check if already logged in
+if(localStorage.getItem('tenantToken')||localStorage.getItem('token')){
+  // Verify token is still valid
+  fetch('/api/tenant-auth/profile',{headers:{'Authorization':'Bearer '+(localStorage.getItem('tenantToken')||localStorage.getItem('token'))}})
+    .then(r=>{if(r.ok)location.href='index.html';})
+    .catch(()=>{});
+}
+
+// Auto-focus
+document.getElementById('rPharmacy').focus();
+
+// Enter key on registration form
+['rPharmacy','rOwner','rEmail','rPhone','rCity'].forEach(id=>{
+  const el=document.getElementById(id);
+  if(el) el.addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('rPass').focus();});
+});
+document.getElementById('rPass').addEventListener('keydown',e=>{if(e.key==='Enter')doRegister();});
+</script>
+</body>
+</html>

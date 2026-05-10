@@ -3,229 +3,398 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MedXpert Pharmacy</title>
+<title>Dashboard — Dawa Hisaab</title>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: 'Segoe UI', sans-serif; background: #f0f4f8; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Segoe UI',sans-serif; background:#f0f4f8; }
 
-  /* LOGIN */
-  .login-page { display: flex; align-items: center; justify-content: center; min-height: 100vh; background: linear-gradient(135deg, #1a73e8, #0d47a1); }
-  .login-box { background: white; padding: 40px; border-radius: 16px; width: 360px; box-shadow: 0 20px 60px rgba(0,0,0,0.2); }
-  .login-box h1 { text-align: center; color: #1a73e8; font-size: 28px; margin-bottom: 6px; }
-  .login-box p { text-align: center; color: #666; margin-bottom: 28px; font-size: 14px; }
-  .login-box input { width: 100%; padding: 12px 16px; border: 1.5px solid #ddd; border-radius: 8px; font-size: 15px; margin-bottom: 14px; outline: none; transition: border 0.2s; }
-  .login-box input:focus { border-color: #1a73e8; }
-  .login-box button { width: 100%; padding: 13px; background: #1a73e8; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; }
-  .login-box button:hover { background: #1557b0; }
-  .login-error { color: red; font-size: 13px; text-align: center; margin-top: 10px; }
+  .navbar { background:linear-gradient(135deg,#1B4F72,#154360); color:white; padding:0 24px; display:flex; align-items:center; height:60px; position:fixed; width:100%; top:0; z-index:100; box-shadow:0 4px 20px rgba(27,79,114,0.4); }
+  .navbar h1 { font-size:22px; font-weight:800; flex:1; letter-spacing:-0.5px; }
+  .navbar h1 span { color:#85C1E9; }
+  .nav-right { display:flex; align-items:center; gap:12px; }
+  .nav-badge { background:rgba(255,255,255,0.15); padding:6px 14px; border-radius:20px; font-size:13px; cursor:pointer; transition:all 0.2s; }
+  .nav-badge:hover { background:rgba(255,255,255,0.25); }
+  .btn-logout { background:rgba(255,255,255,0.15); border:1.5px solid rgba(255,255,255,0.4); color:white; padding:7px 18px; border-radius:8px; cursor:pointer; font-size:13px; font-weight:600; transition:all 0.2s; }
+  .btn-logout:hover { background:rgba(255,255,255,0.25); }
 
-  /* NAVBAR */
-  .navbar { background: #1a73e8; color: white; padding: 0 24px; display: flex; align-items: center; height: 58px; position: fixed; width: 100%; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
-  .navbar h1 { font-size: 20px; font-weight: 700; flex: 1; }
-  .navbar span { font-size: 13px; opacity: 0.85; margin-right: 16px; }
-  .navbar button { background: rgba(255,255,255,0.2); border: none; color: white; padding: 7px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; }
+  .sidebar { position:fixed; left:0; top:60px; width:230px; height:calc(100vh - 60px); background:white; border-right:1px solid #e2e8f0; padding:20px 0; overflow-y:auto; box-shadow:2px 0 10px rgba(0,0,0,0.04); }
+  .sidebar-section { padding:8px 20px; font-size:10px; font-weight:700; color:#b0bec5; text-transform:uppercase; letter-spacing:1px; margin-top:12px; }
+  .sidebar a { display:flex; align-items:center; gap:12px; padding:11px 20px; color:#546e7a; text-decoration:none; font-size:14px; border-left:3px solid transparent; transition:all 0.2s; font-weight:500; }
+  .sidebar a:hover { background:#EBF5FB; color:#1B4F72; border-left-color:#1B4F72; }
+  .sidebar a.active { background:linear-gradient(90deg,#EBF5FB,#f0f9ff); color:#1B4F72; border-left-color:#1B4F72; font-weight:700; }
+  .sidebar a .icon { width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:16px; background:#f5f7fa; flex-shrink:0; }
+  .sidebar a.active .icon { background:#EBF5FB; }
 
-  /* SIDEBAR */
-  .sidebar { position: fixed; left: 0; top: 58px; width: 220px; height: calc(100vh - 58px); background: white; border-right: 1px solid #e0e0e0; padding: 16px 0; overflow-y: auto; }
-  .sidebar a { display: flex; align-items: center; gap: 12px; padding: 12px 20px; color: #444; text-decoration: none; font-size: 14.5px; border-left: 3px solid transparent; transition: all 0.2s; }
-  .sidebar a:hover, .sidebar a.active { background: #e8f0fe; color: #1a73e8; border-left-color: #1a73e8; }
-  .sidebar a .icon { font-size: 18px; width: 22px; text-align: center; }
+  .main { margin-left:230px; margin-top:60px; padding:24px; }
 
-  /* MAIN */
-  .main { margin-left: 220px; margin-top: 58px; padding: 24px; }
+  .welcome-bar { background:linear-gradient(135deg,#1B4F72,#154360); border-radius:16px; padding:24px 28px; color:white; margin-bottom:24px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 8px 32px rgba(27,79,114,0.25); position:relative; overflow:hidden; }
+  .welcome-bar::before { content:''; position:absolute; top:-30px; right:-30px; width:180px; height:180px; background:rgba(255,255,255,0.06); border-radius:50%; }
+  .welcome-bar::after { content:''; position:absolute; bottom:-50px; right:80px; width:120px; height:120px; background:rgba(255,255,255,0.04); border-radius:50%; }
+  .welcome-bar h2 { font-size:22px; font-weight:700; margin-bottom:4px; }
+  .welcome-bar p { font-size:13px; opacity:0.75; }
+  .welcome-time { text-align:right; position:relative; z-index:1; }
+  .welcome-time .time { font-size:32px; font-weight:800; letter-spacing:-1px; }
+  .welcome-time .date { font-size:13px; opacity:0.75; margin-top:2px; }
 
-  /* CARDS */
-  .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
-  .stat-card { background: white; border-radius: 12px; padding: 20px 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); border-left: 4px solid #1a73e8; }
-  .stat-card.green { border-left-color: #2e7d32; }
-  .stat-card.orange { border-left-color: #f57c00; }
-  .stat-card.red { border-left-color: #c62828; }
-  .stat-card .label { font-size: 13px; color: #888; margin-bottom: 6px; }
-  .stat-card .value { font-size: 28px; font-weight: 700; color: #222; }
-  .stat-card .sub { font-size: 12px; color: #aaa; margin-top: 4px; }
+  .stat-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:24px; }
+  .stat-card { background:white; border-radius:16px; padding:20px; box-shadow:0 2px 12px rgba(0,0,0,0.05); position:relative; overflow:hidden; transition:all 0.3s; border:1px solid rgba(0,0,0,0.04); cursor:default; }
+  .stat-card:hover { transform:translateY(-3px); box-shadow:0 10px 28px rgba(0,0,0,0.1); }
+  .stat-card::after { content:''; position:absolute; top:-10px; right:-10px; width:90px; height:90px; border-radius:50%; opacity:0.07; }
+  .stat-card.navy::after { background:#1B4F72; }
+  .stat-card.green::after { background:#1E8449; }
+  .stat-card.orange::after { background:#E67E22; }
+  .stat-card.red::after { background:#C0392B; }
+  .stat-card.purple::after { background:#7D3C98; }
+  .stat-card.teal::after { background:#0E6655; }
+  .stat-icon { width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:22px; margin-bottom:14px; }
+  .stat-card.navy .stat-icon { background:#EBF5FB; }
+  .stat-card.green .stat-icon { background:#EAFAF1; }
+  .stat-card.orange .stat-icon { background:#FEF9E7; }
+  .stat-card.red .stat-icon { background:#FDEDEC; }
+  .stat-card.purple .stat-icon { background:#F4ECF7; }
+  .stat-card.teal .stat-icon { background:#E8F8F5; }
+  .stat-label { font-size:11px; color:#90a4ae; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:6px; }
+  .stat-value { font-size:28px; font-weight:800; color:#1a2332; margin-bottom:4px; line-height:1; }
+  .stat-sub { font-size:12px; color:#b0bec5; margin-top:6px; }
 
-  /* ALERTS */
-  .alert-section { background: white; border-radius: 12px; padding: 20px 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); margin-bottom: 20px; }
-  .alert-section h3 { font-size: 15px; margin-bottom: 14px; color: #333; }
-  .alert-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f0f0f0; font-size: 13.5px; }
-  .badge { padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
-  .badge.red { background: #ffebee; color: #c62828; }
-  .badge.orange { background: #fff3e0; color: #e65100; }
+  .grid-3 { display:grid; grid-template-columns:1.5fr 1fr; gap:20px; margin-bottom:20px; }
+  .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:20px; }
 
-  #loginPage { display: flex; }
-  #appPage { display: none; }
+  .card { background:white; border-radius:16px; padding:20px 24px; box-shadow:0 2px 12px rgba(0,0,0,0.05); border:1px solid rgba(0,0,0,0.04); }
+  .card-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #f0f4f8; }
+  .card-title { font-size:15px; font-weight:700; color:#1a2332; display:flex; align-items:center; gap:8px; }
+  .view-all { font-size:12px; color:#1B4F72; text-decoration:none; font-weight:600; padding:5px 12px; background:#EBF5FB; border-radius:20px; transition:all 0.2s; }
+  .view-all:hover { background:#1B4F72; color:white; }
+
+  .alert-item { display:flex; align-items:center; gap:12px; padding:11px 0; border-bottom:1px solid #f8f9fb; }
+  .alert-item:last-child { border-bottom:none; padding-bottom:0; }
+  .alert-icon { width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
+  .alert-icon.low { background:#FEF9E7; }
+  .alert-icon.exp { background:#FDEDEC; }
+  .alert-info { flex:1; min-width:0; }
+  .alert-name { font-size:13px; font-weight:600; color:#1a2332; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .alert-detail { font-size:11px; color:#b0bec5; margin-top:2px; }
+  .alert-badge { font-size:11px; font-weight:700; padding:4px 10px; border-radius:20px; white-space:nowrap; flex-shrink:0; }
+  .badge-low { background:#FEF9E7; color:#B7770D; }
+  .badge-out { background:#FDEDEC; color:#C0392B; }
+  .badge-exp { background:#FDEDEC; color:#C0392B; }
+  .badge-soon { background:#FEF9E7; color:#B7770D; }
+
+  .bill-item { display:flex; align-items:center; gap:12px; padding:11px 0; border-bottom:1px solid #f8f9fb; }
+  .bill-item:last-child { border-bottom:none; }
+  .bill-avatar { width:40px; height:40px; border-radius:10px; background:linear-gradient(135deg,#EBF5FB,#D6EAF8); display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:800; color:#1B4F72; flex-shrink:0; }
+  .bill-info { flex:1; min-width:0; }
+  .bill-no { font-size:13px; font-weight:700; color:#1a2332; }
+  .bill-cust { font-size:11px; color:#b0bec5; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .bill-right { text-align:right; flex-shrink:0; }
+  .bill-amount { font-size:14px; font-weight:800; color:#1B4F72; }
+  .bill-status { font-size:10px; font-weight:700; padding:2px 8px; border-radius:20px; margin-top:3px; display:inline-block; }
+  .status-paid { background:#EAFAF1; color:#1E8449; }
+  .status-credit { background:#FDEDEC; color:#C0392B; }
+  .status-partial { background:#FEF9E7; color:#B7770D; }
+
+  .quick-actions { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .qa-btn { display:flex; align-items:center; gap:10px; padding:13px 14px; background:#f8fafc; border-radius:12px; border:1.5px solid #e8edf2; cursor:pointer; text-decoration:none; transition:all 0.2s; }
+  .qa-btn:hover { background:#EBF5FB; border-color:#1B4F72; transform:translateY(-1px); box-shadow:0 4px 12px rgba(27,79,114,0.1); }
+  .qa-icon { font-size:20px; flex-shrink:0; }
+  .qa-text strong { display:block; font-size:13px; color:#1a2332; font-weight:700; }
+  .qa-text span { font-size:11px; color:#b0bec5; }
+
+  .empty { text-align:center; padding:28px 20px; color:#b0bec5; }
+  .empty div { font-size:28px; margin-bottom:8px; }
+  .empty p { font-size:13px; }
+
+  @media (max-width:1200px) { .stat-grid { grid-template-columns:repeat(2,1fr); } .grid-3,.grid-2 { grid-template-columns:1fr; } }
 </style>
 </head>
 <body>
 
-<!-- LOGIN PAGE -->
-<div id="loginPage" class="login-page">
-  <div class="login-box">
-    <h1>💊 MedXpert</h1>
-    <p>Pharmacy Management System</p>
-    <input type="text" id="loginUser" placeholder="Username" />
-    <input type="password" id="loginPass" placeholder="Password" />
-    <button onclick="doLogin()">Login</button>
-    <div id="loginError" class="login-error"></div>
+<div class="navbar">
+  <h1>💊 Dawa <span>Hisaab</span></h1>
+  <div class="nav-right">
+    <div class="nav-badge" onclick="location.href='branches.html'">🏪 <span id="navBranch">Main Branch</span></div>
+    <div class="nav-badge">👤 <span id="navUser">Loading...</span></div>
+    <button class="btn-logout" onclick="logout()">Logout</button>
   </div>
 </div>
 
-<!-- APP PAGE -->
-<div id="appPage">
-  <!-- Navbar -->
-  <div class="navbar">
-    <h1>💊 MedXpert Pharmacy</h1>
-    <span id="navBranch" style="font-size:12px;background:rgba(255,255,255,0.2);padding:4px 10px;border-radius:6px;margin-right:8px;cursor:pointer;" onclick="location.href='branches.html'">🏪 Loading...</span>
-    <span id="navUser"></span>
-    <button onclick="logout()">Logout</button>
-  </div>
+<div class="sidebar">
+  <div class="sidebar-section">Main Menu</div>
+  <a href="index.html" class="active"><div class="icon">🏠</div> Dashboard</a>
+  <a href="stock.html"><div class="icon">📦</div> Stock / Inventory</a>
+  <a href="billing.html"><div class="icon">🧾</div> Billing</a>
+  <a href="purchase.html"><div class="icon">🛒</div> Purchase Entry</a>
+  <div class="sidebar-section">Management</div>
+  <a href="customers.html"><div class="icon">👥</div> Customers</a>
+  <a href="prescriptions.html"><div class="icon">📋</div> Prescriptions</a>
+  <a href="branches.html"><div class="icon">🏪</div> Branches</a>
+  <a href="reports.html"><div class="icon">📊</div> Reports</a>
+  <div class="sidebar-section">Settings</div>
+  <a href="profile.html"><div class="icon">⚙️</div> My Settings</a>
+</div>
 
-  <!-- Sidebar -->
-  <div class="sidebar">
-    <a href="index.html" class="active"><span class="icon">🏠</span> Dashboard</a>
-    <a href="stock.html"><span class="icon">📦</span> Stock / Inventory</a>
-    <a href="billing.html"><span class="icon">🧾</span> Billing</a>
-    <a href="purchase.html"><span class="icon">🛒</span> Purchase Entry</a>
-    <a href="reports.html"><span class="icon">📊</span> Reports</a>
-    <a href="customers.html">👥 Customers</a>
-    <a href="prescriptions.html">📋 Prescriptions</a>
-    <a href="branches.html">🏪 Branches</a>
-  </div>
+<div class="main">
 
-  <!-- Main Content -->
-  <div class="main">
-    <div class="stat-grid">
-      <div class="stat-card">
-        <div class="label">Total Products</div>
-        <div class="value" id="totalProducts">0</div>
-        <div class="sub">In inventory</div>
-      </div>
-      <div class="stat-card green">
-        <div class="label">Today's Sales</div>
-        <div class="value" id="todaySales">₹0</div>
-        <div class="sub" id="todayBills">0 bills</div>
-      </div>
-      <div class="stat-card orange">
-        <div class="label">Low Stock Items</div>
-        <div class="value" id="lowStock">0</div>
-        <div class="sub">Below minimum</div>
-      </div>
-      <div class="stat-card red">
-        <div class="label">Expiring Soon</div>
-        <div class="value" id="expiringSoon">0</div>
-        <div class="sub">Within 90 days</div>
-      </div>
+  <!-- WELCOME BAR -->
+  <div class="welcome-bar">
+    <div style="position:relative;z-index:1;">
+      <h2 id="welcomeMsg">Good Morning! 👋</h2>
+      <p id="welcomeSub">Here's what's happening at your pharmacy today.</p>
     </div>
-
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-      <div class="alert-section">
-        <h3>⚠️ Low Stock Alerts</h3>
-        <div id="lowStockList"><p style="color:#aaa;font-size:13px;">Loading...</p></div>
-      </div>
-      <div class="alert-section">
-        <h3>📅 Expiry Alerts</h3>
-        <div id="expiryList"><p style="color:#aaa;font-size:13px;">Loading...</p></div>
-      </div>
+    <div class="welcome-time">
+      <div class="time" id="liveTime">--:--</div>
+      <div class="date" id="liveDate">Loading...</div>
     </div>
   </div>
+
+  <!-- STAT CARDS -->
+  <div class="stat-grid">
+    <div class="stat-card navy">
+      <div class="stat-icon">📦</div>
+      <div class="stat-label">Total Products</div>
+      <div class="stat-value" id="st-products">—</div>
+      <div class="stat-sub">In inventory</div>
+    </div>
+    <div class="stat-card green">
+      <div class="stat-icon">🧾</div>
+      <div class="stat-label">Today's Sales</div>
+      <div class="stat-value" id="st-todaySales">—</div>
+      <div class="stat-sub" id="st-todayRevenue">₹0 revenue</div>
+    </div>
+    <div class="stat-card orange">
+      <div class="stat-icon">⚠️</div>
+      <div class="stat-label">Low Stock Items</div>
+      <div class="stat-value" id="st-lowStock">—</div>
+      <div class="stat-sub">Need reorder</div>
+    </div>
+    <div class="stat-card red">
+      <div class="stat-icon">⏰</div>
+      <div class="stat-label">Expiring Soon</div>
+      <div class="stat-value" id="st-expiring">—</div>
+      <div class="stat-sub">Within 90 days</div>
+    </div>
+    <div class="stat-card purple">
+      <div class="stat-icon">👥</div>
+      <div class="stat-label">Total Customers</div>
+      <div class="stat-value" id="st-customers">—</div>
+      <div class="stat-sub">Registered</div>
+    </div>
+    <div class="stat-card teal">
+      <div class="stat-icon">💰</div>
+      <div class="stat-label">Total Revenue</div>
+      <div class="stat-value" id="st-revenue">—</div>
+      <div class="stat-sub">All time</div>
+    </div>
+    <div class="stat-card red">
+      <div class="stat-icon">📋</div>
+      <div class="stat-label">Pending Dues</div>
+      <div class="stat-value" id="st-pending">—</div>
+      <div class="stat-sub">Credit outstanding</div>
+    </div>
+    <div class="stat-card navy">
+      <div class="stat-icon">📊</div>
+      <div class="stat-label">Total Bills</div>
+      <div class="stat-value" id="st-totalBills">—</div>
+      <div class="stat-sub">All time</div>
+    </div>
+  </div>
+
+  <!-- ROW 1 -->
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">🧾 Recent Bills</div>
+        <a href="billing.html" class="view-all">View All →</a>
+      </div>
+      <div id="recentBillsList">
+        <div class="empty"><div>🧾</div><p>No bills yet</p></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">⚡ Quick Actions</div>
+      </div>
+      <div class="quick-actions">
+        <a href="billing.html" class="qa-btn"><div class="qa-icon">🧾</div><div class="qa-text"><strong>New Bill</strong><span>Create invoice</span></div></a>
+        <a href="stock.html" class="qa-btn"><div class="qa-icon">📦</div><div class="qa-text"><strong>Add Stock</strong><span>Add medicine</span></div></a>
+        <a href="purchase.html" class="qa-btn"><div class="qa-icon">🛒</div><div class="qa-text"><strong>Purchase</strong><span>New entry</span></div></a>
+        <a href="customers.html" class="qa-btn"><div class="qa-icon">👥</div><div class="qa-text"><strong>Customers</strong><span>View database</span></div></a>
+        <a href="reports.html" class="qa-btn"><div class="qa-icon">📊</div><div class="qa-text"><strong>Reports</strong><span>Analytics</span></div></a>
+        <a href="prescriptions.html" class="qa-btn"><div class="qa-icon">📋</div><div class="qa-text"><strong>Prescriptions</strong><span>Manage Rx</span></div></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROW 2 -->
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">⚠️ Low Stock Alerts</div>
+        <a href="stock.html" class="view-all">Manage →</a>
+      </div>
+      <div id="lowStockList">
+        <div class="empty"><div>✅</div><p>All stocks are sufficient!</p></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">⏰ Expiry Alerts</div>
+        <a href="stock.html" class="view-all">Manage →</a>
+      </div>
+      <div id="expiryList">
+        <div class="empty"><div>✅</div><p>No expiring items soon!</p></div>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <script>
-const API = '';
-
 function checkAuth() {
-  // Branch name show karo navbar mein
-const branch = JSON.parse(localStorage.getItem('currentBranch') || 'null');
-const branchEl = document.getElementById('navBranch');
-if (branchEl) branchEl.textContent = '🏪 ' + (branch?.name || 'Main Branch');
-  const token = localStorage.getItem('token');
   const user = JSON.parse(localStorage.getItem('user') || 'null');
-  if (token && user) {
-    document.getElementById('loginPage').style.display = 'none';
-    document.getElementById('appPage').style.display = 'block';
-    document.getElementById('navUser').textContent = '👤 ' + user.name;
-    loadDashboard();
-  }
+  if (!localStorage.getItem('tenantToken') && !localStorage.getItem('token')) { location.href='index.html'; return; }
+  document.getElementById('navUser').textContent = user?.name || 'User';
+  const branch = JSON.parse(localStorage.getItem('currentBranch') || 'null');
+  if (branch) document.getElementById('navBranch').textContent = branch.name;
+  const hour = new Date().getHours();
+  const greet = hour < 12 ? 'Good Morning' : hour < 17 ? 'Good Afternoon' : 'Good Evening';
+  document.getElementById('welcomeMsg').textContent = `${greet}, ${user?.name || 'Doctor'}! 👋`;
 }
 
-async function doLogin() {
-  const username = document.getElementById('loginUser').value;
-  const password = document.getElementById('loginPass').value;
-  try {
-    const res = await fetch('/api/auth/login', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password })
-    });
-    const data = await res.json();
-    if (data.success) {
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
-      checkAuth();
-    } else {
-      document.getElementById('loginError').textContent = data.message || 'Login failed';
-    }
-  } catch(e) {
-    document.getElementById('loginError').textContent = 'Server error!';
-  }
-}
+function logout() { localStorage.clear(); location.href='index.html'; }
 
-function logout() {
-  localStorage.removeItem('token');
-  localStorage.removeItem('user');
-  location.reload();
+function updateClock() {
+  const now = new Date();
+  document.getElementById('liveTime').textContent = now.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' });
+  document.getElementById('liveDate').textContent = now.toLocaleDateString('en-IN', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
 }
+setInterval(updateClock, 1000);
+updateClock();
 
 async function loadDashboard() {
+  const token = localStorage.getItem('tenantToken') || localStorage.getItem('token');
+  const headers = token ? { 'Authorization': 'Bearer ' + token } : {};
+
   try {
-    const [products, sales] = await Promise.all([
-      fetch('/api/products').then(r => r.json()),
-      fetch('/api/sales').then(r => r.json())
+    const [pRes, sRes, cRes] = await Promise.all([
+      fetch('/api/products', { headers }),
+      fetch('/api/sales', { headers }),
+      fetch('/api/customers', { headers })
     ]);
 
-    document.getElementById('totalProducts').textContent = products.length;
+    const products = pRes.ok ? await pRes.json() : [];
+    const sales = sRes.ok ? await sRes.json() : [];
+    const customers = cRes.ok ? await cRes.json() : [];
 
     const today = new Date().toDateString();
-    const todaySalesList = sales.filter(s => new Date(s.date).toDateString() === today);
-    const todayTotal = todaySalesList.reduce((a, b) => a + b.totalAmount, 0);
-    document.getElementById('todaySales').textContent = '₹' + todayTotal.toFixed(0);
-    document.getElementById('todayBills').textContent = todaySalesList.length + ' bills';
-
-    const lowItems = products.filter(p => p.stock <= p.minStock);
-    document.getElementById('lowStock').textContent = lowItems.length;
+    const todaySales = Array.isArray(sales) ? sales.filter(s => new Date(s.date).toDateString() === today) : [];
+    const todayRevenue = todaySales.reduce((a,b) => a+(b.totalAmount||0), 0);
+    const totalRevenue = Array.isArray(sales) ? sales.reduce((a,b) => a+(b.totalAmount||0), 0) : 0;
+    const pendingDues = Array.isArray(sales) ? sales.reduce((a,b) => {
+      const due = (b.totalAmount||0)-(b.paidAmount||0);
+      return a + (due > 0.01 ? due : 0);
+    }, 0) : 0;
 
     const now = new Date();
-    const in90 = new Date(); in90.setDate(now.getDate() + 90);
-    const expiringItems = products.filter(p => {
+    const in90 = new Date(); in90.setDate(now.getDate()+90);
+
+    const lowStock = Array.isArray(products) ? products.filter(p => {
+      const qty = p.sellType==='loose'
+        ? (p.stripStock||0)*(p.unitsPerStrip||10)+(p.looseStock||0)
+        : (p.stock||0);
+      return qty <= (p.minStock||10);
+    }) : [];
+
+    const expiring = Array.isArray(products) ? products.filter(p => {
       if (!p.expiry) return false;
-      const [m, y] = p.expiry.split('/');
-      const exp = new Date(parseInt('20'+y), parseInt(m)-1, 28);
-      return exp <= in90;
-    });
-    document.getElementById('expiringSoon').textContent = expiringItems.length;
+      const parts = p.expiry.split('/');
+      if (parts.length < 2) return false;
+      const exp = new Date(parseInt('20'+parts[1]), parseInt(parts[0])-1, 28);
+      return exp >= now && exp <= in90;
+    }) : [];
 
-    // Low stock list
-    const llEl = document.getElementById('lowStockList');
-    if (lowItems.length === 0) { llEl.innerHTML = '<p style="color:#aaa;font-size:13px;">All stocks OK ✅</p>'; }
-    else {
-      llEl.innerHTML = lowItems.slice(0,6).map(p =>
-        `<div class="alert-item"><span>${p.name}</span><span class="badge orange">Qty: ${p.stock}</span></div>`
-      ).join('');
+    // Stats
+    const set = (id, val) => { const el=document.getElementById(id); if(el) el.textContent=val; };
+    set('st-products', Array.isArray(products) ? products.length : 0);
+    set('st-todaySales', todaySales.length);
+    set('st-todayRevenue', '₹'+todayRevenue.toFixed(0)+' revenue');
+    set('st-lowStock', lowStock.length);
+    set('st-expiring', expiring.length);
+    set('st-customers', Array.isArray(customers) ? customers.length : 0);
+    set('st-revenue', '₹'+(totalRevenue>=1000?(totalRevenue/1000).toFixed(1)+'K':totalRevenue.toFixed(0)));
+    set('st-pending', '₹'+(pendingDues>=1000?(pendingDues/1000).toFixed(1)+'K':pendingDues.toFixed(0)));
+    set('st-totalBills', Array.isArray(sales) ? sales.length : 0);
+
+    // Recent bills
+    const billsEl = document.getElementById('recentBillsList');
+    const recentSales = Array.isArray(sales) ? sales.slice(0,6) : [];
+    if (recentSales.length) {
+      billsEl.innerHTML = recentSales.map(s => {
+        const balance = (s.totalAmount||0)-(s.paidAmount||0);
+        const isCredit = s.paymentMode==='credit' || balance > 0.01;
+        const initial = (s.customer||'W')[0].toUpperCase();
+        const dt = new Date(s.date);
+        const timeStr = dt.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+        const dateStr = dt.toLocaleDateString('en-IN',{day:'2-digit',month:'short'});
+        return `<div class="bill-item">
+          <div class="bill-avatar">${initial}</div>
+          <div class="bill-info">
+            <div class="bill-no">${s.billNo||'-'}</div>
+            <div class="bill-cust">${s.customer||'Walk-in'} · ${dateStr} ${timeStr}</div>
+          </div>
+          <div class="bill-right">
+            <div class="bill-amount">₹${(s.totalAmount||0).toFixed(0)}</div>
+            <div class="bill-status ${isCredit?'status-credit':'status-paid'}">${isCredit?'Credit':'Paid'}</div>
+          </div>
+        </div>`;
+      }).join('');
     }
 
-    // Expiry list
-    const elEl = document.getElementById('expiryList');
-    if (expiringItems.length === 0) { elEl.innerHTML = '<p style="color:#aaa;font-size:13px;">No expiring items ✅</p>'; }
-    else {
-      elEl.innerHTML = expiringItems.slice(0,6).map(p =>
-        `<div class="alert-item"><span>${p.name}</span><span class="badge red">${p.expiry}</span></div>`
-      ).join('');
+    // Low stock
+    const lowEl = document.getElementById('lowStockList');
+    if (lowStock.length) {
+      lowEl.innerHTML = lowStock.slice(0,6).map(p => {
+        const qty = p.sellType==='loose'
+          ? (p.stripStock||0)*(p.unitsPerStrip||10)+(p.looseStock||0)
+          : (p.stock||0);
+        const isOut = qty === 0;
+        return `<div class="alert-item">
+          <div class="alert-icon low">${isOut?'❌':'⚠️'}</div>
+          <div class="alert-info">
+            <div class="alert-name">${p.name}</div>
+            <div class="alert-detail">${p.company||'—'} · Min stock: ${p.minStock||10}</div>
+          </div>
+          <span class="alert-badge ${isOut?'badge-out':'badge-low'}">${isOut?'Out of Stock':'Qty: '+qty}</span>
+        </div>`;
+      }).join('');
     }
-  } catch(e) { console.log(e); }
+
+    // Expiry
+    const expEl = document.getElementById('expiryList');
+    if (expiring.length) {
+      expEl.innerHTML = expiring.slice(0,6).map(p => {
+        const parts = p.expiry.split('/');
+        const exp = new Date(parseInt('20'+parts[1]), parseInt(parts[0])-1, 28);
+        const daysLeft = Math.ceil((exp-now)/(1000*60*60*24));
+        const isUrgent = daysLeft <= 30;
+        return `<div class="alert-item">
+          <div class="alert-icon exp">⏰</div>
+          <div class="alert-info">
+            <div class="alert-name">${p.name}</div>
+            <div class="alert-detail">${p.company||'—'} · Batch: ${p.batch||'—'}</div>
+          </div>
+          <span class="alert-badge ${isUrgent?'badge-exp':'badge-soon'}">Exp: ${p.expiry} · ${daysLeft}d left</span>
+        </div>`;
+      }).join('');
+    }
+
+  } catch(e) {
+    console.log('Dashboard error:', e);
+  }
 }
 
-// Enter key login
-document.addEventListener('keypress', e => { if (e.key === 'Enter') doLogin(); });
 checkAuth();
+loadDashboard();
 </script>
 </body>
 </html>

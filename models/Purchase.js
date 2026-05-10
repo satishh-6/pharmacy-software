@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 const purchaseSchema = new mongoose.Schema({
+  tenantId: { type: String, required: true, index: true },
   invoiceNo: { type: String },
   supplier: { type: String, required: true },
   date: { type: Date, default: Date.now },

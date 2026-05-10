@@ -23,7 +23,10 @@ router.post('/login', async (req, res) => {
     if (!user) return res.status(400).json({ message: 'User not found' });
     const match = await bcrypt.compare(password, user.password);
     if (!match) return res.status(400).json({ message: 'Wrong password' });
-    const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET);
+    const token = jwt.sign(
+  { id: user._id, role: user.role, tenantId: user.tenantId || null },
+  process.env.JWT_SECRET
+);
     res.json({ success: true, token, user: { name: user.name, role: user.role } });
   } catch (err) {
     res.status(500).json({ message: err.message });

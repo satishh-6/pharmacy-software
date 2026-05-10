@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 const saleSchema = new mongoose.Schema({
+  tenantId: { type: String, required: true, index: true },
   billNo: { type: String },
   customer: { type: String, default: 'Walk-in Customer' },
   customerPhone: { type: String },
