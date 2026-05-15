@@ -39,7 +39,6 @@
   .fgroup input:focus, .fgroup select:focus { border-color:#1B4F72; background:white; box-shadow:0 0 0 3px rgba(27,79,114,0.08); }
   .fgroup.full { grid-column:1/-1; }
 
-  /* SEARCH */
   .srch-wrap { position:relative; }
   .srch-wrap input { width:100%; padding:12px 18px; border:2px solid #1B4F72; border-radius:10px; font-size:15px; outline:none; background:white; }
   .srch-wrap input:focus { box-shadow:0 0 0 4px rgba(27,79,114,0.1); }
@@ -51,24 +50,23 @@
   .si-meta { font-size:11.5px; color:#78909c; margin-top:2px; }
   .si-stock { float:right; font-size:12px; font-weight:700; color:#1E8449; }
 
-  /* PURCHASE TABLE */
   .pur-tbl { width:100%; border-collapse:collapse; }
   .pur-tbl thead tr { background:linear-gradient(135deg,#1B4F72,#154360); }
-  .pur-tbl thead th { padding:11px 12px; text-align:left; font-size:11px; color:rgba(255,255,255,0.88); font-weight:700; text-transform:uppercase; letter-spacing:0.5px; white-space:nowrap; }
+  .pur-tbl thead th { padding:11px 10px; text-align:left; font-size:10px; color:rgba(255,255,255,0.88); font-weight:700; text-transform:uppercase; letter-spacing:0.5px; white-space:nowrap; }
   .pur-tbl tbody tr { border-bottom:1px solid #f5f7fa; transition:background 0.12s; }
   .pur-tbl tbody tr:hover { background:#f8fafd; }
-  .pur-tbl tbody td { padding:10px 12px; font-size:13px; color:#37474f; vertical-align:middle; }
-  .pur-tbl input { padding:6px 8px; border:1.5px solid #e2e8f0; border-radius:6px; font-size:13px; outline:none; text-align:center; width:100%; transition:border 0.2s; }
+  .pur-tbl tbody td { padding:9px 10px; font-size:13px; color:#37474f; vertical-align:middle; }
+  .pur-tbl input { padding:6px 8px; border:1.5px solid #e2e8f0; border-radius:6px; font-size:12px; outline:none; text-align:center; width:100%; transition:border 0.2s; }
   .pur-tbl input:focus { border-color:#1B4F72; }
+  .pur-tbl select { padding:5px 4px; border:1.5px solid #e2e8f0; border-radius:6px; font-size:11px; outline:none; width:100%; background:#f8fafc; }
+  .pur-tbl select:focus { border-color:#1B4F72; }
   .rm-btn { background:#FDEDEC; color:#C0392B; border:none; padding:5px 10px; border-radius:6px; cursor:pointer; font-size:12px; font-weight:700; transition:all 0.18s; }
   .rm-btn:hover { background:#C0392B; color:white; }
   .empty-state { text-align:center; padding:40px; color:#b0bec5; }
 
-  /* SUMMARY */
   .srow { display:flex; justify-content:space-between; align-items:center; padding:8px 0; font-size:14px; color:#546e7a; border-bottom:1px solid #f5f7fa; }
   .total-row { display:flex; justify-content:space-between; padding:12px 0 8px; font-size:21px; font-weight:800; color:#1B4F72; border-top:2.5px solid #1B4F72; margin-top:4px; }
 
-  /* PAYMENT */
   .pay-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:12px 0; }
   .pay-btn { padding:10px 8px; border:2px solid #e2e8f0; border-radius:10px; cursor:pointer; font-size:13px; font-weight:600; background:white; color:#546e7a; transition:all 0.18s; text-align:center; }
   .pay-btn:hover { border-color:#1B4F72; color:#1B4F72; }
@@ -79,7 +77,6 @@
   .abtn.save { background:linear-gradient(135deg,#1B4F72,#154360); color:white; }
   .abtn.save:hover { box-shadow:0 6px 20px rgba(27,79,114,0.35); }
 
-  /* RECENT PURCHASES */
   .rpurch { padding:12px 0; border-bottom:1px solid #f5f7fa; }
   .rpurch:last-child { border-bottom:none; }
   .rpurch-btns { display:flex; gap:5px; margin-top:8px; flex-wrap:wrap; }
@@ -88,14 +85,11 @@
   .rbtn-del { background:#FDEDEC; color:#C0392B; }
   .rbtn-edit { background:#EBF5FB; color:#1B4F72; }
 
-  /* STATUS BADGES */
   .badge { display:inline-block; padding:3px 10px; border-radius:12px; font-size:11px; font-weight:700; }
   .badge-paid { background:#EAFAF1; color:#1E8449; }
   .badge-unpaid { background:#FDEDEC; color:#C0392B; }
   .badge-partial { background:#FEF9E7; color:#B7770D; }
-  .badge-credit { background:#F4ECF7; color:#7D3C98; }
 
-  /* MODALS */
   .modal-bg { display:none; position:fixed; inset:0; background:rgba(21,67,96,0.55); z-index:300; align-items:flex-start; justify-content:center; overflow-y:auto; padding:20px 0; backdrop-filter:blur(3px); }
   .modal-bg.open { display:flex; }
   .modal { background:white; border-radius:18px; padding:28px; width:480px; max-width:96vw; margin:0 auto; box-shadow:0 24px 64px rgba(21,67,96,0.22); }
@@ -104,10 +98,8 @@
   .modal-close { background:#f0f4f8; border:none; width:32px; height:32px; border-radius:8px; cursor:pointer; font-size:16px; }
   .modal-close:hover { background:#FDEDEC; color:#C0392B; }
 
-  /* NOTIF */
   .notif { position:fixed; top:74px; right:20px; padding:12px 20px; border-radius:10px; font-size:13px; font-weight:700; color:white; z-index:9999; box-shadow:0 4px 16px rgba(0,0,0,0.22); max-width:320px; }
 
-  /* STAT STRIP */
   .stat-strip { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:4px; }
   .stat-mini { background:white; border-radius:12px; padding:16px 18px; box-shadow:0 2px 10px rgba(0,0,0,0.05); border:1px solid rgba(0,0,0,0.04); display:flex; align-items:center; gap:12px; transition:all 0.2s; }
   .stat-mini:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(0,0,0,0.08); }
@@ -118,6 +110,16 @@
   .stat-mini.red .stat-icon { background:#FDEDEC; }
   .stat-info .lbl { font-size:11px; color:#90a4ae; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; }
   .stat-info .val { font-size:20px; font-weight:800; color:#1a2332; margin-top:2px; line-height:1; }
+
+  /* Stock Mode Cards */
+  .mode-card { padding:14px; border:2px solid #e2e8f0; border-radius:10px; cursor:pointer; text-align:center; transition:all 0.2s; background:#f8fafc; }
+  .mode-card.active-add { border-color:#1B4F72; background:#EBF5FB; }
+  .mode-card.active-set { border-color:#F39C12; background:#FEF9E7; }
+  .mode-card:hover { transform:translateY(-1px); }
+
+  /* GST type badge */
+  .gst-incl { background:#EAFAF1; color:#1E8449; padding:2px 6px; border-radius:6px; font-size:10px; font-weight:700; }
+  .gst-excl { background:#EBF5FB; color:#1B4F72; padding:2px 6px; border-radius:6px; font-size:10px; font-weight:700; }
 </style>
 </head>
 <body>
@@ -146,8 +148,6 @@
 </div>
 
 <div class="main">
-
-  <!-- LEFT PANEL -->
   <div class="left-panel">
 
     <!-- STAT STRIP -->
@@ -170,7 +170,27 @@
       </div>
     </div>
 
-    <!-- SUPPLIER DETAILS -->
+    <!-- ✅ STOCK MODE SELECTOR -->
+    <div class="card" style="padding:18px 20px;">
+      <div style="font-size:13px;font-weight:800;color:#1a2332;margin-bottom:12px;">📦 Stock Update Mode — Kaise add hoga stock?</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+        <div class="mode-card active-add" id="modeAddBtn" onclick="setStockMode('add')">
+          <div style="font-size:22px;">➕</div>
+          <div style="font-size:13px;font-weight:800;color:#1B4F72;margin-top:6px;">Naya Purchase</div>
+          <div style="font-size:11px;color:#78909c;margin-top:4px;line-height:1.4;">Supplier se naya maal aaya<br>Stock mein ADD hoga</div>
+        </div>
+        <div class="mode-card" id="modeSetBtn" onclick="setStockMode('set')">
+          <div style="font-size:22px;">📋</div>
+          <div style="font-size:13px;font-weight:800;color:#546e7a;margin-top:6px;">Opening Stock</div>
+          <div style="font-size:11px;color:#78909c;margin-top:4px;line-height:1.4;">Pehle se rakha hua stock<br>Quantity SET hogi (replace)</div>
+        </div>
+      </div>
+      <div id="stockModeInfo" style="padding:10px 14px;background:#EAFAF1;border-radius:8px;font-size:12px;color:#1E8449;font-weight:700;border:1px solid #A9DFBF;">
+        ➕ Add Mode: Purchase stock mein ADD hogi — Normal purchases ke liye use karo
+      </div>
+    </div>
+
+    <!-- ✅ SUPPLIER DETAILS with GST field -->
     <div class="card">
       <div class="card-title">🏭 Supplier / Purchase Details</div>
       <div class="grid2" style="margin-bottom:12px;">
@@ -188,7 +208,18 @@
         </div>
         <div class="fgroup">
           <label>Supplier Phone</label>
-          <input id="supplierPhone" placeholder="e.g. 9876543210" />
+          <input id="supplierPhone" placeholder="e.g. 9876543210" maxlength="10" />
+        </div>
+        <!-- ✅ NEW: Supplier GST -->
+        <div class="fgroup">
+          <label>Supplier GST No <span style="color:#aaa;font-size:10px;">(Optional)</span></label>
+          <input id="supplierGST" placeholder="e.g. 27XXXXX1234Z1" maxlength="15"
+            style="text-transform:uppercase;"
+            oninput="this.value=this.value.toUpperCase()" />
+        </div>
+        <div class="fgroup">
+          <label>Supplier Email <span style="color:#aaa;font-size:10px;">(Optional)</span></label>
+          <input id="supplierEmail" placeholder="supplier@email.com" type="email" />
         </div>
         <div class="fgroup full">
           <label>Notes (Optional)</label>
@@ -197,7 +228,7 @@
       </div>
     </div>
 
-    <!-- ADD ITEMS -->
+    <!-- SEARCH -->
     <div class="card">
       <div class="card-title" style="margin-bottom:12px;">🔍 Search & Add Medicine / Item</div>
       <div class="srch-wrap">
@@ -212,7 +243,7 @@
     <div class="card">
       <div class="card-hdr">
         <div class="card-title">📋 Purchase Items <span id="itemCnt" style="font-size:12px;color:#78909c;font-weight:400;"></span></div>
-        <button onclick="clearAllItems()" style="font-size:12px;color:#C0392B;background:#FDEDEC;border:none;padding:5px 12px;border-radius:6px;cursor:pointer;font-weight:700;" id="clearBtn" style="display:none;">✕ Clear All</button>
+        <button onclick="clearAllItems()" id="clearBtn" style="display:none;font-size:12px;color:#C0392B;background:#FDEDEC;border:none;padding:5px 12px;border-radius:6px;cursor:pointer;font-weight:700;">✕ Clear All</button>
       </div>
       <div id="emptyItems" class="empty-state">
         <div style="font-size:36px;margin-bottom:8px;">📦</div>
@@ -222,14 +253,15 @@
         <table class="pur-tbl">
           <thead>
             <tr>
-              <th style="width:22%;">Product</th>
-              <th style="width:10%;">Batch</th>
-              <th style="width:9%;">Expiry</th>
-              <th style="width:9%;">Qty</th>
-              <th style="width:11%;">Purchase ₹</th>
-              <th style="width:9%;">MRP ₹</th>
-              <th style="width:9%;">Sale ₹</th>
-              <th style="width:7%;">GST%</th>
+              <th style="width:18%;">Product</th>
+              <th style="width:9%;">Batch</th>
+              <th style="width:8%;">Expiry</th>
+              <th style="width:6%;">Qty</th>
+              <th style="width:10%;">Purchase ₹</th>
+              <th style="width:8%;">MRP ₹</th>
+              <th style="width:8%;">Sale ₹</th>
+              <th style="width:6%;">GST%</th>
+              <th style="width:10%;">GST Type</th>  <!-- ✅ NEW COLUMN -->
               <th style="width:10%;">Total</th>
               <th style="width:4%;"></th>
             </tr>
@@ -238,22 +270,20 @@
         </table>
       </div>
     </div>
+
   </div>
 
   <!-- RIGHT PANEL -->
   <div class="right-panel">
     <div class="right-sticky">
 
-      <!-- SUMMARY -->
       <div class="card">
         <div class="card-title" style="margin-bottom:14px;">💰 Purchase Summary</div>
-
         <div class="srow"><span>Total Items</span><span id="totalItems" style="font-weight:700;">0</span></div>
-        <div class="srow"><span>Subtotal</span><span id="subtotalDisp">₹0.00</span></div>
+        <div class="srow"><span>Subtotal (excl. GST)</span><span id="subtotalDisp">₹0.00</span></div>
         <div class="srow" id="gstRow" style="display:none;"><span>GST Amount</span><span id="gstDisp">₹0.00</span></div>
         <div class="total-row"><span>TOTAL</span><span id="totalDisp">₹0.00</span></div>
 
-        <!-- PAYMENT -->
         <div style="font-size:11px;color:#78909c;font-weight:700;text-transform:uppercase;margin:14px 0 6px;">Payment Mode</div>
         <div class="pay-grid">
           <div class="pay-btn sel" onclick="selPay('cash',this)">💵 Cash</div>
@@ -268,7 +298,7 @@
             style="padding:11px 14px;border:1.5px solid #e2e8f0;border-radius:9px;font-size:15px;outline:none;" />
         </div>
 
-        <div id="dueBar" style="display:none;background:#FEF9E7;border:1px solid #F9E79F;border-radius:9px;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <div id="dueBar" style="display:none;background:#FEF9E7;border:1px solid #F9E79F;border-radius:9px;padding:10px 16px;justify-content:space-between;align-items:center;margin-bottom:12px;">
           <span style="color:#B7770D;font-weight:700;">📋 Credit Due</span>
           <span id="dueAmt" style="color:#B7770D;font-weight:800;font-size:16px;">₹0</span>
         </div>
@@ -276,7 +306,6 @@
         <button class="abtn save" onclick="savePurchase()">💾 Save Purchase Entry</button>
       </div>
 
-      <!-- RECENT PURCHASES -->
       <div class="card">
         <div class="card-hdr">
           <div class="card-title">🕒 Recent Purchases</div>
@@ -318,7 +347,7 @@
   </div>
 </div>
 
-<!-- DELETE CONFIRM MODAL -->
+<!-- DELETE MODAL -->
 <div class="modal-bg" id="delModal">
   <div class="modal" style="width:420px;">
     <div class="modal-hdr">
@@ -339,19 +368,19 @@
 
 <script>
 let products=[], purchaseItems=[], payMode='cash';
+let stockMode='add'; // ✅ 'add' = new purchase, 'set' = opening stock
 let payModalId=null, delModalId=null;
+let editId=null;
 
-// ── TOKEN ──
 function getToken(){return localStorage.getItem('tenantToken')||localStorage.getItem('token')||'';}
 function authH(extra){const t=getToken();return t?{'Authorization':'Bearer '+t,...(extra||{})}:{...(extra||{})};}
 
-// ── AUTH ──
 function checkAuth(){
   const user=JSON.parse(localStorage.getItem('user')||'null');
-  if(!getToken()){location.href='index.html';return;}
+  if(!getToken()){location.href='signup.html';return;}
   document.getElementById('navUser').textContent=user?.name||'';
 }
-function logout(){localStorage.clear();location.href='index.html';}
+function logout(){localStorage.clear();location.href='signup.html';}
 
 function notif(msg,ok=true){
   const el=document.createElement('div');el.className='notif';
@@ -364,11 +393,34 @@ function setToday(){
   document.getElementById('purchaseDate').value=new Date().toISOString().split('T')[0];
 }
 
+// ✅ STOCK MODE SWITCHER
+function setStockMode(mode){
+  stockMode=mode;
+  const addBtn=document.getElementById('modeAddBtn');
+  const setBtn=document.getElementById('modeSetBtn');
+  const info=document.getElementById('stockModeInfo');
+  if(mode==='add'){
+    addBtn.className='mode-card active-add';
+    addBtn.querySelector('div:nth-child(2)').style.color='#1B4F72';
+    setBtn.className='mode-card';
+    setBtn.querySelector('div:nth-child(2)').style.color='#546e7a';
+    info.style.cssText='padding:10px 14px;background:#EAFAF1;border-radius:8px;font-size:12px;color:#1E8449;font-weight:700;border:1px solid #A9DFBF;';
+    info.textContent='➕ Add Mode: Purchase stock mein ADD hogi — Normal purchases ke liye use karo';
+  }else{
+    setBtn.className='mode-card active-set';
+    setBtn.querySelector('div:nth-child(2)').style.color='#B7770D';
+    addBtn.className='mode-card';
+    addBtn.querySelector('div:nth-child(2)').style.color='#546e7a';
+    info.style.cssText='padding:10px 14px;background:#FEF9E7;border-radius:8px;font-size:12px;color:#B7770D;font-weight:700;border:1px solid #F9E79F;';
+    info.textContent='📋 Opening Stock Mode: Quantity SET hogi — Existing stock replace ho jaayegi';
+  }
+}
+
 // ── LOAD PRODUCTS ──
 async function loadProducts(){
   const st=document.getElementById('pstatus');
   try{
-    st.textContent='⏳ Loading medicines...';
+    st.textContent='⏳ Loading...';
     const res=await fetch('/api/products',{headers:authH()});
     if(!res.ok)throw new Error('HTTP '+res.status);
     const data=await res.json();
@@ -383,7 +435,7 @@ function srchProducts(){
   const q=document.getElementById('srchInput').value.toLowerCase().trim();
   const box=document.getElementById('srchResults');
   if(!q){box.style.display='none';return;}
-  if(!products.length){box.innerHTML='<div style="padding:12px;color:#e65100;font-size:13px;">⚠️ Products nahi mile. Refresh karo.</div>';box.style.display='block';return;}
+  if(!products.length){box.innerHTML='<div style="padding:12px;color:#e65100;font-size:13px;">⚠️ Products nahi mile.</div>';box.style.display='block';return;}
   const matches=products.filter(p=>(p.name||'').toLowerCase().includes(q)||(p.generic||'').toLowerCase().includes(q)||(p.company||'').toLowerCase().includes(q)).slice(0,12);
   if(!matches.length){box.innerHTML=`<div style="padding:12px;color:#78909c;font-size:13px;">No results for "${q}"</div>`;box.style.display='block';return;}
   box.innerHTML=matches.map(p=>{
@@ -402,9 +454,12 @@ function addItem(id){
   const ex=purchaseItems.find(x=>x.pid===id);
   if(ex){ex.qty++;renderTable();document.getElementById('srchInput').value='';document.getElementById('srchResults').style.display='none';return;}
   purchaseItems.push({
-    pid:id,name:p.name,cat:p.category,sellType:p.sellType||'piece',
+    pid:id,name:p.name,cat:p.category||'medicine',sellType:p.sellType||'piece',
     batch:p.batch||'',expiry:p.expiry||'',
-    qty:1,purchasePrice:p.purchasePrice||0,mrp:p.mrp||0,salePrice:p.salePrice||0,gst:p.gst||0
+    qty:1,purchasePrice:p.purchasePrice||0,
+    mrp:p.mrp||0,salePrice:p.salePrice||0,
+    gst:p.gst||0,
+    gstType:'exclusive' // ✅ default exclusive
   });
   document.getElementById('srchInput').value='';
   document.getElementById('srchResults').style.display='none';
@@ -417,26 +472,45 @@ function renderTable(){
   const emp=document.getElementById('emptyItems');
   const cnt=document.getElementById('itemCnt');
   const clrBtn=document.getElementById('clearBtn');
-  if(!purchaseItems.length){wrap.style.display='none';emp.style.display='block';cnt.textContent='';clrBtn.style.display='none';calcTotal();return;}
+  if(!purchaseItems.length){
+    wrap.style.display='none';emp.style.display='block';
+    cnt.textContent='';clrBtn.style.display='none';
+    calcTotal();return;
+  }
   wrap.style.display='block';emp.style.display='none';
   cnt.textContent='('+purchaseItems.length+' items)';
   clrBtn.style.display='block';
+
   const tbody=document.getElementById('itemsBody');
   tbody.innerHTML=purchaseItems.map((item,i)=>{
-    const lineTotal=(item.qty*(item.purchasePrice||0)).toFixed(2);
+    // ✅ GST calculation display
+    const pp=item.purchasePrice||0;
+    const gstRate=item.gst||0;
+    let lineTotal=0,baseNote='';
+    if(item.gstType==='inclusive'&&gstRate>0){
+      const basePrice=pp/(1+gstRate/100);
+      const gstAmt=(pp-basePrice)*item.qty;
+      lineTotal=pp*item.qty;
+      baseNote=`<div class="gst-incl" style="margin-top:3px;display:inline-block;">Base:₹${basePrice.toFixed(2)} +GST:₹${gstAmt.toFixed(2)}</div>`;
+    }else{
+      const gstAmt=pp*(gstRate/100)*item.qty;
+      lineTotal=(pp*item.qty)+gstAmt;
+      baseNote=gstRate>0?`<div class="gst-excl" style="margin-top:3px;display:inline-block;">+GST:₹${gstAmt.toFixed(2)}</div>`:'';
+    }
+
     return `<tr>
       <td>
-        <div style="font-weight:700;font-size:13px;">${item.name}</div>
-        <div style="font-size:11px;color:#78909c;">${item.cat==='medicine'?'💊 Medicine':item.cat==='fmcg'?'🛍️ FMCG':'📦 Other'}</div>
+        <div style="font-weight:700;font-size:12px;">${item.name}</div>
+        <div style="font-size:10px;color:#78909c;">${item.cat==='medicine'?'💊':item.cat==='fmcg'?'🛍️':'📦'} ${item.cat}</div>
       </td>
-      <td><input value="${item.batch}" placeholder="Batch" onchange="updItem(${i},'batch',this.value)" style="width:80px;" /></td>
-      <td><input value="${item.expiry}" placeholder="MM/YY" onchange="updItem(${i},'expiry',this.value)" style="width:70px;" /></td>
-      <td><input type="number" value="${item.qty}" min="1" onchange="updItem(${i},'qty',this.value)" style="width:55px;" /></td>
-      <td><input type="number" value="${item.purchasePrice}" min="0" step="0.01" onchange="updItem(${i},'purchasePrice',this.value)" style="width:75px;" /></td>
-      <td><input type="number" value="${item.mrp}" min="0" step="0.01" onchange="updItem(${i},'mrp',this.value)" style="width:65px;" /></td>
-      <td><input type="number" value="${item.salePrice}" min="0" step="0.01" onchange="updItem(${i},'salePrice',this.value)" style="width:65px;" /></td>
+      <td><input value="${item.batch}" placeholder="Batch" onchange="updItem(${i},'batch',this.value)" style="width:75px;" /></td>
+      <td><input value="${item.expiry}" placeholder="MM/YY" onchange="updItem(${i},'expiry',this.value)" style="width:65px;" /></td>
+      <td><input type="number" value="${item.qty}" min="1" onchange="updItem(${i},'qty',this.value)" style="width:50px;" /></td>
+      <td><input type="number" value="${item.purchasePrice}" min="0" step="0.01" onchange="updItem(${i},'purchasePrice',this.value)" style="width:70px;" /></td>
+      <td><input type="number" value="${item.mrp}" min="0" step="0.01" onchange="updItem(${i},'mrp',this.value)" style="width:60px;" /></td>
+      <td><input type="number" value="${item.salePrice}" min="0" step="0.01" onchange="updItem(${i},'salePrice',this.value)" style="width:60px;" /></td>
       <td>
-        <select onchange="updItem(${i},'gst',this.value)" style="padding:5px 6px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:12px;outline:none;width:60px;">
+        <select onchange="updItem(${i},'gst',this.value)" style="width:58px;">
           <option value="0" ${item.gst==0?'selected':''}>0%</option>
           <option value="5" ${item.gst==5?'selected':''}>5%</option>
           <option value="12" ${item.gst==12?'selected':''}>12%</option>
@@ -444,7 +518,15 @@ function renderTable(){
           <option value="28" ${item.gst==28?'selected':''}>28%</option>
         </select>
       </td>
-      <td style="font-weight:700;color:#1B4F72;">₹${lineTotal}</td>
+      <!-- ✅ GST TYPE COLUMN -->
+      <td>
+        <select onchange="updItem(${i},'gstType',this.value)" style="width:80px;">
+          <option value="exclusive" ${item.gstType==='exclusive'?'selected':''}>Excl. GST</option>
+          <option value="inclusive" ${item.gstType==='inclusive'?'selected':''}>Incl. GST</option>
+        </select>
+        ${baseNote}
+      </td>
+      <td style="font-weight:700;color:#1B4F72;">₹${lineTotal.toFixed(2)}</td>
       <td><button class="rm-btn" onclick="rmItem(${i})">✕</button></td>
     </tr>`;
   }).join('');
@@ -452,19 +534,30 @@ function renderTable(){
 }
 
 function updItem(i,field,val){
-  if(['qty'].includes(field))purchaseItems[i][field]=parseInt(val)||1;
+  if(field==='qty')purchaseItems[i][field]=parseInt(val)||1;
   else if(['purchasePrice','mrp','salePrice','gst'].includes(field))purchaseItems[i][field]=parseFloat(val)||0;
-  else purchaseItems[i][field]=val;
+  else purchaseItems[i][field]=val; // batch, expiry, gstType
   renderTable();
 }
 function rmItem(i){purchaseItems.splice(i,1);renderTable();}
 function clearAllItems(){if(!confirm('Saare items hata dein?'))return;purchaseItems=[];renderTable();}
 function selPay(mode,el){payMode=mode;document.querySelectorAll('.pay-btn').forEach(b=>b.classList.remove('sel'));el.classList.add('sel');calcDue();}
 
-// ── CALC TOTAL ──
+// ✅ CALC TOTAL — GST inclusive/exclusive handle karo
 function calcTotal(){
   let sub=0,gst=0;
-  purchaseItems.forEach(item=>{sub+=item.qty*(item.purchasePrice||0);if(item.gst>0)gst+=item.qty*(item.purchasePrice||0)*(item.gst/100);});
+  purchaseItems.forEach(item=>{
+    const pp=item.purchasePrice||0;
+    const gstRate=item.gst||0;
+    if(item.gstType==='inclusive'&&gstRate>0){
+      const basePrice=pp/(1+gstRate/100);
+      sub+=item.qty*basePrice;
+      gst+=item.qty*(pp-basePrice);
+    }else{
+      sub+=item.qty*pp;
+      if(gstRate>0)gst+=item.qty*pp*(gstRate/100);
+    }
+  });
   const grand=sub+gst;
   document.getElementById('totalItems').textContent=purchaseItems.length;
   document.getElementById('subtotalDisp').textContent='₹'+sub.toFixed(2);
@@ -487,26 +580,27 @@ function calcDue(){
   }else bar.style.display='none';
 }
 
-// ── SAVE PURCHASE ──
-async function savePurchase(){
-  const supplier=document.getElementById('supplier').value.trim();
-  if(!supplier){notif('⚠️ Supplier name zaroori hai!',false);return;}
-  if(!purchaseItems.length){notif('⚠️ Koi item add nahi kiya!',false);return;}
+// ── BUILD DATA ──
+function buildData(){
   const totals=calcTotal();
   const paid=parseFloat(document.getElementById('paidAmt').value)||0;
   const pd=document.getElementById('purchaseDate').value;
-
-  const data={
-    supplier,
-    invoiceNo:document.getElementById('invoiceNo').value,
-    supplierPhone:document.getElementById('supplierPhone').value,
-    notes:document.getElementById('purchaseNotes').value,
+  return{
+    supplier:document.getElementById('supplier').value.trim(),
+    supplierGST:document.getElementById('supplierGST').value.trim(), // ✅ NEW
+    supplierEmail:document.getElementById('supplierEmail').value.trim(),
+    invoiceNo:document.getElementById('invoiceNo').value.trim(),
+    supplierPhone:document.getElementById('supplierPhone').value.trim(),
+    notes:document.getElementById('purchaseNotes').value.trim(),
     date:pd?new Date(pd):new Date(),
+    stockUpdateMode:stockMode, // ✅ NEW
     items:purchaseItems.map(item=>({
       product:item.pid,productName:item.name,
       batch:item.batch,expiry:item.expiry,
       qty:item.qty,purchasePrice:item.purchasePrice,
-      mrp:item.mrp,salePrice:item.salePrice,gst:item.gst,
+      mrp:item.mrp,salePrice:item.salePrice,
+      gst:item.gst,
+      gstType:item.gstType||'exclusive', // ✅ NEW
       total:parseFloat((item.qty*item.purchasePrice).toFixed(2))
     })),
     subtotal:parseFloat(totals.sub.toFixed(2)),
@@ -516,24 +610,36 @@ async function savePurchase(){
     paymentMode:payMode,
     paymentStatus:payMode==='credit'?'unpaid':(paid>=totals.grand?'paid':'partial')
   };
+}
+
+// ── SAVE PURCHASE ──
+async function savePurchase(){
+  const supplier=document.getElementById('supplier').value.trim();
+  if(!supplier){notif('⚠️ Supplier name zaroori hai!',false);return;}
+  if(!purchaseItems.length){notif('⚠️ Koi item add nahi kiya!',false);return;}
+
+  const data=buildData();
+  const url=editId?'/api/purchases/'+editId:'/api/purchases';
+  const method=editId?'PUT':'POST';
 
   try{
-    const res=await fetch('/api/purchases',{method:'POST',headers:authH({'Content-Type':'application/json'}),body:JSON.stringify(data)});
+    const res=await fetch(url,{method,headers:authH({'Content-Type':'application/json'}),body:JSON.stringify(data)});
     if(!res.ok)throw new Error('HTTP '+res.status);
     const result=await res.json();
     if(result.success||result._id||result.purchase){
-      notif('✅ Purchase saved! Stock updated.');
-      resetForm();
-      loadRecentPurchases();
-      loadStats();
-      loadProducts();
-    }else notif('❌ Error: '+(result.message||'Failed'),false);
+      notif(editId?'✅ Purchase updated! Stock adjusted.':'✅ Purchase saved! Stock updated.');
+      editId=null;
+      resetForm();loadRecentPurchases();loadStats();loadProducts();
+    }else notif('❌ '+(result.message||'Error'),false);
   }catch(e){notif('❌ '+e.message,false);console.error(e);}
 }
 
 function resetForm(){
-  purchaseItems=[];
-  ['supplier','invoiceNo','supplierPhone','purchaseNotes','paidAmt'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  purchaseItems=[];editId=null;stockMode='add';
+  setStockMode('add');
+  ['supplier','invoiceNo','supplierPhone','supplierGST','supplierEmail','purchaseNotes','paidAmt'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.value='';
+  });
   document.getElementById('purchaseDate').value=new Date().toISOString().split('T')[0];
   document.querySelectorAll('.pay-btn').forEach(b=>b.classList.remove('sel'));
   document.querySelector('.pay-btn').classList.add('sel');
@@ -552,8 +658,7 @@ async function loadStats(){
     const spent=purchases.reduce((a,p)=>a+(p.totalAmount||0),0);
     const pending=purchases.reduce((a,p)=>a+Math.max(0,(p.totalAmount||0)-(p.paidAmount||0)),0);
     const now=new Date();
-    const monthPurchases=purchases.filter(p=>{const d=new Date(p.date);return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();});
-    const monthTotal=monthPurchases.reduce((a,p)=>a+(p.totalAmount||0),0);
+    const monthTotal=purchases.filter(p=>{const d=new Date(p.date);return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();}).reduce((a,p)=>a+(p.totalAmount||0),0);
     document.getElementById('st-total').textContent=total;
     document.getElementById('st-spent').textContent='₹'+(spent>=1000?(spent/1000).toFixed(1)+'K':spent.toFixed(0));
     document.getElementById('st-pending').textContent='₹'+(pending>=1000?(pending/1000).toFixed(1)+'K':pending.toFixed(0));
@@ -577,22 +682,22 @@ async function loadRecentPurchases(){
       const pd=new Date(p.date);
       const ds=pd.toLocaleDateString('en-IN');
       const dy=pd.toLocaleDateString('en-IN',{weekday:'short'});
-      let statusBadge='';
-      if(p.paymentStatus==='paid')statusBadge='<span class="badge badge-paid">✅ Paid</span>';
-      else if(p.paymentStatus==='partial')statusBadge='<span class="badge badge-partial">⚡ Partial</span>';
-      else statusBadge='<span class="badge badge-unpaid">📋 Unpaid</span>';
-
+      const modeTag=p.stockUpdateMode==='set'?'<span style="background:#FEF9E7;color:#B7770D;padding:1px 6px;border-radius:6px;font-size:10px;font-weight:700;">Opening</span>':'';
+      let badge='';
+      if(p.paymentStatus==='paid')badge='<span class="badge badge-paid">✅ Paid</span>';
+      else if(p.paymentStatus==='partial')badge='<span class="badge badge-partial">⚡ Partial</span>';
+      else badge='<span class="badge badge-unpaid">📋 Unpaid</span>';
       return `<div class="rpurch">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;">
           <div style="flex:1;min-width:0;">
-            <div style="font-weight:700;font-size:13px;">${p.supplier||'Unknown'}</div>
-            <div style="color:#78909c;font-size:12px;">${p.invoiceNo?'Inv: '+p.invoiceNo:''} ${p.items?.length||0} items</div>
+            <div style="font-weight:700;font-size:13px;">${p.supplier||'Unknown'} ${modeTag}</div>
+            <div style="color:#78909c;font-size:12px;">${p.invoiceNo?'Inv: '+p.invoiceNo+' · ':''} ${p.items?.length||0} items${p.supplierGST?' · GST:'+p.supplierGST:''}</div>
             <div style="color:#b0bec5;font-size:11px;">${dy} · ${ds}</div>
           </div>
           <div style="text-align:right;flex-shrink:0;">
             <div style="font-weight:800;color:#1B4F72;font-size:14px;">₹${(p.totalAmount||0).toFixed(0)}</div>
-            <div style="margin-top:3px;">${statusBadge}</div>
-            ${isPending?`<div style="font-size:11px;color:#C0392B;margin-top:2px;">Due: ₹${bal.toFixed(0)}</div>`:''}
+            <div style="margin-top:3px;">${badge}</div>
+            ${isPending?`<div style="font-size:11px;color:#C0392B;">Due: ₹${bal.toFixed(0)}</div>`:''}
           </div>
         </div>
         <div class="rpurch-btns">
@@ -607,93 +712,34 @@ async function loadRecentPurchases(){
   }
 }
 
-// ── EDIT PURCHASE (load into form) ──
+// ── EDIT PURCHASE ──
 async function editPurchase(id){
   try{
     const res=await fetch('/api/purchases/'+id,{headers:authH()});
     if(!res.ok)throw new Error('HTTP '+res.status);
     const p=await res.json();
+    editId=id;
     document.getElementById('supplier').value=p.supplier||'';
     document.getElementById('invoiceNo').value=p.invoiceNo||'';
     document.getElementById('supplierPhone').value=p.supplierPhone||'';
+    document.getElementById('supplierGST').value=p.supplierGST||'';
+    document.getElementById('supplierEmail').value=p.supplierEmail||'';
     document.getElementById('purchaseNotes').value=p.notes||'';
-    if(p.date)document.getElementById('purchaseDate').value=new Date(p.date).toISOString().split('T')[0];
     document.getElementById('paidAmt').value=p.paidAmount||0;
-    document.getElementById('supplier').dataset.editId=id;
-
+    if(p.date)document.getElementById('purchaseDate').value=new Date(p.date).toISOString().split('T')[0];
+    setStockMode(p.stockUpdateMode||'add');
     purchaseItems=(p.items||[]).map(item=>({
       pid:item.product?._id||item.product,name:item.productName||'',
       cat:'medicine',sellType:'strip',
       batch:item.batch||'',expiry:item.expiry||'',
       qty:item.qty||1,purchasePrice:item.purchasePrice||0,
-      mrp:item.mrp||0,salePrice:item.salePrice||0,gst:item.gst||0
+      mrp:item.mrp||0,salePrice:item.salePrice||0,
+      gst:item.gst||0,gstType:item.gstType||'exclusive'
     }));
     renderTable();
     window.scrollTo({top:0,behavior:'smooth'});
-    notif('📝 Purchase loaded for editing. Changes karke Save karo!');
+    notif('📝 Edit mode — changes karke Save karo!');
   }catch(e){notif('❌ Error: '+e.message,false);}
-}
-
-// Override savePurchase to handle edit
-const origSavePurchase=savePurchase;
-async function savePurchase(){
-  const editId=document.getElementById('supplier').dataset.editId;
-  if(editId){
-    // Edit mode
-    const supplier=document.getElementById('supplier').value.trim();
-    if(!supplier){notif('⚠️ Supplier name zaroori hai!',false);return;}
-    if(!purchaseItems.length){notif('⚠️ Koi item add nahi kiya!',false);return;}
-    const totals=calcTotal();
-    const paid=parseFloat(document.getElementById('paidAmt').value)||0;
-    const pd=document.getElementById('purchaseDate').value;
-    const data={
-      supplier,invoiceNo:document.getElementById('invoiceNo').value,
-      supplierPhone:document.getElementById('supplierPhone').value,
-      notes:document.getElementById('purchaseNotes').value,
-      date:pd?new Date(pd):new Date(),
-      items:purchaseItems.map(item=>({product:item.pid,productName:item.name,batch:item.batch,expiry:item.expiry,qty:item.qty,purchasePrice:item.purchasePrice,mrp:item.mrp,salePrice:item.salePrice,gst:item.gst,total:parseFloat((item.qty*item.purchasePrice).toFixed(2))})),
-      subtotal:parseFloat(totals.sub.toFixed(2)),gstAmount:parseFloat(totals.gst.toFixed(2)),
-      totalAmount:parseFloat(totals.grand.toFixed(2)),paidAmount:payMode==='credit'?0:paid,
-      paymentMode:payMode,paymentStatus:payMode==='credit'?'unpaid':(paid>=totals.grand?'paid':'partial')
-    };
-    try{
-      const res=await fetch('/api/purchases/'+editId,{method:'PUT',headers:authH({'Content-Type':'application/json'}),body:JSON.stringify(data)});
-      if(!res.ok)throw new Error('HTTP '+res.status);
-      const result=await res.json();
-      if(result.success||result.purchase||result._id){
-        notif('✅ Purchase updated! Stock adjusted.');
-        delete document.getElementById('supplier').dataset.editId;
-        resetForm();loadRecentPurchases();loadStats();loadProducts();
-      }else notif('❌ '+(result.message||'Error'),false);
-    }catch(e){notif('❌ '+e.message,false);}
-  }else{
-    // New purchase
-    const supplier=document.getElementById('supplier').value.trim();
-    if(!supplier){notif('⚠️ Supplier name zaroori hai!',false);return;}
-    if(!purchaseItems.length){notif('⚠️ Koi item add nahi kiya!',false);return;}
-    const totals=calcTotal();
-    const paid=parseFloat(document.getElementById('paidAmt').value)||0;
-    const pd=document.getElementById('purchaseDate').value;
-    const data={
-      supplier,invoiceNo:document.getElementById('invoiceNo').value,
-      supplierPhone:document.getElementById('supplierPhone').value,
-      notes:document.getElementById('purchaseNotes').value,
-      date:pd?new Date(pd):new Date(),
-      items:purchaseItems.map(item=>({product:item.pid,productName:item.name,batch:item.batch,expiry:item.expiry,qty:item.qty,purchasePrice:item.purchasePrice,mrp:item.mrp,salePrice:item.salePrice,gst:item.gst,total:parseFloat((item.qty*item.purchasePrice).toFixed(2))})),
-      subtotal:parseFloat(totals.sub.toFixed(2)),gstAmount:parseFloat(totals.gst.toFixed(2)),
-      totalAmount:parseFloat(totals.grand.toFixed(2)),paidAmount:payMode==='credit'?0:paid,
-      paymentMode:payMode,paymentStatus:payMode==='credit'?'unpaid':(paid>=totals.grand?'paid':'partial')
-    };
-    try{
-      const res=await fetch('/api/purchases',{method:'POST',headers:authH({'Content-Type':'application/json'}),body:JSON.stringify(data)});
-      if(!res.ok)throw new Error('HTTP '+res.status);
-      const result=await res.json();
-      if(result.success||result._id||result.purchase){
-        notif('✅ Purchase saved! Stock updated.');
-        resetForm();loadRecentPurchases();loadStats();loadProducts();
-      }else notif('❌ '+(result.message||'Failed'),false);
-    }catch(e){notif('❌ '+e.message,false);console.error(e);}
-  }
 }
 
 // ── PAY MODAL ──

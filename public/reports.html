@@ -291,10 +291,10 @@ function authH(extra){
 // ── AUTH ──
 function checkAuth(){
   const user=JSON.parse(localStorage.getItem('user')||'null');
-  if(!getToken()){location.href='index.html';return;}
+  if(!getToken()){location.href='signup.html';return;}
   document.getElementById('navUser').textContent=user?.name||'';
 }
-function logout(){localStorage.clear();location.href='index.html';}
+function logout(){localStorage.clear();location.href='signup.html';}
 
 function notif(msg,ok=true){
   const el=document.createElement('div');el.className='notif';

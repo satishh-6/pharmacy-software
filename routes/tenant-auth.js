@@ -56,14 +56,21 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
+    const loginId = (email || '').trim().toLowerCase();
 
-    // Pehle tenant (owner) dhundho
-    let tenant = await Tenant.findOne({ email: email.toLowerCase() });
+    // ✅ Email OR Phone OR TenantId se dhundho
+    let tenant = await Tenant.findOne({
+      $or: [
+        { email: loginId },
+        { phone: loginId },
+        { tenantId: loginId }
+      ]
+    });
     let role = 'owner', staffMember = null;
 
     if (!tenant) {
       // Staff login — email se dhundho
-      tenant = await Tenant.findOne({ 'staff.username': email.toLowerCase() });
+      tenant = await Tenant.findOne({ 'staff.username': loginId });
       if (!tenant) return res.status(401).json({ success:false, message:'Email not found!' });
       staffMember = tenant.staff.find(s => s.username === email.toLowerCase());
       if (!staffMember || !staffMember.isActive)

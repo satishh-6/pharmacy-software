@@ -23,12 +23,14 @@
   --success: #00d4aa;
 }
 * { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
 body {
   font-family: 'Sora', sans-serif;
   background: var(--navy);
   min-height: 100vh;
   display: flex;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 /* ── ANIMATED BACKGROUND ── */
@@ -73,21 +75,22 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 60px 56px;
+  padding: 48px 52px;
   position: relative;
   z-index: 1;
+  overflow-y: auto;
 }
 
 .brand-row {
   display: flex;
   align-items: center;
   gap: 14px;
-  margin-bottom: 56px;
+  margin-bottom: 36px;
   animation: slideIn 0.7s ease both;
 }
 .brand-icon {
-  width: 52px;
-  height: 52px;
+  width: 48px;
+  height: 48px;
   background: linear-gradient(135deg, var(--accent), #0099ff);
   border-radius: 14px;
   display: flex;
@@ -108,7 +111,7 @@ body {
   animation: slideIn 0.7s 0.1s ease both;
 }
 .headline h1 {
-  font-size: 48px;
+  font-size: 40px;
   font-weight: 800;
   color: var(--white);
   line-height: 1.1;
@@ -132,15 +135,15 @@ body {
 .features {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  margin-top: 44px;
+  gap: 10px;
+  margin-top: 32px;
   animation: slideIn 0.7s 0.2s ease both;
 }
 .feat-item {
   display: flex;
   align-items: flex-start;
-  gap: 16px;
-  padding: 16px 18px;
+  gap: 14px;
+  padding: 13px 16px;
   background: var(--glass);
   border: 1px solid var(--border);
   border-radius: 12px;
@@ -171,8 +174,8 @@ body {
 
 .badges {
   display: flex;
-  gap: 10px;
-  margin-top: 36px;
+  gap: 8px;
+  margin-top: 24px;
   animation: slideIn 0.7s 0.3s ease both;
   flex-wrap: wrap;
 }
@@ -198,11 +201,12 @@ body {
   width: 52%;
   min-height: 100vh;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  padding: 40px 52px;
+  padding: 40px 48px 60px;
   position: relative;
   z-index: 1;
+  overflow-y: auto;
 }
 .right-panel::before {
   content: '';
@@ -220,10 +224,11 @@ body {
   background: rgba(15,39,68,0.7);
   border: 1px solid var(--border);
   border-radius: 24px;
-  padding: 40px;
+  padding: 36px 40px 40px;
   backdrop-filter: blur(20px);
   box-shadow: 0 40px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04) inset;
   animation: cardIn 0.8s 0.2s ease both;
+  margin: auto 0;
 }
 @keyframes cardIn {
   from { opacity:0; transform:translateY(30px) scale(0.98); }
@@ -534,8 +539,10 @@ body {
 
 /* Mobile */
 @media (max-width: 900px) {
+  body { flex-direction: column; }
   .left-panel { display: none; }
-  .right-panel { width: 100%; padding: 30px 20px; }
+  .right-panel { width: 100%; min-height: 100vh; padding: 30px 20px 50px; align-items: flex-start; }
+  .form-card { margin: 0; }
 }
 </style>
 </head>
@@ -889,12 +896,14 @@ async function doRegister(){
 
 // ── LOGIN ──
 async function doLogin(){
-  const email=document.getElementById('lEmail').value.trim();
-  const pass=document.getElementById('lPass').value;
+  const emailEl=document.getElementById('lEmail');
+  const passEl=document.getElementById('lPass');
+  const email=(emailEl&&emailEl.value?emailEl.value:'').trim();
+  const pass=passEl&&passEl.value?passEl.value:'';
 
   clearMsgs();
 
-  if(!email){showErr('loginErr','Email enter karo!');return;}
+  if(!email){showErr('loginErr','Email, Phone ya Username enter karo!');return;}
   if(!pass){showErr('loginErr','Password enter karo!');return;}
 
   setLoading('loginBtn','loginBtnTxt','loginSpinner',true);
@@ -907,10 +916,8 @@ async function doLogin(){
     });
     const data=await res.json();
 
-    // Trial expired handle karo
     if(data.trialExpired){
-      showErr('loginErr','⏰ Trial expire ho gaya! Plan upgrade karo ya contact karo: support@dawahisaab.com');
-      showToast('Trial expired!','error');
+      showErr('loginErr','Trial expire ho gaya! Support se contact karo.');
       setLoading('loginBtn','loginBtnTxt','loginSpinner',false);
       return;
     }
@@ -918,7 +925,7 @@ async function doLogin(){
     if(res.ok&&(data.token||data.success)){
       const token=data.token||data.tenantToken;
       localStorage.setItem('tenantToken',token);
-      localStorage.removeItem('token'); // old token clear
+      localStorage.removeItem('token');
       const u=data.tenant||data.user||{};
       localStorage.setItem('user',JSON.stringify({
         name:u.ownerName||u.name||'Owner',
@@ -926,21 +933,19 @@ async function doLogin(){
         role:u.role||'owner',
         tenantId:u.tenantId||u._id||''
       }));
-      // Logo save karo agar hai
       if(u.logo) localStorage.setItem('tenantLogo',u.logo);
-      showOk('loginSuccess','Login successful! Dashboard mein ja rahe hain...');
+      showOk('loginSuccess','Login successful!');
       showToast('Welcome back! 🎉','success');
-      setTimeout(()=>location.href='index.html',1200);
+      setTimeout(()=>location.href='/index.html',1000);
     } else {
-      const msg=data.message||data.error||'Invalid email ya password!';
+      const msg=data.message||data.error||'Invalid credentials!';
       showErr('loginErr',msg);
       showToast(msg,'error');
     }
   }catch(e){
-    showErr('loginErr','Server se connect nahi ho pa raha. Server chal raha hai?');
+    showErr('loginErr','Server se connect nahi ho pa raha!');
     showToast('Connection error!','error');
   }
-
   setLoading('loginBtn','loginBtnTxt','loginSpinner',false);
 }
 

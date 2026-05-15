@@ -252,7 +252,8 @@
 <script>
 function checkAuth() {
   const user = JSON.parse(localStorage.getItem('user') || 'null');
-  if (!localStorage.getItem('tenantToken') && !localStorage.getItem('token')) { location.href='index.html'; return; }
+ const __tk=localStorage.getItem('tenantToken')||localStorage.getItem('token');
+if(!__tk){location.href='signup.html';return;}
   document.getElementById('navUser').textContent = user?.name || 'User';
   const branch = JSON.parse(localStorage.getItem('currentBranch') || 'null');
   if (branch) document.getElementById('navBranch').textContent = branch.name;
@@ -261,7 +262,7 @@ function checkAuth() {
   document.getElementById('welcomeMsg').textContent = `${greet}, ${user?.name || 'Doctor'}! 👋`;
 }
 
-function logout() { localStorage.clear(); location.href='index.html'; }
+function logout() { localStorage.clear(); location.href='signup.html'; }
 
 function updateClock() {
   const now = new Date();

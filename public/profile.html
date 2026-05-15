@@ -493,7 +493,7 @@ let logoBase64='', currentSettings={}, tenantRole='owner';
 
 function getToken(){return localStorage.getItem('tenantToken')||localStorage.getItem('token')||'';}
 function authH(extra){const t=getToken();return t?{'Authorization':'Bearer '+t,...(extra||{})}:{...(extra||{})};}
-function logout(){localStorage.clear();location.href='index.html';}
+function logout(){localStorage.clear();location.href='signup.html';}
 
 function notif(msg,ok=true){
   const el=document.getElementById('notifEl');
@@ -697,7 +697,7 @@ async function saveSettings(){
 
     if(res.status===401){
       notif('❌ Session expire — dobara login karo!',false);
-      setTimeout(()=>{localStorage.clear();location.href='index.html';},2000);
+      setTimeout(()=>{localStorage.clear();location.href='signup.html';},2000);
       return;
     }
 
@@ -907,7 +907,7 @@ async function changePassword(){
     const result=await res.json();
     if(result.success){
       notif('✅ Password changed! Dobara login karo.');
-      setTimeout(()=>{localStorage.clear();location.href='index.html';},2000);
+      setTimeout(()=>{localStorage.clear();location.href='signup.html';},2000);
     } else {
       notif(result.message||'Error — current password wrong?',false);
     }
@@ -915,7 +915,7 @@ async function changePassword(){
 }
 
 // ── INIT ──
-if(!getToken()){location.href='index.html';}
+if(!getToken()){location.href='signup.html';}
 updateBillPreview();
 loadProfile();
 </script>

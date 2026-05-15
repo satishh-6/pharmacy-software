@@ -364,10 +364,10 @@ let allProducts = [], editingId = null, currentFilter = 'all';
 
 function checkAuth() {
   const user = JSON.parse(localStorage.getItem('user') || 'null');
-  if (!localStorage.getItem('tenantToken') && !localStorage.getItem('token')) { location.href='index.html'; return; }
+  if (!localStorage.getItem('tenantToken') && !localStorage.getItem('token')) { location.href='signup.html'; return; }
   document.getElementById('navUser').textContent = user?.name || '';
 }
-function logout() { localStorage.clear(); location.href='index.html'; }
+function logout() { localStorage.clear(); location.href='signup.html'; }
 
 async function loadProducts() {
   try {

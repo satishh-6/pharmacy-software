@@ -1,72 +1,80 @@
-const { app, BrowserWindow, Menu, Tray, nativeImage } = require('electron');
-const path = require('path');
-const { exec } = require('child_process');
 const { app, BrowserWindow, Menu, Tray, nativeImage, globalShortcut } = require('electron');
+const path = require('path');
 
 let mainWindow;
 let tray;
-let serverProcess;
 
-// Server URL — production mein Render URL use hoga
+// ✅ Render.com URL — git push ke baad update hoga
 const SERVER_URL = 'https://medxpert-pharmacy.onrender.com';
 
+// ── CREATE WINDOW ──
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1280,
     height: 800,
     minWidth: 1024,
     minHeight: 600,
-    title: 'MedXpert Pharmacy',
+    title: 'Dawa Hisaab',
     icon: path.join(__dirname, 'assets', 'icon.png'),
     webPreferences: {
       nodeIntegration: false,
-      contextIsolation: true
+      contextIsolation: true,
+      sandbox: false
     },
     show: false,
     backgroundColor: '#f0f4f8'
   });
 
-  // Render.com URL load karo
-  mainWindow.loadURL(SERVER_URL);
+  mainWindow.loadURL(SERVER_URL + '/signup.html');
 
-  // Loading screen
+  // Zoom fix
+  mainWindow.webContents.on('did-finish-load', () => {
+    mainWindow.webContents.setZoomFactor(1.0);
+  });
+
+  // Loading failed → retry
+  mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDesc) => {
+    console.log('Load failed:', errorDesc);
+    setTimeout(() => mainWindow?.loadURL(SERVER_URL + '/signup.html'), 3000);
+  });
+
   mainWindow.once('ready-to-show', () => {
     mainWindow.show();
     mainWindow.focus();
   });
 
-  // Loading failed toh retry
-  mainWindow.webContents.on('did-fail-load', () => {
-    mainWindow.loadURL(SERVER_URL);
-  });
-
   mainWindow.on('closed', () => { mainWindow = null; });
 }
 
+// ── SYSTEM TRAY ──
 function createTray() {
-  // System tray icon
-  const trayIcon = nativeImage.createEmpty();
-  tray = new Tray(trayIcon);
-  const contextMenu = Menu.buildFromTemplate([
-    { label: '💊 MedXpert Pharmacy', enabled: false },
-    { type: 'separator' },
-    { label: '🔄 Reload', click: () => mainWindow?.reload() },
-    { label: '🖥️ Show Window', click: () => mainWindow?.show() },
-    { type: 'separator' },
-    { label: '❌ Quit', click: () => app.quit() }
-  ]);
-  tray.setContextMenu(contextMenu);
-  tray.setToolTip('MedXpert Pharmacy');
+  try {
+    const trayIcon = nativeImage.createEmpty();
+    tray = new Tray(trayIcon);
+    const contextMenu = Menu.buildFromTemplate([
+      { label: '💊 Dawa Hisaab', enabled: false },
+      { type: 'separator' },
+      { label: '🔄 Reload', click: () => mainWindow?.reload() },
+      { label: '🖥️ Show Window', click: () => { mainWindow?.show(); mainWindow?.focus(); } },
+      { label: '🏠 Dashboard', click: () => mainWindow?.loadURL(SERVER_URL + '/index.html') },
+      { type: 'separator' },
+      { label: '❌ Quit', click: () => app.quit() }
+    ]);
+    tray.setContextMenu(contextMenu);
+    tray.setToolTip('Dawa Hisaab');
+  } catch(e) {
+    console.log('Tray error:', e.message);
+  }
 }
 
-// App Menu
+// ── APP MENU ──
 const menuTemplate = [
   {
-    label: '💊 MedXpert',
+    label: '💊 Dawa Hisaab',
     submenu: [
       { label: 'About', click: () => {
         const { dialog } = require('electron');
-        dialog.showMessageBox({ title: 'MedXpert Pharmacy', message: 'Version 1.0\nPowered by MedXpert', buttons: ['OK'] });
+        dialog.showMessageBox({ title: 'Dawa Hisaab', message: 'Smart Pharmacy Management\nVersion 1.0', buttons: ['OK'] });
       }},
       { type: 'separator' },
       { label: 'Quit', accelerator: 'CmdOrCtrl+Q', click: () => app.quit() }
@@ -75,25 +83,30 @@ const menuTemplate = [
   {
     label: 'Navigation',
     submenu: [
-      { label: '🏠 Dashboard', accelerator: 'CmdOrCtrl+1', click: () => mainWindow?.loadURL(SERVER_URL+'/index.html') },
-      { label: '📦 Stock', accelerator: 'CmdOrCtrl+2', click: () => mainWindow?.loadURL(SERVER_URL+'/stock.html') },
-      { label: '🧾 Billing', accelerator: 'CmdOrCtrl+3', click: () => mainWindow?.loadURL(SERVER_URL+'/billing.html') },
-      { label: '🛒 Purchase', accelerator: 'CmdOrCtrl+4', click: () => mainWindow?.loadURL(SERVER_URL+'/purchase.html') },
-      { label: '📊 Reports', accelerator: 'CmdOrCtrl+5', click: () => mainWindow?.loadURL(SERVER_URL+'/reports.html') }
+      { label: '🏠 Dashboard',      accelerator: 'CmdOrCtrl+1', click: () => mainWindow?.loadURL(SERVER_URL + '/index.html') },
+      { label: '📦 Stock',          accelerator: 'CmdOrCtrl+2', click: () => mainWindow?.loadURL(SERVER_URL + '/stock.html') },
+      { label: '🧾 Billing',        accelerator: 'CmdOrCtrl+3', click: () => mainWindow?.loadURL(SERVER_URL + '/billing.html') },
+      { label: '🛒 Purchase',       accelerator: 'CmdOrCtrl+4', click: () => mainWindow?.loadURL(SERVER_URL + '/purchase.html') },
+      { label: '📊 Reports',        accelerator: 'CmdOrCtrl+5', click: () => mainWindow?.loadURL(SERVER_URL + '/reports.html') },
+      { label: '👥 Customers',      accelerator: 'CmdOrCtrl+6', click: () => mainWindow?.loadURL(SERVER_URL + '/customers.html') },
+      { label: '⚙️ Settings',       accelerator: 'CmdOrCtrl+,', click: () => mainWindow?.loadURL(SERVER_URL + '/profile.html') },
+      { label: '🔑 Login',                                       click: () => mainWindow?.loadURL(SERVER_URL + '/signup.html') }
     ]
   },
   {
     label: 'View',
     submenu: [
-      { label: 'Reload', accelerator: 'CmdOrCtrl+R', click: () => mainWindow?.reload() },
-      { label: 'Full Screen', accelerator: 'F11', click: () => mainWindow?.setFullScreen(!mainWindow.isFullScreen()) },
-      { label: 'Zoom In', accelerator: 'CmdOrCtrl+Plus', click: () => mainWindow?.webContents.setZoomLevel(mainWindow.webContents.getZoomLevel()+0.5) },
-      { label: 'Zoom Out', accelerator: 'CmdOrCtrl+-', click: () => mainWindow?.webContents.setZoomLevel(mainWindow.webContents.getZoomLevel()-0.5) },
-      { label: 'Reset Zoom', accelerator: 'CmdOrCtrl+0', click: () => mainWindow?.webContents.setZoomLevel(0) }
+      { label: 'Reload',       accelerator: 'CmdOrCtrl+R', click: () => mainWindow?.reload() },
+      { label: 'Full Screen',  accelerator: 'F11',          click: () => mainWindow?.setFullScreen(!mainWindow.isFullScreen()) },
+      { label: 'Zoom In',      accelerator: 'CmdOrCtrl+=',  click: () => mainWindow?.webContents.setZoomLevel(mainWindow.webContents.getZoomLevel() + 0.5) },
+      { label: 'Zoom Out',     accelerator: 'CmdOrCtrl+-',  click: () => mainWindow?.webContents.setZoomLevel(mainWindow.webContents.getZoomLevel() - 0.5) },
+      { label: 'Reset Zoom',   accelerator: 'CmdOrCtrl+0',  click: () => mainWindow?.webContents.setZoomLevel(0) },
+      { label: 'DevTools',     accelerator: 'F12',           click: () => mainWindow?.webContents.toggleDevTools() }
     ]
   }
 ];
 
+// ── APP READY ──
 app.whenReady().then(() => {
   const menu = Menu.buildFromTemplate(menuTemplate);
   Menu.setApplicationMenu(menu);
@@ -109,41 +122,6 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
 });
 
-function createWindow() {
-  mainWindow = new BrowserWindow({
-    width: 1280,
-    height: 800,
-    minWidth: 1024,
-    minHeight: 600,
-    title: 'MedXpert Pharmacy',
-    icon: path.join(__dirname, 'assets', 'icon.png'),
-    webPreferences: {
-      nodeIntegration: false,
-      contextIsolation: true,
-      sandbox: false  // ← Yeh add karo
-    },
-    show: false,
-    backgroundColor: '#f0f4f8'
-  });
-
-  mainWindow.loadURL(SERVER_URL);
-
-  // ← Yeh add karo — keyboard shortcuts enable
-  mainWindow.webContents.on('before-input-event', (event, input) => {
-    // Allow all keyboard input
-  });
-
-  // ← Zoom level fix
-  mainWindow.webContents.on('did-finish-load', () => {
-    mainWindow.webContents.setZoomFactor(1.0);
-  });
-
-  mainWindow.once('ready-to-show', () => {
-    mainWindow.show();
-    mainWindow.focus();
-  });
-
-  // Fix input issues on Windows
 app.on('browser-window-focus', () => {
   globalShortcut.unregisterAll();
 });

@@ -1,31 +1,26 @@
 const mongoose = require('mongoose');
 
 const productSchema = new mongoose.Schema({
-  tenantId: { type: String, required: true, index: true },
-  name: { type: String, required: true },
-  category: { type: String, enum: ['medicine', 'fmcg', 'other'], default: 'medicine' },
-  generic: { type: String },
-  company: { type: String },
-  batch: { type: String },
-  expiry: { type: String },
-  mrp: { type: Number, required: true },
-  purchasePrice: { type: Number, required: true },
-  salePrice: { type: Number, required: true },
-
-  // Strip/Loose system
-  sellType: { type: String, enum: ['strip', 'loose', 'piece'], default: 'strip' },
+  tenantId:      { type: String, required: true, index: true },
+  name:          { type: String, required: true },
+  generic:       { type: String, default: '' },
+  company:       { type: String, default: '' },
+  category:      { type: String, default: 'medicine' },
+  sellType:      { type: String, enum: ['piece','strip','loose'], default: 'piece' },
+  mrp:           { type: Number, default: 0 },
+  salePrice:     { type: Number, default: 0 },
+  purchasePrice: { type: Number, default: 0 },
+  stock:         { type: Number, default: 0 },
+  stripStock:    { type: Number, default: 0 },
+  looseStock:    { type: Number, default: 0 },
   unitsPerStrip: { type: Number, default: 10 },
-  stripStock: { type: Number, default: 0 },
-  looseStock: { type: Number, default: 0 },
-  pricePerUnit: { type: Number, default: 0 },
-
-  // FMCG / piece items
-  stock: { type: Number, default: 0 },
-
-  minStock: { type: Number, default: 10 },
-  hsn: { type: String },
-  gst: { type: Number, default: 0 },
-  rack: { type: String }
+  pricePerUnit:  { type: Number, default: 0 },
+  minStock:      { type: Number, default: 10 },
+  batch:         { type: String, default: '' },
+  expiry:        { type: String, default: '' },
+  gst:           { type: Number, default: 0 },
+  hsnCode:       { type: String, default: '' },
+  isActive:      { type: Boolean, default: true }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Product', productSchema);

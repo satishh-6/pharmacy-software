@@ -4,238 +4,179 @@ const Sale = require('../models/Sale');
 const Product = require('../models/Product');
 const Customer = require('../models/Customer');
 
-// GET all sales
+// ── BILL NUMBER GENERATE ──
+async function generateBillNo(tenantId) {
+  const today = new Date();
+  const yy = String(today.getFullYear()).slice(-2);
+  const mm = String(today.getMonth() + 1).padStart(2, '0');
+  const prefix = `INV-${yy}${mm}-`;
+  const lastSale = await Sale.findOne({ tenantId, billNo: { $regex: `^${prefix}` } })
+    .sort({ billNo: -1 });
+  let num = 1;
+  if (lastSale?.billNo) {
+    const lastNum = parseInt(lastSale.billNo.replace(prefix, '')) || 0;
+    num = lastNum + 1;
+  }
+  return prefix + String(num).padStart(4, '0');
+}
+
+// ── STOCK DEDUCT ──
+async function deductStock(items, tenantId) {
+  for (const item of items) {
+    const p = await Product.findOne({ _id: item.product, tenantId });
+    if (!p) continue;
+    if (p.sellType === 'loose') {
+      const qty = item.qty;
+      let loose = p.looseStock || 0;
+      let strips = p.stripStock || 0;
+      const ups = p.unitsPerStrip || 10;
+      if (loose >= qty) {
+        loose -= qty;
+      } else {
+        const rem = qty - loose;
+        loose = 0;
+        const stripsNeeded = Math.ceil(rem / ups);
+        strips = Math.max(0, strips - stripsNeeded);
+        loose = (stripsNeeded * ups) - rem;
+      }
+      await Product.findByIdAndUpdate(item.product, { looseStock: loose, stripStock: strips });
+    } else {
+      await Product.findByIdAndUpdate(item.product, { $inc: { stock: -item.qty } });
+    }
+  }
+}
+
+// ── STOCK RESTORE ──
+async function restoreStock(items, tenantId) {
+  for (const item of items) {
+    const p = await Product.findOne({ _id: item.product, tenantId });
+    if (!p) continue;
+    if (item.sellUnit === 'pill' || p.sellType === 'loose') {
+      await Product.findByIdAndUpdate(item.product, { $inc: { looseStock: item.qty } });
+    } else {
+      await Product.findByIdAndUpdate(item.product, { $inc: { stock: item.qty } });
+    }
+  }
+}
+
+// ── GET ALL SALES ──
 router.get('/', async (req, res) => {
   try {
-    const { from, to } = req.query;
-    let filter = { tenantId: req.tenantId };  // ← ADD
-    if (from && to) filter.date = { $gte: new Date(from), $lte: new Date(to) };
-    const sales = await Sale.find(filter).sort({ date: -1 });
+    const sales = await Sale.find({ tenantId: req.tenantId })
+      .sort({ date: -1 })
+      .limit(100);
     res.json(sales);
   } catch (err) { res.status(500).json({ message: err.message }); }
 });
 
-// GET single sale
+// ── GET SINGLE SALE ──
 router.get('/:id', async (req, res) => {
   try {
-    const sale = await Sale.findOne({
-      _id: req.params.id,
-      tenantId: req.tenantId  // ← ADD
-    });
-    if (!sale) return res.status(404).json({ message: 'Not found' });
+    const sale = await Sale.findOne({ _id: req.params.id, tenantId: req.tenantId });
+    if (!sale) return res.status(404).json({ message: 'Sale not found' });
     res.json(sale);
   } catch (err) { res.status(500).json({ message: err.message }); }
 });
 
-// POST new sale
+// ── CREATE SALE ──
 router.post('/', async (req, res) => {
   try {
-    const billNo = 'BILL-' + Date.now().toString().slice(-6);
-    req.body.billNo = billNo;
-    if (!req.body.date) req.body.date = new Date();
-
+    const billNo = await generateBillNo(req.tenantId);
     const sale = new Sale({
       ...req.body,
-      tenantId: req.tenantId  // ← ADD
+      billNo,
+      tenantId: req.tenantId
     });
     await sale.save();
 
-    // ── Stock reduce ──
-    for (const item of req.body.items) {
-      const product = await Product.findOne({
-        _id: item.product,
-        tenantId: req.tenantId  // ← ADD
+    // Stock deduct
+    await deductStock(req.body.items || [], req.tenantId);
+
+    // Customer update
+    if (req.body.customerId) {
+      const earnedPoints = Math.floor((req.body.totalAmount || 0) / 100);
+      await Customer.findByIdAndUpdate(req.body.customerId, {
+        $inc: { totalPurchases: 1, loyaltyPoints: earnedPoints, totalSpent: req.body.totalAmount || 0 },
+        lastVisit: new Date()
       });
-      if (!product) continue;
-      if (product.category === 'medicine' && product.sellType === 'loose') {
-        let qtyToReduce = item.qty;
-        let newLoose = product.looseStock || 0;
-        let newStrips = product.stripStock || 0;
-        const ups = product.unitsPerStrip || 10;
-        if (newLoose >= qtyToReduce) {
-          newLoose -= qtyToReduce;
-        } else {
-          qtyToReduce -= newLoose; newLoose = 0;
-          const stripsNeeded = Math.ceil(qtyToReduce / ups);
-          newStrips = Math.max(0, newStrips - stripsNeeded);
-          newLoose = (stripsNeeded * ups) - qtyToReduce;
-        }
-        await Product.findByIdAndUpdate(item.product, { stripStock: newStrips, looseStock: newLoose });
-      } else {
-        await Product.findByIdAndUpdate(item.product, { $inc: { stock: -item.qty } });
-      }
-    }
-
-    // ── AUTO SAVE/UPDATE CUSTOMER ──
-    const customerName = req.body.customer;
-    const customerPhone = req.body.customerPhone;
-    const totalAmount = req.body.totalAmount || 0;
-
-    if (customerName && customerName !== 'Walk-in Customer') {
-      try {
-        let customer = null;
-
-        if (customerPhone && customerPhone.trim()) {
-          customer = await Customer.findOne({
-            phone: customerPhone.trim(),
-            tenantId: req.tenantId  // ← ADD
-          });
-        }
-
-        if (!customer && customerName) {
-          customer = await Customer.findOne({
-            name: { $regex: new RegExp('^'+customerName.trim()+'$', 'i') },
-            tenantId: req.tenantId  // ← ADD
-          });
-        }
-
-        const pointsEarned = Math.floor(totalAmount / 10);
-
-        if (customer) {
-          await Customer.findByIdAndUpdate(customer._id, {
-            $inc: {
-              totalPurchases: 1,
-              totalSpent: totalAmount,
-              loyaltyPoints: pointsEarned
-            },
-            lastVisit: new Date(),
-            ...(customerPhone && !customer.phone ? { phone: customerPhone } : {})
-          });
-          await Sale.findByIdAndUpdate(sale._id, { customerId: customer._id });
-        } else {
-          const newCustomer = await Customer.create({
-            name: customerName.trim(),
-            phone: customerPhone ? customerPhone.trim() : '',
-            totalSpent: totalAmount,
-            totalPurchases: 1,
-            loyaltyPoints: pointsEarned,
-            lastVisit: new Date(),
-            tenantId: req.tenantId  // ← ADD
-          });
-          await Sale.findByIdAndUpdate(sale._id, { customerId: newCustomer._id });
-          console.log('✅ New customer auto-saved:', customerName);
-        }
-      } catch(custErr) {
-        console.log('Customer auto-save error:', custErr.message);
-      }
     }
 
     res.json({ success: true, sale });
   } catch (err) {
-    console.log('SALE ERROR:', err.message);
     res.status(400).json({ success: false, message: err.message });
   }
 });
 
-// Customer payment
+// ── EDIT SALE ──
+router.put('/:id', async (req, res) => {
+  try {
+    const oldSale = await Sale.findOne({ _id: req.params.id, tenantId: req.tenantId });
+    if (!oldSale) return res.status(404).json({ message: 'Sale not found' });
+
+    // Reverse old stock
+    await restoreStock(oldSale.items || [], req.tenantId);
+
+    // Deduct new stock
+    await deductStock(req.body.items || [], req.tenantId);
+
+    // Update sale (keep original billNo)
+    const updated = await Sale.findByIdAndUpdate(
+      req.params.id,
+      { ...req.body, billNo: oldSale.billNo, tenantId: req.tenantId },
+      { new: true }
+    );
+
+    res.json({ success: true, sale: updated });
+  } catch (err) {
+    res.status(400).json({ success: false, message: err.message });
+  }
+});
+
+// ── DELETE / CANCEL SALE ──
+router.delete('/:id', async (req, res) => {
+  try {
+    const sale = await Sale.findOne({ _id: req.params.id, tenantId: req.tenantId });
+    if (!sale) return res.status(404).json({ message: 'Sale not found' });
+
+    // Restore stock
+    await restoreStock(sale.items || [], req.tenantId);
+
+    await Sale.findByIdAndDelete(req.params.id);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// ── COLLECT PAYMENT (Credit Bill) ──
 router.patch('/:id/payment', async (req, res) => {
   try {
     const { amount, paymentMode, note } = req.body;
-    const sale = await Sale.findOne({
-      _id: req.params.id,
-      tenantId: req.tenantId  // ← ADD
-    });
+    if (!amount || parseFloat(amount) <= 0)
+      return res.status(400).json({ success: false, message: 'Valid amount required!' });
+
+    const sale = await Sale.findOne({ _id: req.params.id, tenantId: req.tenantId });
     if (!sale) return res.status(404).json({ message: 'Sale not found' });
+
     const newPaid = (sale.paidAmount || 0) + parseFloat(amount);
     sale.paidAmount = newPaid;
     sale.paymentMode = paymentMode || sale.paymentMode;
     sale.paymentStatus = newPaid >= sale.totalAmount ? 'paid' : 'partial';
+
     if (!sale.paymentHistory) sale.paymentHistory = [];
-    sale.paymentHistory.push({ amount: parseFloat(amount), date: new Date(), note: note||'', mode: paymentMode||'cash' });
+    sale.paymentHistory.push({
+      amount: parseFloat(amount),
+      date: new Date(),
+      note: note || '',
+      mode: paymentMode || 'cash'
+    });
     sale.markModified('paymentHistory');
     await sale.save();
+
     res.json({ success: true, sale });
-  } catch (err) { res.status(400).json({ success: false, message: err.message }); }
-});
-
-// Edit bill
-router.put('/:id', async (req, res) => {
-  try {
-    const oldSale = await Sale.findOne({
-      _id: req.params.id,
-      tenantId: req.tenantId  // ← ADD
-    });
-    if (!oldSale) return res.status(404).json({ message: 'Sale not found' });
-
-    // Stock wapas add karo (old items)
-    for (const item of oldSale.items) {
-      const product = await Product.findOne({
-        _id: item.product,
-        tenantId: req.tenantId  // ← ADD
-      });
-      if (!product) continue;
-      if (product.category === 'medicine' && product.sellType === 'loose') {
-        await Product.findByIdAndUpdate(item.product, { $inc: { looseStock: item.qty } });
-      } else {
-        await Product.findByIdAndUpdate(item.product, { $inc: { stock: item.qty } });
-      }
-    }
-
-    // Stock reduce karo (new items)
-    for (const item of req.body.items) {
-      const product = await Product.findOne({
-        _id: item.product,
-        tenantId: req.tenantId  // ← ADD
-      });
-      if (!product) continue;
-      if (product.category === 'medicine' && product.sellType === 'loose') {
-        let qtr = item.qty, nl = product.looseStock||0, ns = product.stripStock||0, ups = product.unitsPerStrip||10;
-        if (nl >= qtr) { nl -= qtr; }
-        else { qtr -= nl; nl = 0; const sn = Math.ceil(qtr/ups); ns = Math.max(0,ns-sn); nl = (sn*ups)-qtr; }
-        await Product.findByIdAndUpdate(item.product, { stripStock: ns, looseStock: nl });
-      } else {
-        await Product.findByIdAndUpdate(item.product, { $inc: { stock: -item.qty } });
-      }
-    }
-
-    const updated = await Sale.findOneAndUpdate(
-      { _id: req.params.id, tenantId: req.tenantId },  // ← ADD
-      { ...req.body, billNo: oldSale.billNo },
-      { new: true }
-    );
-    res.json({ success: true, sale: updated });
-  } catch (err) { res.status(400).json({ success: false, message: err.message }); }
-});
-
-// Delete bill
-router.delete('/:id', async (req, res) => {
-  try {
-    const sale = await Sale.findOne({
-      _id: req.params.id,
-      tenantId: req.tenantId  // ← ADD
-    });
-    if (!sale) return res.status(404).json({ message: 'Sale not found' });
-
-    for (const item of sale.items) {
-      const product = await Product.findById(item.product);
-      if (!product) continue;
-      if (product.sellType === 'loose') await Product.findByIdAndUpdate(item.product, { $inc: { looseStock: item.qty } });
-      else await Product.findByIdAndUpdate(item.product, { $inc: { stock: item.qty } });
-    }
-    await Sale.findByIdAndDelete(req.params.id);
-    res.json({ success: true });
-  } catch (err) { res.status(500).json({ success: false, message: err.message }); }
-});
-
-// GET — sirf apne tenant ka data
-router.get('/', async (req, res) => {
-  try {
-    const { from, to } = req.query;
-    const filter = {};
-    if (req.tenantId) filter.tenantId = req.tenantId;
-    if (from && to) filter.date = { $gte: new Date(from), $lte: new Date(to) };
-    const sales = await Sale.find(filter).sort({ date: -1 });
-    res.json(sales);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(400).json({ success: false, message: err.message });
   }
-});
-
-// POST — tenantId save
-router.post('/', async (req, res) => {
-  const product = new Product({ ...req.body, tenantId: req.tenantId });
-  await product.save();
-  res.json({ success: true, product });
 });
 
 module.exports = router;

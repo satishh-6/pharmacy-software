@@ -383,7 +383,7 @@ function authH(extra){const t=getToken();return t?{'Authorization':'Bearer '+t,.
 // ── AUTH ──
 function checkAuth(){
   const user=JSON.parse(localStorage.getItem('user')||'null');
-  if(!getToken()){location.href='index.html';return;}
+  if(!getToken()){location.href='signup.html';return;}
   document.getElementById('navUser').textContent=user?.name||'';
   const branch=JSON.parse(localStorage.getItem('currentBranch')||'null');
   if(branch)document.getElementById('navBranch').textContent=branch.name;
@@ -423,7 +423,7 @@ async function loadPharmacyInfo(){
     };
   }catch(e){console.log('Pharmacy info error:',e);}
 }
-function logout(){localStorage.clear();location.href='index.html';}
+function logout(){localStorage.clear();location.href='signup.html';}
 
 function setNow(){
   const now=new Date();
