@@ -56,6 +56,18 @@ app.get('/api/logo', (req, res) => {
   }
 });
 
+// ── PLATFORM LOGO (Dawa Hisaab brand) ──
+app.get('/api/platform-logo', (req, res) => {
+  try {
+    const p = path.join(__dirname, 'assets', 'dh-logo.png');
+    if (fs.existsSync(p)) {
+      const b64 = 'data:image/png;base64,' + fs.readFileSync(p).toString('base64');
+      return res.json({ logo: b64 });
+    }
+    res.json({ logo: '' });
+  } catch(e) { res.json({ logo: '' }); }
+});
+
 // ── SETTINGS API (MedXpert default — file se) ──
 app.get('/api/settings', (req, res) => {
   try {

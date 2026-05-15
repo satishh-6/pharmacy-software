@@ -105,12 +105,22 @@
   .empty p { font-size:13px; }
 
   @media (max-width:1200px) { .stat-grid { grid-template-columns:repeat(2,1fr); } .grid-3,.grid-2 { grid-template-columns:1fr; } }
-</style>
+
+  /* ── DAWA HISAAB BRAND THEME ── */
+  .navbar {
+    background: linear-gradient(135deg, #0f2744 0%, #1a3a2a 100%) !important;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4) !important;
+  }
+  .navbar .dawa  { color: #ffffff; font-weight: 900; }
+  .navbar .hisaab{ color: #4ade80; font-weight: 900; }
+  .dh-logo { display: none !important; }
+
+  </style>
 </head>
 <body>
 
 <div class="navbar">
-  <h1>💊 Dawa <span>Hisaab</span></h1>
+  <h1><span class="dawa">Dawa</span> <span class="hisaab">Hisaab</span></h1>
   <div class="nav-right">
     <div class="nav-badge" onclick="location.href='branches.html'">🏪 <span id="navBranch">Main Branch</span></div>
     <div class="nav-badge">👤 <span id="navUser">Loading...</span></div>
@@ -397,5 +407,7 @@ async function loadDashboard() {
 checkAuth();
 loadDashboard();
 </script>
+
+
 </body>
 </html>

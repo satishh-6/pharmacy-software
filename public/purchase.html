@@ -120,12 +120,22 @@
   /* GST type badge */
   .gst-incl { background:#EAFAF1; color:#1E8449; padding:2px 6px; border-radius:6px; font-size:10px; font-weight:700; }
   .gst-excl { background:#EBF5FB; color:#1B4F72; padding:2px 6px; border-radius:6px; font-size:10px; font-weight:700; }
-</style>
+
+  /* ── DAWA HISAAB BRAND THEME ── */
+  .navbar {
+    background: linear-gradient(135deg, #0f2744 0%, #1a3a2a 100%) !important;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4) !important;
+  }
+  .navbar .dawa  { color: #ffffff; font-weight: 900; }
+  .navbar .hisaab{ color: #4ade80; font-weight: 900; }
+  .dh-logo { display: none !important; }
+
+  </style>
 </head>
 <body>
 
 <div class="navbar">
-  <h1>💊 Dawa <span>Hisaab</span></h1>
+  <h1><span class="dawa">Dawa</span> <span class="hisaab">Hisaab</span></h1>
   <div class="nav-right">
     <div class="nav-badge">👤 <span id="navUser"></span></div>
     <button class="btn-logout" onclick="logout()">Logout</button>
@@ -795,5 +805,6 @@ loadProducts();
 loadRecentPurchases();
 loadStats();
 </script>
+
 </body>
 </html>

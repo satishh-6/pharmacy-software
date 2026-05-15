@@ -9,8 +9,10 @@
   * { margin:0; padding:0; box-sizing:border-box; }
   body { font-family:'Segoe UI',sans-serif; background:#eef2f7; }
   .navbar { background:linear-gradient(135deg,#1B4F72,#154360); color:white; padding:0 24px; display:flex; align-items:center; height:60px; position:fixed; width:100%; top:0; z-index:100; box-shadow:0 4px 20px rgba(27,79,114,0.45); }
-  .navbar h1 { font-size:22px; font-weight:800; flex:1; }
-  .navbar h1 span { color:#85C1E9; }
+  .navbar h1 { font-size:22px; font-weight:900; flex:1; display:flex; align-items:center; gap:6px; white-space:nowrap; letter-spacing:-0.5px; }
+  .navbar h1 .dawa { color:#ffffff; }
+  .navbar h1 .hisaab { color:#4ade80; }
+  .navbar h1 { white-space: nowrap; display:flex; align-items:center; gap:6px; }
   .nav-right { display:flex; align-items:center; gap:10px; }
   .nav-badge { background:rgba(255,255,255,0.15); padding:6px 14px; border-radius:20px; font-size:12px; cursor:pointer; }
   .nav-badge:hover { background:rgba(255,255,255,0.25); }
@@ -108,8 +110,9 @@
   <div style="display:flex;align-items:center;gap:12px;flex:1;">
     <img id="navLogo" style="display:none;height:36px;width:auto;border-radius:6px;object-fit:contain;background:rgba(255,255,255,0.1);padding:3px;" />
     <div>
-      <h1 style="font-size:20px;font-weight:800;margin:0;">💊 Dawa <span>Hisaab</span></h1>
-      <div id="navPharmacy" style="font-size:11px;color:rgba(255,255,255,0.7);font-weight:600;margin-top:1px;"></div>
+      <h1 style="font-size:22px;font-weight:900;flex:1;display:flex;align-items:center;gap:6px;white-space:nowrap;">
+  <span class="dawa">Dawa</span> <span class="hisaab">Hisaab</span>
+</h1>
     </div>
   </div>
   <div class="nav-right">

@@ -143,5 +143,19 @@ async function saveSettings() {
 
 loadSettings();
 </script>
+<script>
+fetch('/api/platform-logo').then(r=>r.json()).then(d=>{
+  if(!d.logo)return;
+  document.querySelectorAll('h1').forEach(function(h){
+    if(h.innerText&&h.innerText.includes('Hisaab')&&!h.querySelector('img.dh-logo')){
+      var img=document.createElement('img');
+      img.className='dh-logo';
+      img.src=d.logo;
+      img.style.cssText='height:40px;width:40px;object-fit:contain;border-radius:8px;vertical-align:middle;margin-right:6px;';
+      h.prepend(img);
+    }
+  });
+}).catch(function(){});
+</script>
 </body>
 </html>

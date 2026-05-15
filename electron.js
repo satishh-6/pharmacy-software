@@ -5,7 +5,7 @@ let mainWindow;
 let tray;
 
 // ✅ Render.com URL — git push ke baad update hoga
-const SERVER_URL = 'https://medxpert-pharmacy.onrender.com';
+const SERVER_URL = 'https://dawahisaab.onrender.com';
 
 // ── CREATE WINDOW ──
 function createWindow() {

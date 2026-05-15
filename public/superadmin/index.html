@@ -177,7 +177,18 @@
   .empty-state .emoji { font-size:36px; margin-bottom:8px; }
 
   @media(max-width:1200px){ .kpi-grid{grid-template-columns:repeat(2,1fr);} .info-grid{grid-template-columns:1fr 1fr;} }
-</style>
+
+  /* ── DAWA HISAAB BRAND THEME ── */
+  .navbar {
+    background: linear-gradient(135deg, #0f2744 0%, #1a3a2a 100%) !important;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4) !important;
+  }
+  .navbar .dawa  { color: #ffffff; font-weight: 900; }
+  .navbar .hisaab{ color: #4ade80; font-weight: 900; }
+  .dh-logo { display: none !important; }
+
+  </style>
+
 </head>
 <body>
 
@@ -209,7 +220,7 @@
 <div id="mainApp" style="display:none;">
 
   <div class="navbar">
-    <h1>💊 Dawa <span>Hisaab</span> <span class="sa">SUPER ADMIN</span></h1>
+    <h1><span class="dawa">Dawa</span> <span class="hisaab">Hisaab</span> <span class="sa">SUPER ADMIN</span></h1>
     <div class="nav-right">
       <div class="nav-user">🛡️ <span id="adminName">Admin</span></div>
       <button class="nav-logout" onclick="adminLogout()">Logout</button>
@@ -955,5 +966,7 @@ if(adminToken){
     }).catch(()=>{localStorage.removeItem('adminToken');location.reload();});
 }
 </script>
+
+
 </body>
 </html>

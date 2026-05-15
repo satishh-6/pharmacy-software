@@ -148,12 +148,22 @@
   .notif { position:fixed; top:74px; right:20px; padding:12px 20px; border-radius:10px; font-size:13px; font-weight:700; color:white; z-index:9999; box-shadow:0 4px 16px rgba(0,0,0,0.22); max-width:320px; }
 
   @media(max-width:1200px){.kpi-grid{grid-template-columns:repeat(2,1fr);}.chart-grid{grid-template-columns:1fr;}.pl-grid{grid-template-columns:1fr 1fr;}}
-</style>
+
+  /* ── DAWA HISAAB BRAND THEME ── */
+  .navbar {
+    background: linear-gradient(135deg, #0f2744 0%, #1a3a2a 100%) !important;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4) !important;
+  }
+  .navbar .dawa  { color: #ffffff; font-weight: 900; }
+  .navbar .hisaab{ color: #4ade80; font-weight: 900; }
+  .dh-logo { display: none !important; }
+
+  </style>
 </head>
 <body>
 
 <div class="navbar">
-  <h1>💊 Dawa <span>Hisaab</span></h1>
+  <h1><span class="dawa">Dawa</span> <span class="hisaab">Hisaab</span></h1>
   <div class="nav-right">
     <div class="nav-badge">👤 <span id="navUser"></span></div>
     <button class="btn-logout" onclick="logout()">Logout</button>
@@ -1331,5 +1341,6 @@ document.getElementById('dateTo').value=dateTo;
 
 loadAllData();
 </script>
+
 </body>
 </html>

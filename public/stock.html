@@ -123,12 +123,22 @@
   #medicineFields { display:contents; }
   #stripFields { display:contents; }
   .strip-info { grid-column:1/-1; background:#EBF5FB; border-radius:10px; padding:10px 14px; font-size:12px; color:#1B4F72; border-left:3px solid #1B4F72; }
-</style>
+
+  /* ── DAWA HISAAB BRAND THEME ── */
+  .navbar {
+    background: linear-gradient(135deg, #0f2744 0%, #1a3a2a 100%) !important;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4) !important;
+  }
+  .navbar .dawa  { color: #ffffff; font-weight: 900; }
+  .navbar .hisaab{ color: #4ade80; font-weight: 900; }
+  .dh-logo { display: none !important; }
+
+  </style>
 </head>
 <body>
 
 <div class="navbar">
-  <h1>💊 Dawa <span>Hisaab</span></h1>
+  <h1><span class="dawa">Dawa</span> <span class="hisaab">Hisaab</span></h1>
   <div class="nav-right">
     <div class="nav-badge">👤 <span id="navUser"></span></div>
     <button class="btn-logout" onclick="logout()">Logout</button>
@@ -642,5 +652,6 @@ document.getElementById('modalBg').addEventListener('click', e => { if(e.target=
 checkAuth();
 loadProducts();
 </script>
+
 </body>
 </html>

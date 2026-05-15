@@ -544,7 +544,17 @@ body {
   .right-panel { width: 100%; min-height: 100vh; padding: 30px 20px 50px; align-items: flex-start; }
   .form-card { margin: 0; }
 }
-</style>
+
+  /* ── DAWA HISAAB BRAND THEME ── */
+  .navbar {
+    background: linear-gradient(135deg, #0f2744 0%, #1a3a2a 100%) !important;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4) !important;
+  }
+  .navbar .dawa  { color: #ffffff; font-weight: 900; }
+  .navbar .hisaab{ color: #4ade80; font-weight: 900; }
+  .dh-logo { display: none !important; }
+
+  </style>
 </head>
 <body>
 
@@ -558,7 +568,10 @@ body {
 <!-- LEFT PANEL -->
 <div class="left-panel">
   <div class="brand-row">
-    <div class="brand-icon">💊</div>
+    <div class="brand-icon" style="padding:0;background:white;">
+  
+</div>
+
     <div class="brand-name">Dawa <span>Hisaab</span></div>
   </div>
 
@@ -1021,5 +1034,6 @@ document.getElementById('rPharmacy').focus();
 });
 document.getElementById('rPass').addEventListener('keydown',e=>{if(e.key==='Enter')doRegister();});
 </script>
+
 </body>
 </html>
