@@ -8,13 +8,13 @@
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
   body { font-family:'Segoe UI',sans-serif; background:#eef2f7; }
-  .navbar { background:linear-gradient(135deg,#1B4F72,#154360); color:white; padding:0 24px; display:flex; align-items:center; height:60px; position:fixed; width:100%; top:0; z-index:100; box-shadow:0 4px 20px rgba(27,79,114,0.45); }
+  .navbar { background:#ffffff; color:white; padding:0 24px; display:flex; align-items:center; height:60px; position:fixed; width:100%; top:0; z-index:100; box-shadow:0 2px 16px rgba(0,0,0,0.08); }
   .navbar h1 { font-size:22px; font-weight:900; flex:1; display:flex; align-items:center; gap:6px; white-space:nowrap; letter-spacing:-0.5px; }
   .navbar h1 .dawa { color:#ffffff; }
   .navbar h1 .hisaab { color:#4ade80; }
   .navbar h1 { white-space: nowrap; display:flex; align-items:center; gap:6px; }
   .nav-right { display:flex; align-items:center; gap:10px; }
-  .nav-badge { background:rgba(255,255,255,0.15); padding:6px 14px; border-radius:20px; font-size:12px; cursor:pointer; }
+  .nav-badge { background:#f0f4f8; padding:6px 14px; border-radius:20px; font-size:12px; cursor:pointer; color:#1a2332; border:1px solid #e2e8f0; }
   .nav-badge:hover { background:rgba(255,255,255,0.25); }
   .btn-logout { background:transparent; border:1.5px solid rgba(255,255,255,0.5); color:white; padding:7px 16px; border-radius:8px; cursor:pointer; font-size:13px; font-weight:600; }
   .sidebar { position:fixed; left:0; top:60px; width:225px; height:calc(100vh - 60px); background:white; border-right:1px solid #e2e8f0; padding:16px 0; overflow-y:auto; }
@@ -56,7 +56,7 @@
   .sell-badge.loose { background:#FEF9E7; color:#B7770D; }
   #pstatus { font-size:12px; color:#78909c; margin-top:7px; min-height:16px; }
   .bill-tbl { width:100%; border-collapse:collapse; }
-  .bill-tbl thead tr { background:linear-gradient(135deg,#1B4F72,#154360); }
+  .bill-tbl thead tr { background:#ffffff; }
   .bill-tbl thead th { padding:10px 12px; text-align:left; font-size:11px; color:rgba(255,255,255,0.88); font-weight:700; text-transform:uppercase; letter-spacing:0.5px; white-space:nowrap; }
   .bill-tbl tbody tr { border-bottom:1px solid #f5f7fa; transition:background 0.12s; }
   .bill-tbl tbody tr:hover { background:#f8fafd; }
@@ -83,7 +83,7 @@
   .change-bar { background:#EAFAF1; border:1px solid #A9DFBF; border-radius:9px; padding:10px 16px; display:flex; justify-content:space-between; align-items:center; margin-top:10px; }
   .abtn { padding:13px; border:none; border-radius:10px; cursor:pointer; font-size:14px; font-weight:700; width:100%; transition:all 0.2s; margin-top:8px; }
   .abtn:hover { transform:translateY(-1px); }
-  .abtn.save { background:linear-gradient(135deg,#1B4F72,#154360); color:white; }
+  .abtn.save { background:#ffffff; color:white; }
   .abtn.prnt { background:linear-gradient(135deg,#1E8449,#145A32); color:white; }
   .abtn.wa { background:linear-gradient(135deg,#25D366,#128C7E); color:white; }
   .rbill { padding:10px 0; border-bottom:1px solid #f5f7fa; }
@@ -102,6 +102,58 @@
   .modal-close { background:#f0f4f8; border:none; width:32px; height:32px; border-radius:8px; cursor:pointer; font-size:16px; }
   .modal-close:hover { background:#FDEDEC; color:#C0392B; }
   .notif { position:fixed; top:74px; right:20px; padding:12px 20px; border-radius:10px; font-size:13px; font-weight:700; color:white; z-index:9999; box-shadow:0 4px 16px rgba(0,0,0,0.22); max-width:320px; }
+
+  
+
+
+  /* ── GLOBAL WHITE THEME FIX ── */
+  body { background: #f0f4f8; }
+
+  /* Navbar */
+  .navbar { background:#ffffff !important; box-shadow:0 2px 16px rgba(0,0,0,0.08) !important; border-bottom:1px solid #e2e8f0; color:#1a2332 !important; }
+  .navbar h1 { font-size:26px !important; font-weight:900 !important; color:#1a2332 !important; white-space:nowrap; display:flex; align-items:center; gap:6px; }
+  .navbar h1 .dawa, .navbar h1 span:first-child { color:#1a3a6b !important; }
+  .navbar h1 .hisaab, .navbar h1 span:last-child { color:#1e6b3a !important; }
+  .navbar h1 span { color:#1e6b3a !important; }
+
+  /* Nav buttons — dark text on white bg */
+  .nav-badge { background:#f0f4f8 !important; color:#1a2332 !important; border:1px solid #e2e8f0 !important; }
+  .nav-badge:hover { background:#e2e8f0 !important; }
+  .btn-logout { background:transparent !important; border:1.5px solid #d0d7de !important; color:#1a2332 !important; }
+  .btn-logout:hover { background:#f0f4f8 !important; color:#1a2332 !important; }
+  .btn-back { background:#f0f4f8 !important; border:1.5px solid #d0d7de !important; color:#1a2332 !important; }
+  .btn-back:hover { background:#e2e8f0 !important; }
+
+  /* Sidebar active — keep brand colors */
+  .sidebar a:hover { background:#EBF5FB; color:#1a3a6b; border-left-color:#1a3a6b; }
+  .sidebar a.active { background:#EBF5FB; color:#1a3a6b; border-left-color:#1a3a6b; font-weight:700; }
+
+  /* Primary buttons — dark gradient */
+  .btn-primary { background:linear-gradient(135deg,#1a3a6b,#1e6b3a) !important; color:#ffffff !important; }
+  .btn-primary:hover { box-shadow:0 6px 20px rgba(26,58,107,0.3) !important; color:#ffffff !important; }
+  .abtn.save { background:linear-gradient(135deg,#1a3a6b,#154360) !important; color:#ffffff !important; }
+  .abtn.prnt { background:linear-gradient(135deg,#1E8449,#145A32) !important; color:#ffffff !important; }
+  .abtn.wa { background:linear-gradient(135deg,#25D366,#128C7E) !important; color:#ffffff !important; }
+
+  /* Table headers — keep dark */
+  .bill-tbl thead tr, table thead tr { background:linear-gradient(135deg,#1a3a6b,#154360) !important; }
+  .bill-tbl thead th, table thead th { color:rgba(255,255,255,0.9) !important; }
+
+  /* Welcome bar on dashboard */
+  .welcome-bar { background:linear-gradient(135deg,#1a3a6b,#1e6b3a) !important; color:#ffffff !important; }
+  .welcome-bar * { color:#ffffff !important; }
+
+  /* Stat cards keep white bg */
+  .stat-card, .card { background:#ffffff; }
+
+  /* Tab active in profile */
+  .tab-btn.active { background:linear-gradient(135deg,#1a3a6b,#1e6b3a) !important; color:#ffffff !important; }
+
+  /* Profile banner */
+  .profile-banner { background:linear-gradient(135deg,#1a3a6b,#1e6b3a) !important; }
+  .profile-name { color:#ffffff !important; }
+  .profile-sub { color:rgba(255,255,255,0.75) !important; }
+
 </style>
 </head>
 <body>
@@ -627,7 +679,7 @@ function renderBill(){
   tbody.innerHTML=billItems.map((item,i)=>{
     const lineAmt=(item.qty*item.rate*(1-item.disc/100)).toFixed(2);
     let typeHtml='';
-    if(item.cat==='medicine'&&item.origSellType==='loose'){typeHtml=`<select onchange="changeSellUnit(${i},this.value)" style="padding:4px 8px;border:1.5px solid #1B4F72;border-radius:6px;font-size:12px;outline:none;cursor:pointer;"><option value="pill" ${item.sellUnit==='pill'?'selected':''}>💊 Pill</option><option value="strip" ${item.sellUnit==='strip'?'selected':''}>📦 Strip</option></select>`;}
+    if(item.cat==='medicine'&&item.origSellType==='loose'){typeHtml=`<select onchange="changeSellUnit(${i},this.value)" style="padding:4px 8px;border:1.5px solid #1B4F72;border-radius:6px;font-size:12px;outline:none;cursor:pointer;"><option value="pill" ${item.sellUnit==='pill'?'selected':''}>Pill</option><option value="strip" ${item.sellUnit==='strip'?'selected':''}>📦 Strip</option></select>`;}
     else if(item.sellType==='strip'){typeHtml='<span class="sell-badge">📦 Strip</span>';}
     else if(item.cat==='fmcg'){typeHtml='<span class="sell-badge" style="background:#F4ECF7;color:#7D3C98;">🛍️ FMCG</span>';}
     else{typeHtml='<span style="font-size:12px;color:#78909c;">Piece</span>';}
@@ -732,13 +784,13 @@ function printInvoice(sale,fromEdit){
   win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${bType} - ${sale.billNo}</title>
 <style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:'Segoe UI',Arial,sans-serif;background:white;color:#1a1a2e;font-size:13px;}
 .w{max-width:800px;margin:0 auto;padding:30px;}.hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;padding-bottom:16px;border-bottom:3px solid #1B4F72;}
-.ls{display:flex;align-items:center;gap:14px;}.li{width:72px;height:72px;object-fit:contain;border-radius:8px;}.lp{width:72px;height:72px;background:linear-gradient(135deg,#1B4F72,#154360);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:32px;}
+.ls{display:flex;align-items:center;gap:14px;}.li{width:72px;height:72px;object-fit:contain;border-radius:8px;}.lp{width:72px;height:72px;background:#ffffff;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:32px;}
 .pn{font-size:22px;font-weight:800;color:#1B4F72;}.pt{font-size:11px;color:#78909c;margin-top:2px;}.pa{font-size:11px;color:#546e7a;margin-top:6px;line-height:1.7;}
 .br{text-align:right;}.bt{font-size:20px;font-weight:800;color:#1B4F72;margin-bottom:10px;}.bm{font-size:12px;color:#546e7a;line-height:1.9;}.bm span{font-weight:700;color:#1a2332;margin-left:10px;}
 .sb{display:inline-block;padding:4px 14px;border-radius:20px;font-size:11px;font-weight:700;margin-top:8px;}.sk{background:#EAFAF1;color:#1E8449;}.sc{background:#FDEDEC;color:#C0392B;}.sp{background:#FEF9E7;color:#B7770D;}
 .cs{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;}.ib{background:#EBF5FB;border-radius:10px;padding:14px 16px;border:1px solid #AED6F1;}.ibc{background:#f8faff;border:1px solid #D6EAF8;}
 .ibl{font-size:10px;font-weight:800;color:#1B4F72;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;}.ibn{font-size:15px;font-weight:700;color:#1a2332;margin-bottom:3px;}.ibd{font-size:12px;color:#546e7a;line-height:1.6;}
-.it{width:100%;border-collapse:collapse;margin-bottom:16px;}.it thead tr{background:linear-gradient(135deg,#1B4F72,#154360);color:white;}.it thead th{padding:10px 12px;text-align:left;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;}
+.it{width:100%;border-collapse:collapse;margin-bottom:16px;}.it thead tr{background:#ffffff;color:white;}.it thead th{padding:10px 12px;text-align:left;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;}
 .it thead th.r{text-align:right;}.it thead th.c{text-align:center;}.it tbody tr{border-bottom:1px solid #f0f4f8;}.it tbody tr:nth-child(even){background:#f8faff;}.it tbody td{padding:10px 12px;font-size:12.5px;vertical-align:top;}.it tbody td.r{text-align:right;font-weight:600;}.it tbody td.c{text-align:center;}
 .in{font-weight:700;color:#1a2332;}.im{font-size:10px;color:#999;margin-top:2px;}
 .ts{display:flex;justify-content:flex-end;margin-bottom:20px;}.tb{min-width:270px;border-top:1px solid #e2e8f0;padding-top:10px;}
@@ -756,7 +808,7 @@ function printInvoice(sale,fromEdit){
 @media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}.np{display:none!important;}@page{margin:10mm;size:A4;}}</style></head><body>
 ${sale.paymentMode==='credit'?'<div class="wm">CREDIT DUE</div>':''}
 <div class="w">
-<div class="hdr"><div class="ls">${LOGO?`<img src="${LOGO}" class="li" onerror="this.style.display='none'" />`:'<div class="lp">💊</div>'}
+<div class="hdr"><div class="ls">${LOGO?`<img src="${LOGO}" class="li" onerror="this.style.display='none'" />`:'<div class="lp"></div>'}
 <div><div class="pn">${s.pharmacyName||'Dawa Hisaab Pharmacy'}</div><div class="pt">Your Trusted Healthcare Partner</div>
 <div class="pa">${s.address1||''}${s.address2?'<br>'+s.address2:''}${s.phone?'<br>📞 '+s.phone:''}${s.email?' | ✉️ '+s.email:''}${s.gstNo?'<br>GST: '+s.gstNo:''}${s.licenseNo?' | DL: '+s.licenseNo:''}</div></div></div>
 <div class="br"><div class="bt">${bType}</div><div class="bm">Bill No <span>${sale.billNo}</span><br>Date <span>${dateStr}</span><br>Day <span>${dayName}</span><br>Time <span>${timeStr}</span></div><span class="sb ${stClass}">${stTxt}</span></div></div>

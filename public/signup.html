@@ -7,26 +7,26 @@
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root {
-  --navy: #0f2744;
-  --navy2: #162f52;
-  --blue: #1B4F72;
+  --navy: #f0f4f8;
+  --navy2: #e8eef5;
+  --blue: #1a3a6b;
   --blue2: #154360;
-  --accent: #00d4aa;
-  --accent2: #00b894;
+  --accent: #1e6b3a;
+  --accent2: #155a2e;
   --gold: #f4c430;
-  --white: #ffffff;
-  --glass: rgba(255,255,255,0.06);
-  --glass2: rgba(255,255,255,0.1);
-  --border: rgba(255,255,255,0.12);
-  --text-dim: rgba(255,255,255,0.55);
-  --error: #ff6b6b;
-  --success: #00d4aa;
+  --white: #1a2332;
+  --glass: rgba(0,0,0,0.04);
+  --glass2: rgba(0,0,0,0.07);
+  --border: rgba(0,0,0,0.08);
+  --text-dim: #64748b;
+  --error: #dc2626;
+  --success: #1e6b3a;
 }
 * { margin:0; padding:0; box-sizing:border-box; }
 html { scroll-behavior: smooth; }
 body {
   font-family: 'Sora', sans-serif;
-  background: var(--navy);
+  background: #ffffff;
   min-height: 100vh;
   display: flex;
   overflow-x: hidden;
@@ -47,9 +47,9 @@ body {
   filter: blur(80px);
   animation: drift 12s ease-in-out infinite;
 }
-.orb1 { width:500px; height:500px; background:rgba(0,212,170,0.12); top:-100px; left:-100px; animation-delay:0s; }
-.orb2 { width:400px; height:400px; background:rgba(27,79,114,0.3); bottom:-80px; right:-60px; animation-delay:-4s; }
-.orb3 { width:300px; height:300px; background:rgba(244,196,48,0.06); top:40%; left:30%; animation-delay:-8s; }
+.orb1 { width:500px; height:500px; background:rgba(30,107,58,0.06); top:-100px; left:-100px; animation-delay:0s; }
+.orb2 { width:400px; height:400px; background:rgba(26,58,107,0.08); bottom:-80px; right:-60px; animation-delay:-4s; }
+.orb3 { width:300px; height:300px; background:rgba(30,107,58,0.04); top:40%; left:30%; animation-delay:-8s; }
 @keyframes drift {
   0%,100% { transform: translate(0,0) scale(1); }
   33% { transform: translate(30px,-20px) scale(1.05); }
@@ -61,8 +61,8 @@ body {
   position: fixed;
   inset: 0;
   background-image:
-    linear-gradient(rgba(0,212,170,0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0,212,170,0.03) 1px, transparent 1px);
+    linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px);
   background-size: 60px 60px;
   z-index: 0;
   pointer-events: none;
@@ -91,21 +91,21 @@ body {
 .brand-icon {
   width: 48px;
   height: 48px;
-  background: linear-gradient(135deg, var(--accent), #0099ff);
+  background: linear-gradient(135deg, #1e6b3a, #1a3a6b);
   border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 26px;
-  box-shadow: 0 0 30px rgba(0,212,170,0.35);
+  box-shadow: 0 0 20px rgba(30,107,58,0.2);
 }
 .brand-name {
   font-size: 26px;
   font-weight: 800;
-  color: var(--white);
+  color: #1a2332;
   letter-spacing: -0.5px;
 }
-.brand-name span { color: var(--accent); }
+.brand-name span { color: #1e6b3a; }
 
 .headline {
   animation: slideIn 0.7s 0.1s ease both;
@@ -113,21 +113,21 @@ body {
 .headline h1 {
   font-size: 40px;
   font-weight: 800;
-  color: var(--white);
+  color: #1a2332;
   line-height: 1.1;
   letter-spacing: -1.5px;
   margin-bottom: 18px;
 }
 .headline h1 em {
   font-style: normal;
-  background: linear-gradient(90deg, var(--accent), #85C1E9);
+  background: linear-gradient(90deg, #1e6b3a, #1a3a6b);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 .headline p {
   font-size: 16px;
-  color: var(--text-dim);
+  color: #64748b;
   line-height: 1.7;
   max-width: 400px;
 }
@@ -144,15 +144,15 @@ body {
   align-items: flex-start;
   gap: 14px;
   padding: 13px 16px;
-  background: var(--glass);
-  border: 1px solid var(--border);
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
   border-radius: 12px;
   transition: all 0.25s;
   cursor: default;
 }
 .feat-item:hover {
-  background: var(--glass2);
-  border-color: rgba(0,212,170,0.25);
+  background: #f1f5f9;
+  border-color: rgba(30,107,58,0.25);
   transform: translateX(4px);
 }
 .feat-icon {
@@ -165,12 +165,12 @@ body {
   font-size: 18px;
   flex-shrink: 0;
 }
-.fi-green { background: rgba(0,212,170,0.15); }
+.fi-green { background: rgba(30,107,58,0.12); }
 .fi-blue { background: rgba(133,193,233,0.15); }
 .fi-gold { background: rgba(244,196,48,0.12); }
 .fi-purple { background: rgba(167,139,250,0.15); }
-.feat-text .ft-title { font-size: 14px; font-weight: 700; color: var(--white); margin-bottom: 3px; }
-.feat-text .ft-sub { font-size: 12px; color: var(--text-dim); line-height: 1.5; }
+.feat-text .ft-title { font-size: 14px; font-weight: 700; color: #1a2332; margin-bottom: 3px; }
+.feat-text .ft-sub { font-size: 12px; color: #64748b; line-height: 1.5; }
 
 .badges {
   display: flex;
@@ -184,12 +184,12 @@ body {
   border-radius: 50px;
   font-size: 12px;
   font-weight: 600;
-  border: 1px solid var(--border);
-  color: var(--text-dim);
-  background: var(--glass);
+  border: 1px solid #e2e8f0;
+  color: #64748b;
+  background: #f8fafc;
   letter-spacing: 0.2px;
 }
-.badge.highlight { border-color: rgba(0,212,170,0.4); color: var(--accent); background: rgba(0,212,170,0.08); }
+.badge.highlight { border-color: rgba(30,107,58,0.4); color: #1e6b3a; background: rgba(30,107,58,0.08); }
 
 @keyframes slideIn {
   from { opacity:0; transform:translateY(24px); }
@@ -215,18 +215,18 @@ body {
   top: 10%;
   height: 80%;
   width: 1px;
-  background: linear-gradient(to bottom, transparent, var(--border), transparent);
+  background: linear-gradient(to bottom, transparent, #e2e8f0, transparent);
 }
 
 .form-card {
   width: 100%;
   max-width: 460px;
-  background: rgba(15,39,68,0.7);
-  border: 1px solid var(--border);
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
   border-radius: 24px;
   padding: 36px 40px 40px;
   backdrop-filter: blur(20px);
-  box-shadow: 0 40px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04) inset;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.1), 0 0 0 1px rgba(0,0,0,0.06) inset;
   animation: cardIn 0.8s 0.2s ease both;
   margin: auto 0;
 }
@@ -238,11 +238,11 @@ body {
 /* TABS */
 .tabs {
   display: flex;
-  background: rgba(255,255,255,0.05);
+  background: #f1f5f9;
   border-radius: 12px;
   padding: 4px;
   margin-bottom: 32px;
-  border: 1px solid var(--border);
+  border: 1px solid #e2e8f0;
 }
 .tab-btn {
   flex: 1;
@@ -253,27 +253,27 @@ body {
   font-family: 'Sora', sans-serif;
   font-size: 13.5px;
   font-weight: 600;
-  color: var(--text-dim);
+  color: #64748b;
   cursor: pointer;
   transition: all 0.25s;
 }
 .tab-btn.active {
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
-  color: var(--navy);
-  box-shadow: 0 4px 16px rgba(0,212,170,0.35);
+  background: linear-gradient(135deg, #1e6b3a, #1a3a6b);
+  color: #ffffff;
+  box-shadow: 0 4px 16px rgba(30,107,58,0.3);
 }
 
 /* FORM */
 .form-title {
   font-size: 22px;
   font-weight: 800;
-  color: var(--white);
+  color: #1a2332;
   margin-bottom: 6px;
   letter-spacing: -0.5px;
 }
 .form-sub {
   font-size: 13px;
-  color: var(--text-dim);
+  color: #64748b;
   margin-bottom: 28px;
 }
 
@@ -296,28 +296,28 @@ body {
 .fgroup label {
   font-size: 11px;
   font-weight: 700;
-  color: rgba(255,255,255,0.5);
+  color: #64748b;
   text-transform: uppercase;
   letter-spacing: 0.7px;
 }
 .fgroup input, .fgroup select {
   padding: 12px 16px;
-  background: rgba(255,255,255,0.06);
-  border: 1.5px solid rgba(255,255,255,0.1);
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
   border-radius: 10px;
   font-family: 'Sora', sans-serif;
   font-size: 14px;
-  color: var(--white);
+  color: #1a2332;
   outline: none;
   transition: all 0.2s;
 }
-.fgroup input::placeholder { color: rgba(255,255,255,0.25); }
+.fgroup input::placeholder { color: #adb5bd; }
 .fgroup input:focus, .fgroup select:focus {
-  border-color: var(--accent);
-  background: rgba(0,212,170,0.06);
-  box-shadow: 0 0 0 3px rgba(0,212,170,0.1);
+  border-color: #1e6b3a;
+  background: rgba(30,107,58,0.05);
+  box-shadow: 0 0 0 3px rgba(30,107,58,0.1);
 }
-.fgroup select option { background: #0f2744; color: white; }
+.fgroup select option { background: #ffffff; color: #1a2332; }
 
 .pw-wrap { position: relative; }
 .pw-wrap input { padding-right: 44px; width: 100%; }
@@ -328,7 +328,7 @@ body {
   transform: translateY(-50%);
   background: none;
   border: none;
-  color: var(--text-dim);
+  color: #64748b;
   cursor: pointer;
   font-size: 16px;
   padding: 4px;
@@ -342,18 +342,18 @@ body {
 }
 .plan-card {
   padding: 14px;
-  border: 1.5px solid rgba(255,255,255,0.1);
+  border: 1.5px solid #e2e8f0;
   border-radius: 10px;
   cursor: pointer;
   transition: all 0.2s;
-  background: rgba(255,255,255,0.04);
+  background: #f8fafc;
 }
-.plan-card:hover { border-color: rgba(0,212,170,0.4); background: rgba(0,212,170,0.05); }
-.plan-card.selected { border-color: var(--accent); background: rgba(0,212,170,0.1); }
+.plan-card:hover { border-color: rgba(30,107,58,0.4); background: rgba(30,107,58,0.05); }
+.plan-card.selected { border-color: #1e6b3a; background: rgba(0,212,170,0.1); }
 .plan-card input { display: none; }
-.pc-name { font-size: 13px; font-weight: 700; color: var(--white); margin-bottom: 3px; }
-.pc-price { font-size: 11px; color: var(--text-dim); }
-.pc-badge { font-size: 10px; color: var(--accent); font-weight: 700; margin-top: 4px; }
+.pc-name { font-size: 13px; font-weight: 700; color: #1a2332; margin-bottom: 3px; }
+.pc-price { font-size: 11px; color: #64748b; }
+.pc-badge { font-size: 10px; color: #1e6b3a; font-weight: 700; margin-top: 4px; }
 
 .err-msg {
   background: rgba(255,107,107,0.12);
@@ -381,8 +381,8 @@ body {
   padding: 14px;
   border: none;
   border-radius: 12px;
-  background: linear-gradient(135deg, var(--accent) 0%, #00a8ff 100%);
-  color: var(--navy);
+  background: linear-gradient(135deg, #1e6b3a 0%, #1a3a6b 100%);
+  color: #ffffff;
   font-family: 'Sora', sans-serif;
   font-size: 15px;
   font-weight: 800;
@@ -393,7 +393,7 @@ body {
   margin-top: 4px;
   letter-spacing: 0.2px;
 }
-.submit-btn:hover { transform: translateY(-1px); box-shadow: 0 12px 30px rgba(0,212,170,0.4); }
+.submit-btn:hover { transform: translateY(-1px); box-shadow: 0 12px 30px rgba(30,107,58,0.3); }
 .submit-btn:active { transform: translateY(0); }
 .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 .submit-btn .spinner {
@@ -401,7 +401,7 @@ body {
   width: 18px;
   height: 18px;
   border: 2.5px solid rgba(15,39,68,0.4);
-  border-top-color: var(--navy);
+  border-top-color: #ffffff;
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
   margin: 0 auto;
@@ -413,24 +413,24 @@ body {
   align-items: center;
   gap: 12px;
   margin: 18px 0;
-  color: var(--text-dim);
+  color: #64748b;
   font-size: 12px;
 }
 .divider::before, .divider::after {
   content: '';
   flex: 1;
   height: 1px;
-  background: var(--border);
+  background: #e2e8f0;
 }
 
 .terms {
   font-size: 11.5px;
-  color: var(--text-dim);
+  color: #64748b;
   text-align: center;
   margin-top: 16px;
   line-height: 1.7;
 }
-.terms a { color: var(--accent); text-decoration: none; }
+.terms a { color: #1e6b3a; text-decoration: none; }
 
 .stats-row {
   display: flex;
@@ -438,16 +438,16 @@ body {
   gap: 28px;
   margin-top: 24px;
   padding-top: 20px;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid #e2e8f0;
 }
 .stat-item { text-align: center; }
-.stat-num { font-size: 18px; font-weight: 800; color: var(--accent); font-variant-numeric: tabular-nums; }
-.stat-lbl { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+.stat-num { font-size: 18px; font-weight: 800; color: #1e6b3a; font-variant-numeric: tabular-nums; }
+.stat-lbl { font-size: 11px; color: #64748b; margin-top: 2px; }
 
 /* ── FORGOT PASSWORD ── */
 .forgot-link {
   font-size: 12px;
-  color: var(--accent);
+  color: #1e6b3a;
   text-decoration: none;
   float: right;
   margin-bottom: 4px;
@@ -461,13 +461,13 @@ body {
   display: inline-block;
   width: 8px;
   height: 8px;
-  background: var(--accent);
+  background: #1e6b3a;
   border-radius: 50%;
   margin-right: 6px;
   animation: pulse 2s ease-in-out infinite;
 }
 @keyframes pulse {
-  0%,100% { box-shadow: 0 0 0 0 rgba(0,212,170,0.6); }
+  0%,100% { box-shadow: 0 0 0 0 rgba(30,107,58,0.6); }
   50% { box-shadow: 0 0 0 6px rgba(0,212,170,0); }
 }
 
@@ -484,7 +484,7 @@ body {
   text-align: center;
   font-size: 22px;
   font-weight: 700;
-  background: rgba(255,255,255,0.06);
+  background: #f8fafc;
   border: 1.5px solid rgba(255,255,255,0.12);
   border-radius: 12px;
   color: white;
@@ -493,7 +493,7 @@ body {
   transition: all 0.2s;
 }
 .otp-inputs input:focus {
-  border-color: var(--accent);
+  border-color: #1e6b3a;
   background: rgba(0,212,170,0.08);
   box-shadow: 0 0 0 3px rgba(0,212,170,0.12);
 }
@@ -519,7 +519,7 @@ body {
   font-family: 'Sora', sans-serif;
 }
 .toast.show { transform: translateX(0); }
-.toast.success { background: linear-gradient(135deg, #00d4aa, #00a8ff); color: var(--navy); }
+.toast.success { background: linear-gradient(135deg, #00d4aa, #00a8ff); color: #ffffff; }
 .toast.error { background: linear-gradient(135deg, #ff6b6b, #ff4757); }
 
 /* Strength bar */
@@ -544,17 +544,7 @@ body {
   .right-panel { width: 100%; min-height: 100vh; padding: 30px 20px 50px; align-items: flex-start; }
   .form-card { margin: 0; }
 }
-
-  /* ── DAWA HISAAB BRAND THEME ── */
-  .navbar {
-    background: linear-gradient(135deg, #0f2744 0%, #1a3a2a 100%) !important;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.4) !important;
-  }
-  .navbar .dawa  { color: #ffffff; font-weight: 900; }
-  .navbar .hisaab{ color: #4ade80; font-weight: 900; }
-  .dh-logo { display: none !important; }
-
-  </style>
+</style>
 </head>
 <body>
 
@@ -568,10 +558,7 @@ body {
 <!-- LEFT PANEL -->
 <div class="left-panel">
   <div class="brand-row">
-    <div class="brand-icon" style="padding:0;background:white;">
-  
-</div>
-
+    
     <div class="brand-name">Dawa <span>Hisaab</span></div>
   </div>
 
@@ -729,15 +716,15 @@ body {
         Naya account? <a onclick="switchTab('register')" style="cursor:pointer;">Free mein start karo →</a>
       </div>
 
-      <div style="margin-top:20px;padding:14px;background:rgba(0,212,170,0.06);border:1px solid rgba(0,212,170,0.15);border-radius:10px;">
-        <div style="font-size:11px;color:var(--text-dim);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Demo Accounts</div>
-        <div onclick="fillDemo('satish@medxpert.com','MedXpert@123')" style="padding:8px 10px;border-radius:7px;cursor:pointer;transition:all 0.15s;margin-bottom:4px;" onmouseover="this.style.background='rgba(0,212,170,0.1)'" onmouseout="this.style.background='transparent'">
-          <span style="font-size:12.5px;color:white;font-weight:600;">💊 MedXpert</span>
-          <span style="font-family:'JetBrains Mono';font-size:11px;color:var(--text-dim);margin-left:8px;">MedXpert@123</span>
+      <div style="margin-top:20px;padding:14px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;">
+        <div style="font-size:11px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Demo Accounts</div>
+        <div onclick="fillDemo('satish@medxpert.com','MedXpert@123')" style="padding:8px 10px;border-radius:7px;cursor:pointer;transition:all 0.15s;margin-bottom:4px;" onmouseover="this.style.background='rgba(30,107,58,0.08)'" onmouseout="this.style.background='transparent'">
+          <span style="font-size:12.5px;color:#1a2332;font-weight:600;">💊 MedXpert</span>
+          <span style="font-family:'JetBrains Mono';font-size:11px;color:#64748b;margin-left:8px;">MedXpert@123</span>
         </div>
-        <div onclick="fillDemo('satish01tiwari@gmail.com','Test@123')" style="padding:8px 10px;border-radius:7px;cursor:pointer;transition:all 0.15s;" onmouseover="this.style.background='rgba(0,212,170,0.1)'" onmouseout="this.style.background='transparent'">
-          <span style="font-size:12.5px;color:white;font-weight:600;">🏪 DawaZone</span>
-          <span style="font-family:'JetBrains Mono';font-size:11px;color:var(--text-dim);margin-left:8px;">Test@123</span>
+        <div onclick="fillDemo('satish01tiwari@gmail.com','Test@123')" style="padding:8px 10px;border-radius:7px;cursor:pointer;transition:all 0.15s;" onmouseover="this.style.background='rgba(30,107,58,0.08)'" onmouseout="this.style.background='transparent'">
+          <span style="font-size:12.5px;color:#1a2332;font-weight:600;">🏪 DawaZone</span>
+          <span style="font-family:'JetBrains Mono';font-size:11px;color:#64748b;margin-left:8px;">Test@123</span>
         </div>
       </div>
     </div>
@@ -1034,6 +1021,5 @@ document.getElementById('rPharmacy').focus();
 });
 document.getElementById('rPass').addEventListener('keydown',e=>{if(e.key==='Enter')doRegister();});
 </script>
-
 </body>
 </html>

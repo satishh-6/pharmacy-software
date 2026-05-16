@@ -9,9 +9,9 @@
   body { font-family:'Segoe UI',sans-serif; background:#eef2f7; }
 
   /* NAVBAR */
-  .navbar { background:linear-gradient(135deg,#1B4F72,#154360); color:white; padding:0 24px; display:flex; align-items:center; height:60px; position:fixed; width:100%; top:0; z-index:100; box-shadow:0 4px 20px rgba(27,79,114,0.45); }
+  .navbar { background:#ffffff; color:white; padding:0 24px; display:flex; align-items:center; height:60px; position:fixed; width:100%; top:0; z-index:100; box-shadow:0 2px 16px rgba(0,0,0,0.08); }
   .navbar h1 { font-size:20px; font-weight:800; flex:1; }
-  .navbar h1 span { color:#85C1E9; }
+  .navbar h1 span { color:#1e6b3a; }
   .navbar h1 .sa { font-size:11px; font-weight:700; background:rgba(16,185,129,0.25); color:#6ee7b7; padding:3px 10px; border-radius:20px; margin-left:10px; border:1px solid rgba(16,185,129,0.3); }
   .nav-right { display:flex; align-items:center; gap:10px; }
   .nav-user { background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.25); color:white; padding:6px 14px; border-radius:20px; font-size:12px; font-weight:600; }
@@ -42,7 +42,7 @@
   .fgroup label { font-size:10.5px; color:#78909c; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; }
   .fgroup input { padding:11px 14px; background:#f8fafc; border:1.5px solid #e2e8f0; border-radius:9px; color:#1a2332; font-size:14px; outline:none; transition:all 0.2s; }
   .fgroup input:focus { border-color:#1B4F72; background:white; box-shadow:0 0 0 3px rgba(27,79,114,0.08); }
-  .login-btn { width:100%; padding:13px; background:linear-gradient(135deg,#1B4F72,#154360); color:white; border:none; border-radius:10px; font-size:15px; font-weight:700; cursor:pointer; transition:all 0.2s; margin-top:4px; }
+  .login-btn { width:100%; padding:13px; background:#ffffff; color:white; border:none; border-radius:10px; font-size:15px; font-weight:700; cursor:pointer; transition:all 0.2s; margin-top:4px; }
   .login-btn:hover { transform:translateY(-1px); box-shadow:0 8px 24px rgba(27,79,114,0.3); }
 
   /* KPI CARDS */
@@ -84,7 +84,7 @@
   /* TABLE */
   .table-wrap { overflow-x:auto; }
   .data-table { width:100%; border-collapse:collapse; min-width:900px; }
-  .data-table thead tr { background:linear-gradient(135deg,#1B4F72,#154360); }
+  .data-table thead tr { background:#ffffff; }
   .data-table thead th { padding:11px 14px; text-align:left; font-size:10.5px; color:rgba(255,255,255,0.88); font-weight:700; text-transform:uppercase; letter-spacing:0.5px; white-space:nowrap; }
   .data-table tbody tr { border-bottom:1px solid #f5f7fa; transition:background 0.12s; }
   .data-table tbody tr:hover { background:#f8fafd; }
@@ -118,7 +118,7 @@
   .btn-orange:hover { background:#B7770D; color:white; }
   .btn-purple { background:#F4ECF7; color:#7D3C98; border:1px solid #E8DAEF; }
   .btn-purple:hover { background:#7D3C98; color:white; }
-  .btn-primary { background:linear-gradient(135deg,#1B4F72,#154360); color:white; padding:10px 20px; font-size:13px; }
+  .btn-primary { background:#ffffff; color:white; padding:10px 20px; font-size:13px; }
   .btn-primary:hover { box-shadow:0 6px 20px rgba(27,79,114,0.3); }
 
   /* SECTION */
@@ -138,7 +138,7 @@
   /* DETAIL TABS */
   .detail-tabs { display:flex; gap:4px; background:#f8fafc; border-radius:10px; padding:4px; margin-bottom:20px; overflow-x:auto; border:1px solid #e2e8f0; }
   .dtab { padding:8px 16px; border-radius:8px; cursor:pointer; font-size:12px; font-weight:700; color:#78909c; background:transparent; border:none; transition:all 0.2s; white-space:nowrap; }
-  .dtab.active { background:linear-gradient(135deg,#1B4F72,#154360); color:white; box-shadow:0 3px 10px rgba(27,79,114,0.2); }
+  .dtab.active { background:#ffffff; color:white; box-shadow:0 3px 10px rgba(27,79,114,0.2); }
 
   /* INFO GRID */
   .info-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:16px; }
@@ -180,14 +180,46 @@
 
   /* ── DAWA HISAAB BRAND THEME ── */
   .navbar {
-    background: linear-gradient(135deg, #0f2744 0%, #1a3a2a 100%) !important;
+    background:#ffffff !important;
     box-shadow: 0 4px 20px rgba(0,0,0,0.4) !important;
   }
   .navbar .dawa  { color: #ffffff; font-weight: 900; }
   .navbar .hisaab{ color: #4ade80; font-weight: 900; }
   .dh-logo { display: none !important; }
 
-  </style>
+  
+  /* ── WHITE NAVBAR THEME ── */
+  .navbar {
+    background: #ffffff !important;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.08) !important;
+    border-bottom: 1px solid #e2e8f0;
+    color: #1a2332 !important;
+  }
+  .navbar h1 {
+    font-size: 26px !important;
+    font-weight: 900 !important;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .navbar h1 .dawa   { color: #1a3a6b !important; }
+  .navbar h1 .hisaab { color: #1e6b3a !important; }
+  .navbar h1 span    { color: #1e6b3a !important; }
+  .nav-badge {
+    background: #f0f4f8 !important;
+    color: #1a2332 !important;
+    border: 1px solid #e2e8f0;
+  }
+  .nav-badge:hover { background: #e2e8f0 !important; }
+  .btn-logout {
+    background: transparent !important;
+    border: 1.5px solid #e2e8f0 !important;
+    color: #1a2332 !important;
+  }
+  .btn-logout:hover { background: #f0f4f8 !important; }
+
+</style>
 
 </head>
 <body>
@@ -547,7 +579,7 @@
     </div>
     <div style="display:flex;gap:10px;margin-top:20px;">
       <button onclick="closePlanModal()" style="flex:1;padding:11px;background:#f0f4f8;color:#546e7a;border:none;border-radius:9px;cursor:pointer;font-size:14px;font-weight:700;">Cancel</button>
-      <button onclick="updatePlan()" style="flex:2;padding:11px;background:linear-gradient(135deg,#1B4F72,#154360);color:white;border:none;border-radius:9px;cursor:pointer;font-size:14px;font-weight:700;">✅ Update Plan</button>
+      <button onclick="updatePlan()" style="flex:2;padding:11px;background:#ffffff;color:white;border:none;border-radius:9px;cursor:pointer;font-size:14px;font-weight:700;">✅ Update Plan</button>
     </div>
   </div>
 </div>
