@@ -485,6 +485,47 @@ async function loadProducts(){
   }catch(e){st.textContent='❌ Load error. Refresh karo.';console.error(e);}
 }
 
+// Quick Add Product Modal
+function openQuickAddProduct(name){
+  document.getElementById('srchInput').value='';
+  document.getElementById('srchResults').style.display='none';
+  document.getElementById('qpName').value=name||'';
+  document.getElementById('quickAddModal').classList.add('open');
+}
+
+async function saveQuickProduct(){
+  const name=document.getElementById('qpName').value.trim();
+  const cat=document.getElementById('qpCat').value;
+  const mrp=parseFloat(document.getElementById('qpMrp').value)||0;
+  const pp=parseFloat(document.getElementById('qpPP').value)||0;
+  const hsn=document.getElementById('qpHSN').value.trim();
+  const sellType=document.getElementById('qpSellType').value;
+
+  if(!name){alert('Product name enter karo!');return;}
+
+  try{
+    const res=await fetch('/api/products',{
+      method:'POST',
+      headers:authH({'Content-Type':'application/json'}),
+      body:JSON.stringify({
+  name,category:cat,mrp,salePrice:mrp,purchasePrice:pp,
+  hsnCode:hsn,sellType,stock:0
+})
+    });
+    const data=await res.json();
+    if(data._id||data.success){
+      notif('✅ '+name+' added to stock!');
+      document.getElementById('quickAddModal').classList.remove('open');
+      await loadProducts(); // Refresh products list
+      // Auto-add to purchase items
+      const p=data._id?data:data.product;
+      if(p) addItem(p._id||p);
+    } else {
+      notif('❌ '+(data.message||'Error'),false);
+    }
+  }catch(e){notif('❌ '+e.message,false);}
+}
+
 // ── PRODUCT SEARCH ──
 function srchProducts(){
   const q=document.getElementById('srchInput').value.toLowerCase().trim();
@@ -492,8 +533,15 @@ function srchProducts(){
   if(!q){box.style.display='none';return;}
   if(!products.length){box.innerHTML='<div style="padding:12px;color:#e65100;font-size:13px;">⚠️ Products nahi mile.</div>';box.style.display='block';return;}
   const matches=products.filter(p=>(p.name||'').toLowerCase().includes(q)||(p.generic||'').toLowerCase().includes(q)||(p.company||'').toLowerCase().includes(q)).slice(0,12);
-  if(!matches.length){box.innerHTML=`<div style="padding:12px;color:#78909c;font-size:13px;">No results for "${q}"</div>`;box.style.display='block';return;}
-  box.innerHTML=matches.map(p=>{
+if(!matches.length){
+  box.innerHTML=`
+    <div style="padding:12px;color:#78909c;font-size:13px;">No results for "${q}"</div>
+    <div onclick="openQuickAddProduct('${q}')" style="padding:12px 16px;cursor:pointer;border-top:1px solid #e2e8f0;background:#f0fdf4;display:flex;align-items:center;gap:10px;">
+      <span style="background:#1e6b3a;color:white;border-radius:6px;padding:3px 10px;font-size:12px;font-weight:700;">+ New</span>
+      <span style="font-size:13px;font-weight:700;color:#1e6b3a;">Add "${q}" as new product</span>
+    </div>`;
+  box.style.display='block';return;
+}  box.innerHTML=matches.map(p=>{
     const stk=p.sellType==='loose'?`${p.stripStock||0}s+${p.looseStock||0} loose`:`${p.stock||0} in stock`;
     return `<div class="srch-item" onclick="addItem('${p._id}')">
       <span class="si-stock">${stk}</span>
@@ -850,6 +898,59 @@ loadProducts();
 loadRecentPurchases();
 loadStats();
 </script>
+
+<!-- QUICK ADD PRODUCT MODAL -->
+<div class="modal-bg" id="quickAddModal">
+  <div class="modal" style="width:480px;">
+    <div class="modal-hdr">
+      <div class="modal-title">+ New Product</div>
+      <button class="modal-close" onclick="document.getElementById('quickAddModal').classList.remove('open')">✕</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+      <div class="fgroup full" style="grid-column:1/-1;">
+        <label>Product Name *</label>
+        <input id="qpName" placeholder="Medicine / FMCG name" />
+      </div>
+      <div class="fgroup">
+        <label>Category</label>
+        <select id="qpCat">
+          <option value="medicine">Medicine</option>
+          <option value="fmcg">FMCG</option>
+          <option value="cosmetic">Cosmetic</option>
+          <option value="surgical">Surgical</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="fgroup">
+        <label>Sell Type</label>
+        <select id="qpSellType">
+          <option value="piece">Piece</option>
+          <option value="strip">Strip</option>
+          <option value="loose">Loose (Tablet/Pill)</option>
+        </select>
+      </div>
+      <div class="fgroup">
+        <label>MRP (₹)</label>
+        <input id="qpMrp" type="number" placeholder="0" />
+      </div>
+      <div class="fgroup">
+        <label>Purchase Price (₹)</label>
+        <input id="qpPP" type="number" placeholder="0" />
+      </div>
+      <div class="fgroup" style="grid-column:1/-1;">
+        <label>HSN Code (Optional)</label>
+        <input id="qpHSN" placeholder="e.g. 30049099" maxlength="8" />
+      </div>
+    </div>
+    <div style="background:#f0fdf4;border-radius:8px;padding:10px 14px;margin-top:14px;font-size:12px;color:#1e6b3a;">
+      ℹ️ Product stock mein add ho jaayega. Baaki details (batch, expiry, generic) Stock section mein edit kar sakte ho.
+    </div>
+    <div style="display:flex;gap:10px;margin-top:16px;">
+      <button onclick="document.getElementById('quickAddModal').classList.remove('open')" style="flex:1;padding:12px;background:#f0f4f8;border:none;border-radius:8px;cursor:pointer;font-weight:700;">Cancel</button>
+      <button onclick="saveQuickProduct()" style="flex:2;padding:12px;background:linear-gradient(135deg,#1a3a6b,#1e6b3a);color:white;border:none;border-radius:8px;cursor:pointer;font-size:14px;font-weight:700;">✅ Add Product</button>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>

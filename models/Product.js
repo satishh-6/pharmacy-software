@@ -20,6 +20,7 @@ const productSchema = new mongoose.Schema({
   expiry:        { type: String, default: '' },
   gst:           { type: Number, default: 0 },
   hsnCode:       { type: String, default: '' },
+  composition: [{ type: String }],
   isActive:      { type: Boolean, default: true }
 }, { timestamps: true });
 
