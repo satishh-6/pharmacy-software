@@ -26,6 +26,7 @@
 
   .main { margin-left:230px; margin-top:60px; padding:24px; }
 
+  /* STAT STRIP */
   .stat-strip { display:grid; grid-template-columns:repeat(5,1fr); gap:14px; margin-bottom:24px; }
   .stat-mini { background:white; border-radius:14px; padding:16px 18px; box-shadow:0 2px 10px rgba(0,0,0,0.05); border:1px solid rgba(0,0,0,0.04); display:flex; align-items:center; gap:14px; transition:all 0.2s; }
   .stat-mini:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(0,0,0,0.08); }
@@ -38,6 +39,7 @@
   .stat-mini-info .label { font-size:11px; color:#90a4ae; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; }
   .stat-mini-info .value { font-size:22px; font-weight:800; color:#1a2332; margin-top:2px; line-height:1; }
 
+  /* TOP BAR */
   .top-bar { background:white; border-radius:14px; padding:16px 20px; margin-bottom:20px; display:flex; gap:12px; align-items:center; flex-wrap:wrap; box-shadow:0 2px 10px rgba(0,0,0,0.05); border:1px solid rgba(0,0,0,0.04); }
   .search-wrap { position:relative; flex:1; min-width:220px; }
   .search-wrap input { width:100%; padding:10px 14px 10px 40px; border:1.5px solid #e2e8f0; border-radius:10px; font-size:14px; outline:none; transition:border 0.2s; background:#f8fafc; }
@@ -52,6 +54,7 @@
   .btn-sub-search { background:#F4ECF7; color:#7D3C98; border:1.5px solid #E8D5F5; padding:10px 16px; border-radius:10px; font-size:13px; font-weight:700; cursor:pointer; white-space:nowrap; transition:all 0.2s; }
   .btn-sub-search:hover { background:#7D3C98; color:white; }
 
+  /* TABLE */
   .table-wrap { background:white; border-radius:16px; box-shadow:0 2px 12px rgba(0,0,0,0.05); border:1px solid rgba(0,0,0,0.04); overflow:hidden; }
   .table-header { padding:16px 20px; border-bottom:1px solid #f0f4f8; display:flex; justify-content:space-between; align-items:center; }
   .table-title { font-size:15px; font-weight:700; color:#1a2332; }
@@ -65,12 +68,14 @@
   tbody td { padding:13px 16px; font-size:13px; color:#37474f; vertical-align:middle; }
   .product-name { font-weight:700; color:#1a2332; font-size:14px; }
   .product-generic { font-size:11px; color:#90a4ae; margin-top:2px; }
+  .product-company { font-size:12px; color:#78909c; }
 
+  /* BADGES */
   .badge { padding:4px 10px; border-radius:20px; font-size:11px; font-weight:700; display:inline-block; }
   .badge-med { background:#EBF5FB; color:#1a3a6b; }
   .badge-fmcg { background:#F4ECF7; color:#7D3C98; }
-  .badge-cosmetic { background:#FDEDEC; color:#E91E63; }
-  .badge-surgical { background:#E8F5E9; color:#2E7D32; }
+  .badge-cosmetic { background:#fce4ec; color:#c2185b; }
+  .badge-surgical { background:#e8f5e9; color:#2e7d32; }
   .badge-other { background:#ECEFF1; color:#546e7a; }
   .badge-ok { background:#EAFAF1; color:#1E8449; }
   .badge-low { background:#FEF9E7; color:#B7770D; }
@@ -78,12 +83,14 @@
   .badge-exp { background:#FDEDEC; color:#C0392B; }
   .badge-soon { background:#FEF9E7; color:#B7770D; }
 
+  /* PRICE CELLS */
   .price { font-weight:700; color:#1a2332; }
   .price-sale { color:#1a3a6b; font-weight:800; }
   .price-purchase { color:#78909c; font-size:12px; }
   .stock-qty { font-size:15px; font-weight:800; color:#1a2332; }
   .stock-detail { font-size:11px; color:#90a4ae; margin-top:2px; }
 
+  /* ACTION BTNS */
   .action-btns { display:flex; gap:5px; flex-wrap:wrap; }
   .btn-edit { background:#EBF5FB; color:#1a3a6b; border:none; padding:6px 12px; border-radius:8px; cursor:pointer; font-size:11px; font-weight:700; transition:all 0.2s; }
   .btn-edit:hover { background:#1a3a6b; color:white; }
@@ -94,6 +101,7 @@
 
   .empty-state { text-align:center; padding:60px 20px; color:#b0bec5; }
 
+  /* MODAL */
   .modal-bg { display:none; position:fixed; inset:0; background:rgba(21,67,96,0.5); z-index:200; align-items:flex-start; justify-content:center; overflow-y:auto; padding:20px 0; backdrop-filter:blur(4px); }
   .modal-bg.show { display:flex; }
   .modal { background:white; border-radius:20px; padding:28px; width:620px; max-width:95vw; margin:0 auto; box-shadow:0 20px 60px rgba(21,67,96,0.2); }
@@ -108,16 +116,12 @@
   .form-group input, .form-group select { padding:10px 12px; border:1.5px solid #e2e8f0; border-radius:10px; font-size:14px; outline:none; transition:border 0.2s; background:#f8fafc; color:#333; }
   .form-group input:focus, .form-group select:focus { border-color:#1a3a6b; background:white; }
   .section-label { grid-column:1/-1; font-size:11px; font-weight:800; color:#1a3a6b; text-transform:uppercase; letter-spacing:1px; padding:4px 0 2px; border-bottom:2px solid #EBF5FB; }
-  .tip-text { font-size:11px; color:#90a4ae; margin-top:3px; }
+  .strip-info { grid-column:1/-1; background:#EBF5FB; border-radius:10px; padding:10px 14px; font-size:12px; color:#1a3a6b; border-left:3px solid #1a3a6b; }
   .modal-footer { display:flex; gap:10px; margin-top:24px; padding-top:16px; border-top:1px solid #f0f4f8; }
   .btn-cancel { flex:1; padding:12px; background:#f0f4f8; color:#546e7a; border:none; border-radius:10px; cursor:pointer; font-size:14px; font-weight:700; }
   .btn-cancel:hover { background:#e2e8f0; }
   .btn-save { flex:2; padding:12px; background:linear-gradient(135deg,#1a3a6b,#1e6b3a); color:white; border:none; border-radius:10px; cursor:pointer; font-size:14px; font-weight:700; transition:all 0.2s; }
   .btn-save:hover { transform:translateY(-1px); box-shadow:0 6px 20px rgba(26,58,107,0.3); }
-
-  #medicineFields { display:contents; }
-  #stripFields { display:contents; }
-  .strip-info { grid-column:1/-1; background:#EBF5FB; border-radius:10px; padding:10px 14px; font-size:12px; color:#1a3a6b; border-left:3px solid #1a3a6b; }
 
   /* Drug Tags */
   .tags-wrap { display:flex; flex-wrap:wrap; gap:6px; padding:8px 10px; border:1.5px solid #e2e8f0; border-radius:10px; background:#f8fafc; min-height:46px; align-items:center; cursor:text; transition:border 0.2s; }
@@ -158,29 +162,47 @@
 </div>
 
 <div class="main">
+
+  <!-- STAT STRIP -->
   <div class="stat-strip">
     <div class="stat-mini navy">
       <div class="stat-mini-icon">📦</div>
-      <div class="stat-mini-info"><div class="label">Total Items</div><div class="value" id="st-total">—</div></div>
+      <div class="stat-mini-info">
+        <div class="label">Total Items</div>
+        <div class="value" id="st-total">—</div>
+      </div>
     </div>
     <div class="stat-mini green">
       <div class="stat-mini-icon">💰</div>
-      <div class="stat-mini-info"><div class="label">Stock Value</div><div class="value" id="st-value">—</div></div>
+      <div class="stat-mini-info">
+        <div class="label">Stock Value</div>
+        <div class="value" id="st-value">—</div>
+      </div>
     </div>
     <div class="stat-mini orange">
       <div class="stat-mini-icon">⚠️</div>
-      <div class="stat-mini-info"><div class="label">Low Stock</div><div class="value" id="st-low">—</div></div>
+      <div class="stat-mini-info">
+        <div class="label">Low Stock</div>
+        <div class="value" id="st-low">—</div>
+      </div>
     </div>
     <div class="stat-mini red">
       <div class="stat-mini-icon">⏰</div>
-      <div class="stat-mini-info"><div class="label">Expiring</div><div class="value" id="st-exp">—</div></div>
+      <div class="stat-mini-info">
+        <div class="label">Expiring</div>
+        <div class="value" id="st-exp">—</div>
+      </div>
     </div>
     <div class="stat-mini purple">
       <div class="stat-mini-icon">🛍️</div>
-      <div class="stat-mini-info"><div class="label">FMCG Items</div><div class="value" id="st-fmcg">—</div></div>
+      <div class="stat-mini-info">
+        <div class="label">FMCG Items</div>
+        <div class="value" id="st-fmcg">—</div>
+      </div>
     </div>
   </div>
 
+  <!-- TOP BAR -->
   <div class="top-bar">
     <div class="search-wrap">
       <span class="s-icon">🔍</span>
@@ -200,6 +222,7 @@
     <button class="btn-add" onclick="openModal()">+ Add Item</button>
   </div>
 
+  <!-- TABLE -->
   <div class="table-wrap">
     <div class="table-header">
       <div class="table-title">📦 Inventory List</div>
@@ -226,14 +249,17 @@
   </div>
 </div>
 
-<!-- ADD/EDIT MODAL -->
+<!-- ADD / EDIT MODAL -->
 <div class="modal-bg" id="modalBg">
   <div class="modal">
     <div class="modal-header">
       <div class="modal-title" id="modalTitle">➕ Add New Item</div>
       <button class="modal-close" onclick="closeModal()">✕</button>
     </div>
+
     <div class="form-grid">
+
+      <!-- Category -->
       <div class="form-group full">
         <label>Category *</label>
         <select id="f_category" onchange="onCategoryChange()">
@@ -244,10 +270,13 @@
           <option value="other">📦 Other</option>
         </select>
       </div>
+
+      <!-- Name -->
       <div class="form-group full">
         <label>Item Name *</label>
         <input id="f_name" placeholder="e.g. Paracetamol 500mg / Maggi 70g" />
       </div>
+
       <div class="form-group">
         <label>Company / Brand</label>
         <input id="f_company" placeholder="e.g. Cipla / Nestle" />
@@ -257,8 +286,8 @@
         <input id="f_rack" placeholder="e.g. A-12" />
       </div>
 
-      <!-- Medicine Fields -->
-      <div id="medicineFields">
+      <!-- MEDICINE ONLY: Drug Composition -->
+      <div id="compositionSection" style="display:contents;">
         <div class="section-label">Drug Composition / Generic</div>
         <div class="form-group full">
           <label>Drug Composition
@@ -279,64 +308,102 @@
           </div>
           <input type="hidden" id="f_generic" />
         </div>
+      </div>
 
-        <div class="section-label">Medicine Details</div>
-        <div class="form-group">
-          <label>Batch No</label>
-          <input id="f_batch" placeholder="e.g. BT2024" />
-        </div>
-        <div class="form-group">
-          <label>Expiry (MM/YY)</label>
-          <input id="f_expiry" placeholder="e.g. 12/26" />
-        </div>
-        <div class="form-group">
-          <label>HSN Code</label>
-          <input id="f_hsn" placeholder="e.g. 30049099" />
-        </div>
-        <div class="form-group">
-          <label>GST %</label>
-          <select id="f_gst">
-            <option value="0" selected>0% — No GST</option>
-            <option value="5">5% GST</option>
-            <option value="12">12% GST</option>
-            <option value="18">18% GST</option>
-            <option value="28">28% GST</option>
-          </select>
-        </div>
+      <!-- ALL CATEGORIES: Product Details -->
+      <div class="section-label">Product Details</div>
+      <div class="form-group">
+        <label>Batch No</label>
+        <input id="f_batch" placeholder="e.g. BT2024" />
+      </div>
+      <div class="form-group">
+        <label>Expiry (MM/YY)</label>
+        <input id="f_expiry" placeholder="e.g. 12/26" />
+      </div>
+      <div class="form-group">
+        <label>HSN Code</label>
+        <input id="f_hsn" placeholder="e.g. 30049099" />
+      </div>
+      <div class="form-group">
+        <label>GST %</label>
+        <select id="f_gst">
+          <option value="0" selected>0% — No GST</option>
+          <option value="5">5% GST</option>
+          <option value="12">12% GST</option>
+          <option value="18">18% GST</option>
+          <option value="28">28% GST</option>
+        </select>
+      </div>
 
-        <div class="section-label">Selling Type</div>
+      <!-- SELLING TYPE — changes based on category -->
+      <div class="section-label">Selling Type</div>
+
+      <!-- Medicine sell options -->
+      <div id="medSellSection" style="display:contents;">
         <div class="form-group full">
-          <label>How is this sold?</label>
+          <label>Medicine Kaise Bechte Ho?</label>
           <select id="f_sellType" onchange="onSellTypeChange()">
-            <option value="strip">Strip only</option>
-            <option value="loose">Strip + Loose pills</option>
-            <option value="piece">Piece / Bottle / Unit</option>
+            <option value="strip">Strip Only (Poori strip bechte hain)</option>
+            <option value="loose">Loose Only (Sirf pills/tablets alag alag)</option>
+            <option value="both">Strip + Loose Dono (Customer choose kare)</option>
           </select>
         </div>
-        <div id="stripFields">
-          <div class="strip-info full" id="stripInfoBox">
-            💡 Loose selling: Customer individual pills le sakta hai
+        <!-- Strip details -->
+        <div id="stripSection" style="display:contents;">
+          <div class="strip-info full" id="stripInfoBox" style="display:none;">
+            💡 Both mode: Customer poori strip ya individual pills — dono le sakta hai
           </div>
           <div class="form-group">
-            <label>Units Per Strip</label>
-            <input id="f_unitsPerStrip" type="number" placeholder="e.g. 10" value="10" oninput="calcUnitPrice()" />
+            <label>Pills / Tablets Per Strip</label>
+            <input id="f_unitsPerStrip" type="number" placeholder="e.g. 10" value="10" oninput="calcPillPrice()" />
           </div>
           <div class="form-group">
-            <label>Price Per Pill (₹)</label>
-            <input id="f_pricePerUnit" type="number" placeholder="Auto-calc" readonly style="background:#f0f4f8;color:#90a4ae;" />
+            <label>💊 Price Per Pill (₹)</label>
+            <input id="f_pricePerUnit" type="number" placeholder="Auto-calc" readonly
+              style="background:#f0fdf4;color:#1E8449;font-weight:700;border-color:#A9DFBF;" />
           </div>
-          <div class="form-group">
+          <div class="form-group" id="stripStockField">
+            <label>Strips in Stock</label>
+            <input id="f_stripStock" type="number" placeholder="0" />
+          </div>
+          <div class="form-group" id="looseStockField" style="display:none;">
             <label>Loose Pills in Stock</label>
             <input id="f_looseStock" type="number" placeholder="0" />
           </div>
-          <input type="hidden" id="f_stripStock" value="0" />
         </div>
       </div>
 
+      <!-- Other category sell options -->
+      <div id="otherSellSection" style="display:none;">
+        <div class="form-group full" style="display:flex;flex-direction:column;gap:6px;">
+          <label style="font-size:11px;color:#546e7a;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">Selling Unit Type</label>
+          <select id="f_otherSellType" onchange="onOtherSellTypeChange()">
+            <option value="piece">Piece (Ek ek piece)</option>
+            <option value="bottle">Bottle</option>
+            <option value="box">Box / Packet</option>
+            <option value="unit">Unit (Generic)</option>
+          </select>
+        </div>
+        <!-- Per pack price calc for non-medicine -->
+        <div id="packCalcFields" style="display:none; grid-column:1/-1; margin-top:8px;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+            <div class="form-group">
+              <label id="packUnitsLabel">Units / ml per Pack</label>
+              <input id="f_packUnits" type="number" placeholder="e.g. 100" value="1" oninput="calcPackUnitPrice()" />
+            </div>
+            <div class="form-group">
+              <label>Price Per Unit (₹)</label>
+              <input id="f_packUnitPrice" type="number" placeholder="Auto-calc" readonly style="background:#f0f4f8;color:#90a4ae;" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pricing & Stock -->
       <div class="section-label">Pricing & Stock</div>
       <div class="form-group">
-        <label>MRP (₹) *</label>
-        <input id="f_mrp" type="number" placeholder="0.00" oninput="calcUnitPrice()" />
+        <label>MRP / Strip Price (₹) *</label>
+        <input id="f_mrp" type="number" placeholder="0.00" oninput="calcPillPrice();calcPackUnitPrice();" />
       </div>
       <div class="form-group">
         <label>Purchase Price (₹)</label>
@@ -354,6 +421,7 @@
         <label>Min Stock Alert</label>
         <input id="f_min" type="number" placeholder="10" />
       </div>
+
     </div>
 
     <div class="modal-footer">
@@ -363,7 +431,7 @@
   </div>
 </div>
 
-<!-- SUBSTITUTE MODAL -->
+<!-- SUBSTITUTE MODAL (from list) -->
 <div class="modal-bg" id="subModal">
   <div class="modal" style="max-width:520px;">
     <div class="modal-header">
@@ -379,7 +447,7 @@
     <div style="display:flex;gap:8px;padding:8px 0 12px;border-bottom:1px solid #f0f4f8;flex-wrap:wrap;">
       <span style="background:#EAFAF1;color:#1E8449;padding:4px 12px;border-radius:10px;font-size:11px;font-weight:700;">🟢 Full Match</span>
       <span style="background:#FEF9E7;color:#B7770D;padding:4px 12px;border-radius:10px;font-size:11px;font-weight:700;">🟡 Partial Match</span>
-      <span style="font-size:11px;color:#90a4ae;align-self:center;">Matching drugs highlighted</span>
+      <span style="font-size:11px;color:#90a4ae;align-self:center;">Matching drugs highlighted ✅</span>
     </div>
     <div id="subContent" style="max-height:420px;overflow-y:auto;"></div>
     <div style="padding-top:12px;border-top:1px solid #f0f4f8;margin-top:8px;">
@@ -390,8 +458,6 @@
     </div>
   </div>
 </div>
-
-
 
 <!-- STANDALONE SUBSTITUTE SEARCH -->
 <div class="modal-bg" id="subSearchModal">
@@ -406,7 +472,7 @@
     <div style="margin-bottom:16px;">
       <input id="subSearchInput"
         placeholder="e.g. Crocin, Paracetamol 500mg, Metformin..."
-        style="width:100%;padding:12px 16px;border:2px solid #7D3C98;border-radius:10px;font-size:14px;outline:none;transition:all 0.2s;"
+        style="width:100%;padding:12px 16px;border:2px solid #7D3C98;border-radius:10px;font-size:14px;outline:none;"
         oninput="runSubSearch()" />
       <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">
         <span style="font-size:11px;color:#90a4ae;align-self:center;">Search by:</span>
@@ -431,19 +497,21 @@
 </div>
 
 <script>
-let allProducts = [], editingId = null, currentFilter = 'all';
-let compositionList = [];
+let allProducts = [], editingId = null, currentFilter = 'all', compositionList = [];
 
+/* ── AUTH ── */
 function checkAuth() {
   const user = JSON.parse(localStorage.getItem('user') || 'null');
-  if (!localStorage.getItem('tenantToken') && !localStorage.getItem('token')) { location.href='signup.html'; return; }
+  if (!localStorage.getItem('tenantToken') && !localStorage.getItem('token')) {
+    location.href = 'signup.html'; return;
+  }
   document.getElementById('navUser').textContent = user?.name || '';
 }
-function logout() { localStorage.clear(); location.href='signup.html'; }
-
+function logout() { localStorage.clear(); location.href = 'signup.html'; }
 function getToken() { return localStorage.getItem('tenantToken') || localStorage.getItem('token') || ''; }
-function authH(extra) { const t=getToken(); return t?{'Authorization':'Bearer '+t,...(extra||{})}:{...(extra||{})}; }
+function authH(extra) { const t = getToken(); return t ? { 'Authorization': 'Bearer ' + t, ...(extra || {}) } : { ...(extra || {}) }; }
 
+/* ── LOAD PRODUCTS ── */
 async function loadProducts() {
   try {
     const res = await fetch('/api/products', { headers: authH() });
@@ -452,36 +520,48 @@ async function loadProducts() {
     updateStats();
     renderTable();
   } catch(e) {
-    document.getElementById('productTable').innerHTML = '<tr><td colspan="9" style="text-align:center;padding:40px;color:#C0392B;">Error loading. Refresh karo.</td></tr>';
+    document.getElementById('productTable').innerHTML =
+      '<tr><td colspan="9" style="text-align:center;padding:40px;color:#C0392B;">Error loading. Refresh karo. (' + e.message + ')</td></tr>';
   }
 }
 
+/* ── STATS ── */
 function updateStats() {
   const now = new Date();
-  const in90 = new Date(); in90.setDate(now.getDate()+90);
+  const in90 = new Date(); in90.setDate(now.getDate() + 90);
+
   const low = allProducts.filter(p => {
-    const qty = p.sellType==='loose' ? (p.stripStock||0)*(p.unitsPerStrip||10)+(p.looseStock||0) : (p.stock||0);
-    return qty <= (p.minStock||10);
+    const qty = p.sellType === 'loose'
+      ? (p.stripStock || 0) * (p.unitsPerStrip || 10) + (p.looseStock || 0)
+      : (p.stock || 0);
+    return qty <= (p.minStock || 10);
   });
+
   const exp = allProducts.filter(p => {
     if (!p.expiry) return false;
     const parts = p.expiry.split('/');
     if (parts.length < 2) return false;
-    const d = new Date(parseInt('20'+parts[1]), parseInt(parts[0])-1, 28);
+    const d = new Date(parseInt('20' + parts[1]), parseInt(parts[0]) - 1, 28);
     return d >= now && d <= in90;
   });
-  const stockValue = allProducts.reduce((a,p) => {
-    const qty = p.sellType==='loose' ? (p.stripStock||0)*(p.unitsPerStrip||10)+(p.looseStock||0) : (p.stock||0);
-    return a + qty*(p.purchasePrice||0);
+
+  const stockValue = allProducts.reduce((a, p) => {
+    const qty = p.sellType === 'loose'
+      ? (p.stripStock || 0) * (p.unitsPerStrip || 10) + (p.looseStock || 0)
+      : (p.stock || 0);
+    return a + qty * (p.purchasePrice || 0);
   }, 0);
-  const fmcg = allProducts.filter(p => p.category==='fmcg');
+
+  const fmcg = allProducts.filter(p => p.category === 'fmcg');
+
   document.getElementById('st-total').textContent = allProducts.length;
-  document.getElementById('st-value').textContent = '₹'+(stockValue>=1000?(stockValue/1000).toFixed(1)+'K':stockValue.toFixed(0));
+  document.getElementById('st-value').textContent = '₹' + (stockValue >= 1000 ? (stockValue / 1000).toFixed(1) + 'K' : stockValue.toFixed(0));
   document.getElementById('st-low').textContent = low.length;
   document.getElementById('st-exp').textContent = exp.length;
   document.getElementById('st-fmcg').textContent = fmcg.length;
 }
 
+/* ── FILTER & RENDER ── */
 function setFilter(f, el) {
   currentFilter = f;
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -491,24 +571,32 @@ function setFilter(f, el) {
 function filterProducts() { renderTable(); }
 
 function renderTable() {
-  const q = document.getElementById('searchInput').value.toLowerCase();
+  const q = (document.getElementById('searchInput').value || '').toLowerCase();
   const now = new Date();
-  const in90 = new Date(); in90.setDate(now.getDate()+90);
+  const in90 = new Date(); in90.setDate(now.getDate() + 90);
 
   let products = allProducts.filter(p => {
-    if (q && !(p.name||'').toLowerCase().includes(q) && !(p.generic||'').toLowerCase().includes(q) && !(p.company||'').toLowerCase().includes(q) && !(p.composition||[]).join(' ').toLowerCase().includes(q)) return false;
-    const qty = p.sellType==='loose' ? (p.stripStock||0)*(p.unitsPerStrip||10)+(p.looseStock||0) : (p.stock||0);
+    if (q) {
+      const inName = (p.name || '').toLowerCase().includes(q);
+      const inGeneric = (p.generic || '').toLowerCase().includes(q);
+      const inCompany = (p.company || '').toLowerCase().includes(q);
+      const inComp = (p.composition || []).join(' ').toLowerCase().includes(q);
+      if (!inName && !inGeneric && !inCompany && !inComp) return false;
+    }
+    const qty = p.sellType === 'loose'
+      ? (p.stripStock || 0) * (p.unitsPerStrip || 10) + (p.looseStock || 0)
+      : (p.stock || 0);
     if (currentFilter === 'medicine') return p.category === 'medicine';
     if (currentFilter === 'fmcg') return p.category === 'fmcg';
     if (currentFilter === 'cosmetic') return p.category === 'cosmetic';
     if (currentFilter === 'surgical') return p.category === 'surgical';
     if (currentFilter === 'other') return p.category === 'other';
-    if (currentFilter === 'low') return qty <= (p.minStock||10);
+    if (currentFilter === 'low') return qty <= (p.minStock || 10);
     if (currentFilter === 'expiring') {
       if (!p.expiry) return false;
       const parts = p.expiry.split('/');
       if (parts.length < 2) return false;
-      const d = new Date(parseInt('20'+parts[1]), parseInt(parts[0])-1, 28);
+      const d = new Date(parseInt('20' + parts[1]), parseInt(parts[0]) - 1, 28);
       return d >= now && d <= in90;
     }
     return true;
@@ -516,67 +604,104 @@ function renderTable() {
 
   document.getElementById('tableCount').textContent = products.length + ' items';
   const tbody = document.getElementById('productTable');
+
   if (!products.length) {
-    tbody.innerHTML = `<tr><td colspan="9"><div class="empty-state"><div style="font-size:48px;margin-bottom:12px;">📦</div><p style="font-size:14px;">No items found</p></div></td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="9">
+      <div class="empty-state">
+        <div style="font-size:48px;margin-bottom:12px;">📦</div>
+        <p style="font-size:14px;">No items found</p>
+      </div>
+    </td></tr>`;
     return;
   }
 
-  tbody.innerHTML = products.map(p => {
-    const catBadge = {
-      medicine: '<span class="badge badge-med">Medicine</span>',
-      fmcg: '<span class="badge badge-fmcg">🛍️ FMCG</span>',
-      cosmetic: '<span class="badge badge-cosmetic">💄 Cosmetic</span>',
-      surgical: '<span class="badge badge-surgical">🏥 Surgical</span>',
-      other: '<span class="badge badge-other">📦 Other</span>'
-    }[p.category] || '<span class="badge badge-other">📦 Other</span>';
+  const catBadges = {
+    medicine: '<span class="badge badge-med">Medicine</span>',
+    fmcg: '<span class="badge badge-fmcg">🛍️ FMCG</span>',
+    cosmetic: '<span class="badge badge-cosmetic">💄 Cosmetic</span>',
+    surgical: '<span class="badge badge-surgical">🏥 Surgical</span>',
+    other: '<span class="badge badge-other">📦 Other</span>'
+  };
 
+  tbody.innerHTML = products.map(p => {
+    // Stock display
     let qty = 0, stockDisplay = '';
-    if (p.category==='medicine' && p.sellType==='loose') {
-      const strips=p.stripStock||0, loose=p.looseStock||0, ups=p.unitsPerStrip||10;
-      qty = strips*ups+loose;
-      stockDisplay = `<div class="stock-qty">${qty}</div><div class="stock-detail">${strips}s + ${loose} pills</div>`;
+    if (p.sellType === 'loose') {
+      const strips = p.stripStock || 0, loose = p.looseStock || 0, ups = p.unitsPerStrip || 10;
+      qty = strips * ups + loose;
+      stockDisplay = `<div class="stock-qty">${qty}</div><div class="stock-detail">${strips}s + ${loose} loose</div>`;
     } else {
-      qty = p.stock||0;
+      qty = p.stock || 0;
       stockDisplay = `<div class="stock-qty">${qty}</div><div class="stock-detail">units</div>`;
     }
 
-    const minStock = p.minStock||10;
-    let statusBadge = qty===0 ? '<span class="badge badge-out">Out of Stock</span>'
-      : qty<=minStock ? '<span class="badge badge-low">Low Stock</span>'
-      : '<span class="badge badge-ok">In Stock</span>';
+    // Status badge
+    const minStock = p.minStock || 10;
+    let statusBadge = '';
+    if (qty === 0) statusBadge = '<span class="badge badge-out">Out of Stock</span>';
+    else if (qty <= minStock) statusBadge = '<span class="badge badge-low">Low Stock</span>';
+    else statusBadge = '<span class="badge badge-ok">In Stock</span>';
 
-    let expiryDisplay = `<div>${p.batch||'-'}</div><div style="color:#b0bec5;font-size:11px;">No expiry</div>`;
+    // Expiry display
+    let expiryDisplay = `<div>${p.batch || '-'}</div><div style="color:#b0bec5;font-size:11px;">No expiry</div>`;
     if (p.expiry) {
       const parts = p.expiry.split('/');
       if (parts.length >= 2) {
-        const d = new Date(parseInt('20'+parts[1]), parseInt(parts[0])-1, 28);
+        const d = new Date(parseInt('20' + parts[1]), parseInt(parts[0]) - 1, 28);
         const isExp = d < now, isSoon = d >= now && d <= in90;
-        expiryDisplay = `<div>${p.batch||'-'}</div><div style="margin-top:3px;"><span class="badge ${isExp?'badge-exp':isSoon?'badge-soon':''}" style="${!isExp&&!isSoon?'background:transparent;color:#90a4ae;padding:0;':''}">${p.expiry}${isExp?' ⚠️':isSoon?' ⚡':''}</span></div>`;
+        expiryDisplay = `<div>${p.batch || '-'}</div>
+          <div style="margin-top:3px;">
+            <span class="badge ${isExp ? 'badge-exp' : isSoon ? 'badge-soon' : ''}"
+              style="${!isExp && !isSoon ? 'background:transparent;color:#90a4ae;padding:0;' : ''}">
+              ${p.expiry}${isExp ? ' ⚠️' : isSoon ? ' ⚡' : ''}
+            </span>
+          </div>`;
       }
     }
 
     // Composition display
-    const compDisplay = (p.composition||[]).length > 0
-      ? `<div style="font-size:11px;color:#7D3C98;margin-top:2px;">${p.composition.slice(0,2).join(' + ')}${p.composition.length>2?'...':''}</div>`
-      : p.generic ? `<div class="product-generic">${p.generic}</div>` : '';
+    let compDisplay = '';
+    if ((p.composition || []).length > 0) {
+      const shown = p.composition.slice(0, 2).join(' + ');
+      compDisplay = `<div style="font-size:11px;color:#7D3C98;margin-top:2px;">${shown}${p.composition.length > 2 ? '...' : ''}</div>`;
+    } else if (p.generic) {
+      compDisplay = `<div class="product-generic">${p.generic}</div>`;
+    }
+
+    // Per unit price display
+    let perUnitDisplay = '';
+    if (p.pricePerUnit) {
+      perUnitDisplay = `<div class="price-purchase">₹${p.pricePerUnit}/unit</div>`;
+    }
+
+    const catBadge = catBadges[p.category] || catBadges.other;
+    const subBtn = p.category === 'medicine'
+      ? `<button class="btn-sub" onclick="findSubstitute('${p._id}')">🔄 Sub</button>`
+      : '';
 
     return `<tr>
       <td>
         <div class="product-name">${p.name}</div>
         ${compDisplay}
-        ${p.rack?`<div style="font-size:11px;color:#b0bec5;margin-top:2px;">📍 ${p.rack}</div>`:''}
+        ${p.rack ? `<div style="font-size:11px;color:#b0bec5;margin-top:2px;">📍 ${p.rack}</div>` : ''}
       </td>
-      <td>${catBadge}<div style="font-size:12px;color:#78909c;margin-top:4px;">${p.company||'-'}</div></td>
+      <td>
+        ${catBadge}
+        <div class="product-company" style="margin-top:4px;">${p.company || '-'}</div>
+      </td>
       <td>${expiryDisplay}</td>
-      <td><div class="price">₹${p.mrp||0}</div></td>
-      <td><div class="price-sale">₹${p.salePrice||0}</div>${p.category==='medicine'&&p.pricePerUnit?`<div class="price-purchase">₹${p.pricePerUnit}/pill</div>`:''}</td>
-      <td><div class="price-purchase" style="font-size:13px;">₹${p.purchasePrice||0}</div></td>
+      <td><div class="price">₹${p.mrp || 0}</div></td>
+      <td>
+        <div class="price-sale">₹${p.salePrice || 0}</div>
+        ${perUnitDisplay}
+      </td>
+      <td><div class="price-purchase" style="font-size:13px;color:#546e7a;">₹${p.purchasePrice || 0}</div></td>
       <td>${stockDisplay}</td>
       <td>${statusBadge}</td>
       <td>
         <div class="action-btns">
           <button class="btn-edit" onclick="editProduct('${p._id}')">✏️ Edit</button>
-          ${p.category==='medicine'?`<button class="btn-sub" onclick="findSubstitute('${p._id}')">🔄 Sub</button>`:''}
+          ${subBtn}
           <button class="btn-del" onclick="deleteProduct('${p._id}')">🗑️</button>
         </div>
       </td>
@@ -584,270 +709,378 @@ function renderTable() {
   }).join('');
 }
 
-// ── DRUG TAGS ──
+/* ── DRUG TAGS ── */
 function addDrugTag() {
   const input = document.getElementById('drugTagInput');
-  const drug = (input.value||'').trim();
-  if(!drug) return;
-  if(compositionList.includes(drug)){input.value='';return;}
-  compositionList.push(drug);
-  renderTags();
-  input.value='';
+  const drug = (input.value || '').trim();
+  if (!drug) return;
+  if (!compositionList.includes(drug)) {
+    compositionList.push(drug);
+    renderTags();
+    document.getElementById('f_generic').value = compositionList.join(' + ');
+  }
+  input.value = '';
   input.focus();
-  document.getElementById('f_generic').value = compositionList.join(' + ');
 }
 function removeDrugTag(idx) {
-  compositionList.splice(idx,1);
+  compositionList.splice(idx, 1);
   renderTags();
   document.getElementById('f_generic').value = compositionList.join(' + ');
 }
 function renderTags() {
   const wrap = document.getElementById('compositionTags');
-  if(!wrap) return;
-  wrap.innerHTML = compositionList.map((d,i) =>
+  if (!wrap) return;
+  wrap.innerHTML = compositionList.map((d, i) =>
     `<span class="drug-tag">${d}<span class="tag-x" onclick="removeDrugTag(${i})">×</span></span>`
   ).join('');
 }
 function resetTags() {
-  compositionList=[];
+  compositionList = [];
   renderTags();
-  const inp=document.getElementById('drugTagInput');if(inp)inp.value='';
-  const hid=document.getElementById('f_generic');if(hid)hid.value='';
+  const inp = document.getElementById('drugTagInput'); if (inp) inp.value = '';
+  const hid = document.getElementById('f_generic'); if (hid) hid.value = '';
 }
 
-// ── FIND SUBSTITUTE ──
+/* ── CATEGORY CHANGE ── */
+function onCategoryChange() {
+  const cat = document.getElementById('f_category').value;
+
+  // Drug composition — medicine only
+  const cs = document.getElementById('compositionSection');
+  if (cs) cs.style.display = cat === 'medicine' ? 'contents' : 'none';
+
+  // Sell type sections
+  const medSell = document.getElementById('medSellSection');
+  const othSell = document.getElementById('otherSellSection');
+  if (medSell) medSell.style.display = cat === 'medicine' ? 'contents' : 'none';
+  if (othSell) othSell.style.display = cat !== 'medicine' ? 'block' : 'none';
+
+  // Auto GST
+  const gstMap = { medicine: '0', fmcg: '5', cosmetic: '18', surgical: '12', other: '0' };
+  document.getElementById('f_gst').value = gstMap[cat] || '0';
+
+  // Update MRP label
+  const mrpLabel = document.querySelector('label[for-mrp]') || document.querySelector('#f_mrp')?.closest('.form-group')?.querySelector('label');
+  if (mrpLabel) mrpLabel.textContent = cat === 'medicine' ? 'MRP / Strip Price (₹) *' : 'MRP (₹) *';
+
+  onSellTypeChange();
+}
+
+/* ── MEDICINE SELL TYPE CHANGE ── */
+function onSellTypeChange() {
+  const cat = document.getElementById('f_category').value;
+  if (cat !== 'medicine') return;
+
+  const type = document.getElementById('f_sellType').value;
+  const info = document.getElementById('stripInfoBox');
+  const looseStockFld = document.getElementById('looseStockField');
+  const stripStockFld = document.getElementById('stripStockField');
+
+  // Info box
+  if (info) info.style.display = type === 'both' ? 'block' : 'none';
+
+  // Strip stock visible for strip + both
+  if (stripStockFld) stripStockFld.style.display = (type === 'strip' || type === 'both') ? 'flex' : 'none';
+
+  // Loose stock visible for loose + both
+  if (looseStockFld) looseStockFld.style.display = (type === 'loose' || type === 'both') ? 'flex' : 'none';
+
+  calcPillPrice();
+}
+
+/* ── OTHER CATEGORY SELL TYPE ── */
+function onOtherSellTypeChange() {
+  const type = document.getElementById('f_otherSellType').value;
+  const packCalc = document.getElementById('packCalcFields');
+
+  // Show per-unit calc for bottle/box
+  if (packCalc) {
+    packCalc.style.display = ['bottle', 'box', 'unit'].includes(type) ? 'block' : 'none';
+  }
+
+  const lblMap = { bottle: 'ml / Units Per Bottle', box: 'Units Per Box/Packet', unit: 'Sub-units Per Unit' };
+  const lbl = document.getElementById('packUnitsLabel');
+  if (lbl) lbl.textContent = lblMap[type] || 'Units Per Pack';
+}
+
+/* ── PILL PRICE CALCULATOR ── */
+function calcPillPrice() {
+  const mrp = parseFloat(document.getElementById('f_mrp').value) || 0;
+  const ups = parseInt(document.getElementById('f_unitsPerStrip').value) || 10;
+  const el = document.getElementById('f_pricePerUnit');
+  if (el && mrp && ups) {
+    el.value = (mrp / ups).toFixed(2);
+  }
+}
+
+function calcUnitPrice() { calcPillPrice(); }
+
+function calcPackUnitPrice() {
+  const mrp = parseFloat(document.getElementById('f_mrp').value) || 0;
+  const units = parseInt(document.getElementById('f_packUnits')?.value) || 1;
+  const el = document.getElementById('f_packUnitPrice');
+  if (el && mrp && units) el.value = (mrp / units).toFixed(2);
+}
+
+/* ── MODAL OPEN/CLOSE ── */
+function openModal(reset = true) {
+  if (reset) {
+    editingId = null;
+    document.getElementById('modalTitle').textContent = '➕ Add New Item';
+    ['f_name','f_company','f_batch','f_expiry','f_mrp','f_purchase','f_sale',
+     'f_stock','f_min','f_hsn','f_rack','f_looseStock','f_pricePerUnit',
+     'f_packUnits','f_packUnitPrice'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+    document.getElementById('f_gst').value = '0';
+    document.getElementById('f_unitsPerStrip').value = '10';
+    document.getElementById('f_stripStock').value = '0';
+    const pu = document.getElementById('f_packUnits'); if(pu) pu.value = '1';
+    document.getElementById('f_category').value = 'medicine';
+    document.getElementById('f_sellType').value = 'strip';
+    resetTags();
+    onCategoryChange();
+  }
+  document.getElementById('modalBg').classList.add('show');
+}
+function closeModal() {
+  document.getElementById('modalBg').classList.remove('show');
+  editingId = null;
+}
+
+/* ── EDIT PRODUCT ── */
+function editProduct(id) {
+  const p = allProducts.find(x => x._id === id);
+  if (!p) return;
+  editingId = id;
+  document.getElementById('modalTitle').textContent = '✏️ Edit Item';
+  document.getElementById('f_category').value = p.category || 'medicine';
+  document.getElementById('f_name').value = p.name || '';
+  document.getElementById('f_company').value = p.company || '';
+  document.getElementById('f_batch').value = p.batch || '';
+  document.getElementById('f_expiry').value = p.expiry || '';
+  document.getElementById('f_mrp').value = p.mrp || '';
+  document.getElementById('f_purchase').value = p.purchasePrice || '';
+  document.getElementById('f_sale').value = p.salePrice || '';
+  document.getElementById('f_stock').value = p.stock || 0;
+  document.getElementById('f_min').value = p.minStock || 10;
+  document.getElementById('f_gst').value = p.gst !== undefined ? p.gst : 0;
+  document.getElementById('f_hsn').value = p.hsnCode || p.hsn || '';
+  document.getElementById('f_rack').value = p.rack || '';
+  document.getElementById('f_sellType').value = p.sellType || 'piece';
+  document.getElementById('f_unitsPerStrip').value = p.unitsPerStrip || 10;
+  document.getElementById('f_stripStock').value = p.stripStock || 0;
+  document.getElementById('f_looseStock').value = p.looseStock || 0;
+  document.getElementById('f_pricePerUnit').value = p.pricePerUnit || 0;
+  document.getElementById('f_packUnits').value = p.packUnits || 1;
+  document.getElementById('f_packUnitPrice').value = p.packUnitPrice || 0;
+
+  // Load composition
+  compositionList = Array.isArray(p.composition) && p.composition.length > 0
+    ? [...p.composition]
+    : p.generic ? [p.generic] : [];
+  renderTags();
+  document.getElementById('f_generic').value = compositionList.join(' + ');
+
+  // Other sell type
+  const otherST = document.getElementById('f_otherSellType');
+  if (otherST && p.category !== 'medicine') {
+    otherST.value = p.sellType || 'piece';
+  }
+
+  onCategoryChange();
+  openModal(false);
+}
+
+/* ── SAVE PRODUCT ── */
+async function saveProduct() {
+  const name = (document.getElementById('f_name').value || '').trim();
+  const mrp = parseFloat(document.getElementById('f_mrp').value) || 0;
+  const salePrice = parseFloat(document.getElementById('f_sale').value) || 0;
+  if (!name) { alert('Item name zaroori hai!'); return; }
+  if (!mrp) { alert('MRP zaroori hai!'); return; }
+  if (!salePrice) { alert('Sale price zaroori hai!'); return; }
+
+  const data = {
+    name,
+    category: document.getElementById('f_category').value,
+    company: document.getElementById('f_company').value,
+    batch: document.getElementById('f_batch').value,
+    expiry: document.getElementById('f_expiry').value,
+    mrp,
+    salePrice,
+    purchasePrice: parseFloat(document.getElementById('f_purchase').value) || 0,
+    stock: parseInt(document.getElementById('f_stock').value) || 0,
+    minStock: parseInt(document.getElementById('f_min').value) || 10,
+    gst: parseInt(document.getElementById('f_gst').value) || 0,
+    hsnCode: document.getElementById('f_hsn').value,
+    rack: document.getElementById('f_rack').value,
+    sellType: (document.getElementById('f_category').value === 'medicine'
+      ? document.getElementById('f_sellType').value
+      : (document.getElementById('f_otherSellType')?.value || 'piece')),
+    unitsPerStrip: parseInt(document.getElementById('f_unitsPerStrip').value) || 10,
+    stripStock: parseInt(document.getElementById('f_stripStock').value) || 0,
+    looseStock: parseInt(document.getElementById('f_looseStock').value) || 0,
+    pricePerUnit: parseFloat(document.getElementById('f_pricePerUnit').value) || 0,
+    packUnits: parseInt(document.getElementById('f_packUnits').value) || 1,
+    packUnitPrice: parseFloat(document.getElementById('f_packUnitPrice').value) || 0,
+    composition: compositionList,
+    generic: compositionList.join(' + ')
+  };
+
+  try {
+    const url = editingId ? `/api/products/${editingId}` : '/api/products';
+    const method = editingId ? 'PUT' : 'POST';
+    const res = await fetch(url, {
+      method,
+      headers: authH({ 'Content-Type': 'application/json' }),
+      body: JSON.stringify(data)
+    });
+    if (res.ok) {
+      closeModal();
+      loadProducts();
+    } else {
+      const r = await res.json();
+      alert('Error: ' + (r.message || 'Something went wrong'));
+    }
+  } catch(e) { alert('Server error: ' + e.message); }
+}
+
+/* ── DELETE PRODUCT ── */
+async function deleteProduct(id) {
+  if (!confirm('Delete karna chahte ho? Stock bhi remove ho jaayega.')) return;
+  try {
+    await fetch(`/api/products/${id}`, { method: 'DELETE', headers: authH() });
+    loadProducts();
+  } catch(e) { alert('Server error!'); }
+}
+
+/* ── FIND SUBSTITUTE (from product row) ── */
 function findSubstitute(id) {
-  const current = allProducts.find(p=>p._id===id);
-  if(!current){alert('Product not found!');return;}
+  const current = allProducts.find(p => p._id === id);
+  if (!current) { alert('Product not found!'); return; }
 
-  const myDrugs = (current.composition||[]).length>0
-    ? current.composition.map(d=>d.toLowerCase().split(' ')[0].trim())
-    : (current.generic||'').toLowerCase().split('+').map(d=>d.trim().split(' ')[0]).filter(Boolean);
+  const myDrugs = (current.composition || []).length > 0
+    ? current.composition.map(d => d.toLowerCase().split(' ')[0].trim())
+    : (current.generic || '').toLowerCase().split('+').map(d => d.trim().split(' ')[0]).filter(Boolean);
 
-  if(!myDrugs.length){
-    alert('Is product mein composition nahi hai.\nEdit karo aur drugs add karo.');return;
+  if (!myDrugs.length) {
+    alert('Is product mein composition nahi hai.\nEdit karo aur drugs add karo.');
+    return;
   }
 
   const results = allProducts
-    .filter(p=>p._id!==id && p.category==='medicine')
-    .map(p=>{
-      const pDrugs=(p.composition||[]).length>0
-        ? p.composition.map(d=>d.toLowerCase().split(' ')[0].trim())
-        : (p.generic||'').toLowerCase().split('+').map(d=>d.trim().split(' ')[0]).filter(Boolean);
-      const matched=myDrugs.filter(d=>pDrugs.some(pd=>pd.includes(d)||d.includes(pd)));
-      return{...p,matchCount:matched.length,pDrugsArr:(p.composition||[])};
+    .filter(p => p._id !== id && p.category === 'medicine')
+    .map(p => {
+      const pDrugs = (p.composition || []).length > 0
+        ? p.composition.map(d => d.toLowerCase().split(' ')[0].trim())
+        : (p.generic || '').toLowerCase().split('+').map(d => d.trim().split(' ')[0]).filter(Boolean);
+      const matched = myDrugs.filter(d => pDrugs.some(pd => pd.includes(d) || d.includes(pd)));
+      return { ...p, matchCount: matched.length, pDrugsArr: p.composition || [] };
     })
-    .filter(p=>p.matchCount>0)
-    .sort((a,b)=>b.matchCount-a.matchCount);
+    .filter(p => p.matchCount > 0)
+    .sort((a, b) => b.matchCount - a.matchCount);
 
-  document.getElementById('subCurrentName').textContent=current.name;
-  document.getElementById('subCurrentComp').textContent=
-    (current.composition||[]).length>0?current.composition.join(' + '):(current.generic||'—');
+  document.getElementById('subCurrentName').textContent = current.name;
+  document.getElementById('subCurrentComp').textContent =
+    (current.composition || []).length > 0
+      ? current.composition.join(' + ')
+      : (current.generic || '—');
 
-  const content=document.getElementById('subContent');
-  if(!results.length){
-    content.innerHTML=`<div style="text-align:center;padding:30px;color:#b0bec5;"><div style="font-size:40px;margin-bottom:10px;">🔍</div><p style="font-weight:700;">Stock mein koi substitute nahi mila</p><p style="font-size:12px;margin-top:6px;">Same composition wali medicines add karo</p></div>`;
-  } else {
-    content.innerHTML=results.map(p=>{
-      const qty=p.sellType==='loose'?(p.stripStock||0)*(p.unitsPerStrip||10)+(p.looseStock||0):(p.stock||0);
-      const inStock=qty>0;
-      const isFullMatch=p.matchCount>=myDrugs.length;
-      return `<div style="padding:14px 16px;border-bottom:1px solid #f0f4f8;" class="${isFullMatch?'sub-full':'sub-partial'}">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">
-          <div style="flex:1;">
-            <div style="font-weight:800;font-size:14px;color:#1a2332;">${p.name}</div>
-            <div style="margin-top:5px;display:flex;flex-wrap:wrap;gap:4px;">
-              ${p.pDrugsArr.length>0?p.pDrugsArr.map(d=>{
-                const isMatch=myDrugs.some(md=>d.toLowerCase().includes(md)||md.includes(d.toLowerCase().split(' ')[0]));
-                return `<span style="background:${isMatch?'#EAFAF1':'#f0f4f8'};color:${isMatch?'#1E8449':'#78909c'};padding:3px 8px;border-radius:10px;font-size:11px;font-weight:700;">${isMatch?'✅ ':''}${d}</span>`;
-              }).join(''):p.generic?`<span style="font-size:12px;color:#78909c;">${p.generic}</span>`:''}
-            </div>
-            <div style="font-size:11px;color:#90a4ae;margin-top:4px;">${p.company||''}</div>
-          </div>
-          <div style="text-align:right;flex-shrink:0;">
-            <div style="font-weight:800;color:#1a3a6b;font-size:15px;">₹${p.mrp||0}</div>
-            <div style="margin-top:5px;">
-              ${inStock?`<span style="background:#EAFAF1;color:#1E8449;padding:3px 10px;border-radius:10px;font-size:11px;font-weight:700;">✅ ${qty} stock</span>`:`<span style="background:#FDEDEC;color:#C0392B;padding:3px 10px;border-radius:10px;font-size:11px;font-weight:700;">❌ Out</span>`}
-            </div>
-            <div style="font-size:11px;color:#78909c;margin-top:3px;">${p.matchCount}/${myDrugs.length} match</div>
-          </div>
-        </div>
+  const content = document.getElementById('subContent');
+  if (!results.length) {
+    content.innerHTML = `
+      <div style="text-align:center;padding:30px;color:#b0bec5;">
+        <div style="font-size:40px;margin-bottom:10px;">🔍</div>
+        <p style="font-weight:700;">Stock mein koi substitute nahi mila</p>
+        <p style="font-size:12px;margin-top:6px;">Same composition wali medicines add karo</p>
       </div>`;
+  } else {
+    content.innerHTML = results.map(p => {
+      const qty = p.sellType === 'loose'
+        ? (p.stripStock || 0) * (p.unitsPerStrip || 10) + (p.looseStock || 0)
+        : (p.stock || 0);
+      const inStock = qty > 0;
+      const isFullMatch = p.matchCount >= myDrugs.length;
+
+      const drugsHtml = p.pDrugsArr.map(d => {
+        const isMatch = myDrugs.some(md => d.toLowerCase().includes(md) || md.includes(d.toLowerCase().split(' ')[0]));
+        return `<span style="background:${isMatch ? '#EAFAF1' : '#f0f4f8'};color:${isMatch ? '#1E8449' : '#78909c'};padding:2px 8px;border-radius:8px;font-size:11px;font-weight:700;">${isMatch ? '✅ ' : ''}${d}</span>`;
+      }).join(' ');
+
+      return `
+        <div style="padding:14px 16px;border-bottom:1px solid #f0f4f8;" class="${isFullMatch ? 'sub-full' : 'sub-partial'}">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">
+            <div style="flex:1;">
+              <div style="font-weight:800;font-size:14px;color:#1a2332;">${p.name}</div>
+              <div style="margin-top:5px;display:flex;flex-wrap:wrap;gap:4px;">${drugsHtml}</div>
+              <div style="font-size:11px;color:#90a4ae;margin-top:4px;">${p.company || ''}</div>
+            </div>
+            <div style="text-align:right;flex-shrink:0;">
+              <div style="font-weight:800;color:#1a3a6b;font-size:15px;">₹${p.mrp || 0}</div>
+              <div style="margin-top:5px;">
+                ${inStock
+                  ? `<span style="background:#EAFAF1;color:#1E8449;padding:3px 10px;border-radius:10px;font-size:11px;font-weight:700;">✅ ${qty} stock</span>`
+                  : `<span style="background:#FDEDEC;color:#C0392B;padding:3px 10px;border-radius:10px;font-size:11px;font-weight:700;">❌ Out</span>`}
+              </div>
+              <div style="font-size:11px;color:#78909c;margin-top:3px;">${p.matchCount}/${myDrugs.length} match</div>
+            </div>
+          </div>
+        </div>`;
     }).join('');
   }
   document.getElementById('subModal').classList.add('show');
 }
 
-// ── MODAL ──
-function onCategoryChange() {
-  const cat=document.getElementById('f_category').value;
-  document.getElementById('medicineFields').style.display=cat==='medicine'?'contents':'none';
-  if(cat==='fmcg')document.getElementById('f_gst').value='5';
-  else if(cat==='cosmetic')document.getElementById('f_gst').value='18';
-  else if(cat==='other'||cat==='surgical')document.getElementById('f_gst').value='12';
-}
-function onSellTypeChange() {
-  const type=document.getElementById('f_sellType').value;
-  const sf=document.getElementById('stripFields');
-  const info=document.getElementById('stripInfoBox');
-  if(type==='loose'){sf.style.display='contents';info.style.display='block';}
-  else if(type==='strip'){sf.style.display='contents';info.style.display='none';}
-  else{sf.style.display='none';}
-}
-function calcUnitPrice() {
-  const mrp=parseFloat(document.getElementById('f_mrp').value)||0;
-  const ups=parseInt(document.getElementById('f_unitsPerStrip').value)||10;
-  if(mrp&&ups)document.getElementById('f_pricePerUnit').value=(mrp/ups).toFixed(2);
-}
-
-function openModal(reset=true) {
-  if(reset){
-    editingId=null;
-    document.getElementById('modalTitle').textContent='➕ Add New Item';
-    ['f_name','f_company','f_batch','f_expiry','f_mrp','f_purchase','f_sale','f_stock','f_min','f_hsn','f_rack','f_stripStock','f_looseStock','f_pricePerUnit'].forEach(id=>{
-      const el=document.getElementById(id);if(el)el.value='';
-    });
-    document.getElementById('f_gst').value='0';
-    document.getElementById('f_unitsPerStrip').value='10';
-    document.getElementById('f_category').value='medicine';
-    document.getElementById('f_sellType').value='strip';
-    resetTags();
-    onCategoryChange();onSellTypeChange();
-  }
-  document.getElementById('modalBg').classList.add('show');
-}
-function closeModal(){document.getElementById('modalBg').classList.remove('show');editingId=null;}
-
-function editProduct(id) {
-  const p=allProducts.find(x=>x._id===id);if(!p)return;
-  editingId=id;
-  document.getElementById('modalTitle').textContent='✏️ Edit Item';
-  document.getElementById('f_category').value=p.category||'medicine';
-  document.getElementById('f_name').value=p.name||'';
-  document.getElementById('f_company').value=p.company||'';
-  document.getElementById('f_batch').value=p.batch||'';
-  document.getElementById('f_expiry').value=p.expiry||'';
-  document.getElementById('f_mrp').value=p.mrp||'';
-  document.getElementById('f_purchase').value=p.purchasePrice||'';
-  document.getElementById('f_sale').value=p.salePrice||'';
-  document.getElementById('f_stock').value=p.stock||0;
-  document.getElementById('f_min').value=p.minStock||10;
-  document.getElementById('f_gst').value=p.gst!==undefined?p.gst:0;
-  document.getElementById('f_hsn').value=p.hsnCode||p.hsn||'';
-  document.getElementById('f_rack').value=p.rack||'';
-  document.getElementById('f_sellType').value=p.sellType||'strip';
-  document.getElementById('f_unitsPerStrip').value=p.unitsPerStrip||10;
-  document.getElementById('f_stripStock').value=p.stripStock||0;
-  document.getElementById('f_looseStock').value=p.looseStock||0;
-  document.getElementById('f_pricePerUnit').value=p.pricePerUnit||0;
-
-  // Load composition tags
-  compositionList=Array.isArray(p.composition)&&p.composition.length>0
-    ? [...p.composition]
-    : p.generic?[p.generic]:[];
-  renderTags();
-  document.getElementById('f_generic').value=compositionList.join(' + ');
-
-  onCategoryChange();onSellTypeChange();
-  openModal(false);
-}
-
-async function saveProduct() {
-  const name=document.getElementById('f_name').value.trim();
-  const mrp=parseFloat(document.getElementById('f_mrp').value)||0;
-  const salePrice=parseFloat(document.getElementById('f_sale').value)||0;
-  if(!name){alert('Item name zaroori hai!');return;}
-  if(!mrp){alert('MRP zaroori hai!');return;}
-  if(!salePrice){alert('Sale price zaroori hai!');return;}
-
-  const data={
-    name,
-    category:document.getElementById('f_category').value,
-    company:document.getElementById('f_company').value,
-    batch:document.getElementById('f_batch').value,
-    expiry:document.getElementById('f_expiry').value,
-    mrp,salePrice,
-    purchasePrice:parseFloat(document.getElementById('f_purchase').value)||0,
-    stock:parseInt(document.getElementById('f_stock').value)||0,
-    minStock:parseInt(document.getElementById('f_min').value)||10,
-    gst:parseInt(document.getElementById('f_gst').value)||0,
-    hsnCode:document.getElementById('f_hsn').value,
-    rack:document.getElementById('f_rack').value,
-    sellType:document.getElementById('f_sellType').value,
-    unitsPerStrip:parseInt(document.getElementById('f_unitsPerStrip').value)||10,
-    stripStock:parseInt(document.getElementById('f_stripStock').value)||0,
-    looseStock:parseInt(document.getElementById('f_looseStock').value)||0,
-    pricePerUnit:parseFloat(document.getElementById('f_pricePerUnit').value)||0,
-    composition:compositionList,
-    generic:compositionList.join(' + ')
-  };
-
-  try{
-    const url=editingId?`/api/products/${editingId}`:'/api/products';
-    const method=editingId?'PUT':'POST';
-    const res=await fetch(url,{method,headers:authH({'Content-Type':'application/json'}),body:JSON.stringify(data)});
-    if(res.ok){closeModal();loadProducts();}
-    else{const r=await res.json();alert('Error: '+(r.message||'Something went wrong'));}
-  }catch(e){alert('Server error!');}
-}
-
-async function deleteProduct(id) {
-  if(!confirm('Delete karna chahte ho?'))return;
-  try{
-    await fetch(`/api/products/${id}`,{method:'DELETE',headers:authH()});
-    loadProducts();
-  }catch(e){alert('Server error!');}
-}
-
-document.getElementById('modalBg').addEventListener('click',e=>{if(e.target===document.getElementById('modalBg'))closeModal();});
-const _sm=document.getElementById('subModal');if(_sm)_sm.addEventListener('click',e=>{if(e.target===_sm)_sm.classList.remove('show');});
-
-checkAuth();
-loadProducts();
-
-// ── SUBSTITUTE SEARCH ──
-function openSubSearch(){
-  document.getElementById('subSearchInput').value='';
-  document.getElementById('subSearchResults').innerHTML=`
+/* ── STANDALONE SUBSTITUTE SEARCH ── */
+function openSubSearch() {
+  document.getElementById('subSearchInput').value = '';
+  document.getElementById('subSearchResults').innerHTML = `
     <div style="text-align:center;padding:30px;color:#b0bec5;">
       <div style="font-size:36px;margin-bottom:8px;">🔍</div>
       <p>Medicine ya drug name type karo</p>
     </div>`;
   document.getElementById('subSearchModal').classList.add('show');
-  setTimeout(()=>document.getElementById('subSearchInput').focus(),200);
+  setTimeout(() => document.getElementById('subSearchInput').focus(), 200);
 }
-function closeSubSearch(){document.getElementById('subSearchModal').classList.remove('show');}
+function closeSubSearch() {
+  document.getElementById('subSearchModal').classList.remove('show');
+}
 
-function runSubSearch(){
-  const q=(document.getElementById('subSearchInput').value||'').trim().toLowerCase();
-  const results=document.getElementById('subSearchResults');
-  if(q.length<2){
-    results.innerHTML='<div style="text-align:center;padding:20px;color:#b0bec5;">Kam se kam 2 characters type karo</div>';
+function runSubSearch() {
+  const q = (document.getElementById('subSearchInput').value || '').trim().toLowerCase();
+  const results = document.getElementById('subSearchResults');
+
+  if (q.length < 2) {
+    results.innerHTML = '<div style="text-align:center;padding:20px;color:#b0bec5;">Kam se kam 2 characters type karo</div>';
     return;
   }
-  const qWords=q.split(/[\s+,]+/).filter(w=>w.length>1);
-  const matches=allProducts
-    .filter(p=>p.category==='medicine')
-    .map(p=>{
-      let score=0;
-      const name=(p.name||'').toLowerCase();
-      const generic=(p.generic||'').toLowerCase();
-      const comp=(p.composition||[]).join(' ').toLowerCase();
-      if(name.includes(q))score+=4;
-      if(generic.includes(q))score+=3;
-      if(comp.includes(q))score+=3;
-      qWords.forEach(w=>{
-        if(name.includes(w))score+=2;
-        if(generic.includes(w))score+=1;
-        if(comp.includes(w))score+=1;
-      });
-      return{...p,score};
-    })
-    .filter(p=>p.score>0)
-    .sort((a,b)=>b.score-a.score);
 
-  if(!matches.length){
-    results.innerHTML=`
+  const qWords = q.split(/[\s+,]+/).filter(w => w.length > 1);
+
+  const matches = allProducts
+    .filter(p => p.category === 'medicine')
+    .map(p => {
+      let score = 0;
+      const name = (p.name || '').toLowerCase();
+      const generic = (p.generic || '').toLowerCase();
+      const comp = (p.composition || []).join(' ').toLowerCase();
+      if (name.includes(q)) score += 4;
+      if (generic.includes(q)) score += 3;
+      if (comp.includes(q)) score += 3;
+      qWords.forEach(w => {
+        if (name.includes(w)) score += 2;
+        if (generic.includes(w)) score += 1;
+        if (comp.includes(w)) score += 1;
+      });
+      return { ...p, score };
+    })
+    .filter(p => p.score > 0)
+    .sort((a, b) => b.score - a.score);
+
+  if (!matches.length) {
+    results.innerHTML = `
       <div style="text-align:center;padding:30px;color:#b0bec5;">
         <div style="font-size:36px;margin-bottom:8px;">😕</div>
         <p style="font-weight:700;">Koi match nahi mila</p>
@@ -856,37 +1089,54 @@ function runSubSearch(){
     return;
   }
 
-  results.innerHTML=matches.map(p=>{
-    const qty=p.sellType==='loose'?(p.stripStock||0)*(p.unitsPerStrip||10)+(p.looseStock||0):(p.stock||0);
-    const inStock=qty>0;
-    const compDisplay=(p.composition||[]).length>0
-      ?p.composition.map(d=>{
-        const isMatch=qWords.some(w=>d.toLowerCase().includes(w))||d.toLowerCase().includes(q);
-        return `<span style="background:${isMatch?'#EAFAF1':'#f0f4f8'};color:${isMatch?'#1E8449':'#78909c'};padding:2px 8px;border-radius:8px;font-size:11px;font-weight:700;">${isMatch?'✅ ':''}${d}</span>`;
-      }).join(' ')
-      :p.generic?`<span style="font-size:12px;color:#78909c;">${p.generic}</span>`:'';
+  results.innerHTML = matches.map(p => {
+    const qty = p.sellType === 'loose'
+      ? (p.stripStock || 0) * (p.unitsPerStrip || 10) + (p.looseStock || 0)
+      : (p.stock || 0);
+    const inStock = qty > 0;
 
-    return `<div style="padding:14px 16px;border-bottom:1px solid #f5f7fa;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">
-      <div style="flex:1;">
-        <div style="font-weight:800;font-size:14px;color:#1a2332;">${p.name}</div>
-        <div style="margin-top:5px;display:flex;flex-wrap:wrap;gap:4px;">${compDisplay}</div>
-        <div style="font-size:11px;color:#90a4ae;margin-top:4px;">${p.company||''}</div>
-      </div>
-      <div style="text-align:right;flex-shrink:0;">
-        <div style="font-weight:800;color:#1a3a6b;font-size:15px;">₹${p.mrp||0}</div>
-        <div style="margin-top:4px;">
-          ${inStock
-            ?`<span style="background:#EAFAF1;color:#1E8449;padding:3px 10px;border-radius:10px;font-size:11px;font-weight:700;">✅ ${qty} stock</span>`
-            :`<span style="background:#FDEDEC;color:#C0392B;padding:3px 10px;border-radius:10px;font-size:11px;font-weight:700;">❌ Out</span>`}
+    const compDisplay = (p.composition || []).length > 0
+      ? p.composition.map(d => {
+          const isMatch = qWords.some(w => d.toLowerCase().includes(w)) || d.toLowerCase().includes(q);
+          return `<span style="background:${isMatch ? '#EAFAF1' : '#f0f4f8'};color:${isMatch ? '#1E8449' : '#78909c'};padding:2px 8px;border-radius:8px;font-size:11px;font-weight:700;">${isMatch ? '✅ ' : ''}${d}</span>`;
+        }).join(' ')
+      : p.generic ? `<span style="font-size:12px;color:#78909c;">${p.generic}</span>` : '';
+
+    return `
+      <div style="padding:14px 16px;border-bottom:1px solid #f5f7fa;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">
+        <div style="flex:1;">
+          <div style="font-weight:800;font-size:14px;color:#1a2332;">${p.name}</div>
+          <div style="margin-top:5px;display:flex;flex-wrap:wrap;gap:4px;">${compDisplay}</div>
+          <div style="font-size:11px;color:#90a4ae;margin-top:4px;">${p.company || ''}</div>
         </div>
-        <div style="font-size:11px;color:#78909c;margin-top:3px;">₹${p.salePrice||p.mrp||0} sale</div>
-      </div>
-    </div>`;
+        <div style="text-align:right;flex-shrink:0;">
+          <div style="font-weight:800;color:#1a3a6b;font-size:15px;">₹${p.mrp || 0}</div>
+          <div style="margin-top:4px;">
+            ${inStock
+              ? `<span style="background:#EAFAF1;color:#1E8449;padding:3px 10px;border-radius:10px;font-size:11px;font-weight:700;">✅ ${qty} stock</span>`
+              : `<span style="background:#FDEDEC;color:#C0392B;padding:3px 10px;border-radius:10px;font-size:11px;font-weight:700;">❌ Out</span>`}
+          </div>
+          <div style="font-size:11px;color:#78909c;margin-top:3px;">₹${p.salePrice || p.mrp || 0} sale</div>
+        </div>
+      </div>`;
   }).join('');
 }
 
-// subSearchModal listener added after DOM loads
-const _ssm=document.getElementById('subSearchModal');if(_ssm)_ssm.addEventListener('click',e=>{if(e.target===_ssm)closeSubSearch();});
+/* ── EVENT LISTENERS ── */
+document.getElementById('modalBg').addEventListener('click', e => {
+  if (e.target === document.getElementById('modalBg')) closeModal();
+});
+document.getElementById('subModal').addEventListener('click', e => {
+  if (e.target === document.getElementById('subModal'))
+    document.getElementById('subModal').classList.remove('show');
+});
+document.getElementById('subSearchModal').addEventListener('click', e => {
+  if (e.target === document.getElementById('subSearchModal')) closeSubSearch();
+});
+
+/* ── INIT ── */
+checkAuth();
+loadProducts();
 </script>
 </body>
 </html>

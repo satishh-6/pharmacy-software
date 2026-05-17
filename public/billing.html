@@ -8,20 +8,20 @@
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
   body { font-family:'Segoe UI',sans-serif; background:#eef2f7; }
-  .navbar { background:#ffffff; color:white; padding:0 24px; display:flex; align-items:center; height:60px; position:fixed; width:100%; top:0; z-index:100; box-shadow:0 2px 16px rgba(0,0,0,0.08); }
-  .navbar h1 { font-size:22px; font-weight:900; flex:1; display:flex; align-items:center; gap:6px; white-space:nowrap; letter-spacing:-0.5px; }
-  .navbar h1 .dawa { color:#ffffff; }
-  .navbar h1 .hisaab { color:#4ade80; }
-  .navbar h1 { white-space: nowrap; display:flex; align-items:center; gap:6px; }
+  .navbar { background:#ffffff; color:#1a2332; padding:0 24px; display:flex; align-items:center; height:60px; position:fixed; width:100%; top:0; z-index:100; box-shadow:0 2px 16px rgba(0,0,0,0.08); border-bottom:1px solid #e2e8f0; }
+  .navbar h1 { font-size:26px; font-weight:900; flex:1; display:flex; align-items:center; gap:6px; white-space:nowrap; }
+  .navbar h1 .dawa { color:#1a3a6b; }
+  .navbar h1 .hisaab { color:#1e6b3a; }
   .nav-right { display:flex; align-items:center; gap:10px; }
   .nav-badge { background:#f0f4f8; padding:6px 14px; border-radius:20px; font-size:12px; cursor:pointer; color:#1a2332; border:1px solid #e2e8f0; }
-  .nav-badge:hover { background:rgba(255,255,255,0.25); }
-  .btn-logout { background:transparent; border:1.5px solid rgba(255,255,255,0.5); color:white; padding:7px 16px; border-radius:8px; cursor:pointer; font-size:13px; font-weight:600; }
+  .nav-badge:hover { background:#e2e8f0; }
+  .btn-logout { background:transparent; border:1.5px solid #d0d7de; color:#1a2332; padding:7px 16px; border-radius:8px; cursor:pointer; font-size:13px; font-weight:600; }
+  .btn-logout:hover { background:#f0f4f8; }
   .sidebar { position:fixed; left:0; top:60px; width:225px; height:calc(100vh - 60px); background:white; border-right:1px solid #e2e8f0; padding:16px 0; overflow-y:auto; }
   .sidebar-section { padding:10px 20px 4px; font-size:10px; font-weight:800; color:#b0bec5; text-transform:uppercase; letter-spacing:1px; }
   .sidebar a { display:flex; align-items:center; gap:10px; padding:10px 20px; color:#546e7a; text-decoration:none; font-size:13.5px; border-left:3px solid transparent; transition:all 0.2s; font-weight:500; }
-  .sidebar a:hover { background:#EBF5FB; color:#1B4F72; border-left-color:#1B4F72; }
-  .sidebar a.active { background:#EBF5FB; color:#1B4F72; border-left-color:#1B4F72; font-weight:700; }
+  .sidebar a:hover { background:#EBF5FB; color:#1a3a6b; border-left-color:#1a3a6b; }
+  .sidebar a.active { background:#EBF5FB; color:#1a3a6b; border-left-color:#1a3a6b; font-weight:700; }
   .sidebar a .sicon { width:30px; height:30px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:15px; background:#f5f7fa; flex-shrink:0; }
   .main { margin-left:225px; margin-top:60px; padding:20px; display:grid; grid-template-columns:1fr 370px; gap:18px; min-height:calc(100vh - 60px); }
   .left-panel { display:flex; flex-direction:column; gap:16px; }
@@ -54,10 +54,16 @@
   .si-stock { float:right; font-size:12px; font-weight:700; color:#1E8449; }
   .sell-badge { font-size:10.5px; padding:2px 8px; border-radius:12px; background:#EBF5FB; color:#1B4F72; margin-left:5px; font-weight:600; }
   .sell-badge.loose { background:#FEF9E7; color:#B7770D; }
+  /* TYPE SELECT DROPDOWN */
+  .type-sel { padding:4px 6px; border:1.5px solid #1B4F72; border-radius:6px; font-size:11px; outline:none; cursor:pointer; color:#1B4F72; font-weight:700; background:white; min-width:80px; }
+  .type-badge { font-size:11px; padding:3px 9px; border-radius:12px; font-weight:700; display:inline-block; }
+  .type-badge.strip { background:#EBF5FB; color:#1B4F72; }
+  .type-badge.pill { background:#FEF9E7; color:#B7770D; }
+  .type-badge.other { background:#F4ECF7; color:#7D3C98; }
   #pstatus { font-size:12px; color:#78909c; margin-top:7px; min-height:16px; }
   .bill-tbl { width:100%; border-collapse:collapse; }
-  .bill-tbl thead tr { background:#ffffff; }
-  .bill-tbl thead th { padding:10px 12px; text-align:left; font-size:11px; color:rgba(255,255,255,0.88); font-weight:700; text-transform:uppercase; letter-spacing:0.5px; white-space:nowrap; }
+  .bill-tbl thead tr { background:linear-gradient(135deg,#1a3a6b,#154360); }
+  .bill-tbl thead th { padding:10px 12px; text-align:left; font-size:11px; color:rgba(255,255,255,0.9); font-weight:700; text-transform:uppercase; letter-spacing:0.5px; white-space:nowrap; }
   .bill-tbl tbody tr { border-bottom:1px solid #f5f7fa; transition:background 0.12s; }
   .bill-tbl tbody tr:hover { background:#f8fafd; }
   .bill-tbl tbody td { padding:10px 12px; font-size:13px; color:#37474f; vertical-align:middle; }
@@ -78,12 +84,12 @@
   .pay-btn { padding:10px 8px; border:2px solid #e2e8f0; border-radius:10px; cursor:pointer; font-size:13px; font-weight:600; background:white; color:#546e7a; transition:all 0.18s; text-align:center; }
   .pay-btn:hover { border-color:#1B4F72; color:#1B4F72; }
   .pay-btn.sel { border-color:#1B4F72; background:#EBF5FB; color:#1B4F72; }
-  .paid-input { width:100%; padding:11px 14px; border:1.5px solid #e2e8f0; border-radius:9px; font-size:15px; outline:none; transition:all 0.2s; }
+  .paid-input { width:100%; padding:11px 14px; border:1.5px solid #e2e8f0; border-radius:9px; font-size:15px; outline:none; }
   .paid-input:focus { border-color:#1B4F72; }
   .change-bar { background:#EAFAF1; border:1px solid #A9DFBF; border-radius:9px; padding:10px 16px; display:flex; justify-content:space-between; align-items:center; margin-top:10px; }
   .abtn { padding:13px; border:none; border-radius:10px; cursor:pointer; font-size:14px; font-weight:700; width:100%; transition:all 0.2s; margin-top:8px; }
   .abtn:hover { transform:translateY(-1px); }
-  .abtn.save { background:#ffffff; color:white; }
+  .abtn.save { background:linear-gradient(135deg,#1a3a6b,#154360); color:white; }
   .abtn.prnt { background:linear-gradient(135deg,#1E8449,#145A32); color:white; }
   .abtn.wa { background:linear-gradient(135deg,#25D366,#128C7E); color:white; }
   .rbill { padding:10px 0; border-bottom:1px solid #f5f7fa; }
@@ -102,58 +108,6 @@
   .modal-close { background:#f0f4f8; border:none; width:32px; height:32px; border-radius:8px; cursor:pointer; font-size:16px; }
   .modal-close:hover { background:#FDEDEC; color:#C0392B; }
   .notif { position:fixed; top:74px; right:20px; padding:12px 20px; border-radius:10px; font-size:13px; font-weight:700; color:white; z-index:9999; box-shadow:0 4px 16px rgba(0,0,0,0.22); max-width:320px; }
-
-  
-
-
-  /* ── GLOBAL WHITE THEME FIX ── */
-  body { background: #f0f4f8; }
-
-  /* Navbar */
-  .navbar { background:#ffffff !important; box-shadow:0 2px 16px rgba(0,0,0,0.08) !important; border-bottom:1px solid #e2e8f0; color:#1a2332 !important; }
-  .navbar h1 { font-size:26px !important; font-weight:900 !important; color:#1a2332 !important; white-space:nowrap; display:flex; align-items:center; gap:6px; }
-  .navbar h1 .dawa, .navbar h1 span:first-child { color:#1a3a6b !important; }
-  .navbar h1 .hisaab, .navbar h1 span:last-child { color:#1e6b3a !important; }
-  .navbar h1 span { color:#1e6b3a !important; }
-
-  /* Nav buttons — dark text on white bg */
-  .nav-badge { background:#f0f4f8 !important; color:#1a2332 !important; border:1px solid #e2e8f0 !important; }
-  .nav-badge:hover { background:#e2e8f0 !important; }
-  .btn-logout { background:transparent !important; border:1.5px solid #d0d7de !important; color:#1a2332 !important; }
-  .btn-logout:hover { background:#f0f4f8 !important; color:#1a2332 !important; }
-  .btn-back { background:#f0f4f8 !important; border:1.5px solid #d0d7de !important; color:#1a2332 !important; }
-  .btn-back:hover { background:#e2e8f0 !important; }
-
-  /* Sidebar active — keep brand colors */
-  .sidebar a:hover { background:#EBF5FB; color:#1a3a6b; border-left-color:#1a3a6b; }
-  .sidebar a.active { background:#EBF5FB; color:#1a3a6b; border-left-color:#1a3a6b; font-weight:700; }
-
-  /* Primary buttons — dark gradient */
-  .btn-primary { background:linear-gradient(135deg,#1a3a6b,#1e6b3a) !important; color:#ffffff !important; }
-  .btn-primary:hover { box-shadow:0 6px 20px rgba(26,58,107,0.3) !important; color:#ffffff !important; }
-  .abtn.save { background:linear-gradient(135deg,#1a3a6b,#154360) !important; color:#ffffff !important; }
-  .abtn.prnt { background:linear-gradient(135deg,#1E8449,#145A32) !important; color:#ffffff !important; }
-  .abtn.wa { background:linear-gradient(135deg,#25D366,#128C7E) !important; color:#ffffff !important; }
-
-  /* Table headers — keep dark */
-  .bill-tbl thead tr, table thead tr { background:linear-gradient(135deg,#1a3a6b,#154360) !important; }
-  .bill-tbl thead th, table thead th { color:rgba(255,255,255,0.9) !important; }
-
-  /* Welcome bar on dashboard */
-  .welcome-bar { background:linear-gradient(135deg,#1a3a6b,#1e6b3a) !important; color:#ffffff !important; }
-  .welcome-bar * { color:#ffffff !important; }
-
-  /* Stat cards keep white bg */
-  .stat-card, .card { background:#ffffff; }
-
-  /* Tab active in profile */
-  .tab-btn.active { background:linear-gradient(135deg,#1a3a6b,#1e6b3a) !important; color:#ffffff !important; }
-
-  /* Profile banner */
-  .profile-banner { background:linear-gradient(135deg,#1a3a6b,#1e6b3a) !important; }
-  .profile-name { color:#ffffff !important; }
-  .profile-sub { color:rgba(255,255,255,0.75) !important; }
-
 </style>
 </head>
 <body>
@@ -162,9 +116,7 @@
   <div style="display:flex;align-items:center;gap:12px;flex:1;">
     <img id="navLogo" style="display:none;height:36px;width:auto;border-radius:6px;object-fit:contain;background:rgba(255,255,255,0.1);padding:3px;" />
     <div>
-      <h1 style="font-size:22px;font-weight:900;flex:1;display:flex;align-items:center;gap:6px;white-space:nowrap;">
-  <span class="dawa">Dawa</span> <span class="hisaab">Hisaab</span>
-</h1>
+      <h1><span class="dawa">Dawa</span> <span class="hisaab">Hisaab</span></h1>
     </div>
   </div>
   <div class="nav-right">
@@ -273,13 +225,13 @@
       <table class="bill-tbl" id="billTbl" style="display:none;">
         <thead>
           <tr>
-            <th style="width:30%;">Item</th>
-            <th style="width:13%;">Type</th>
+            <th style="width:28%;">Item</th>
+            <th style="width:14%;">Type</th>
             <th style="width:11%;">Qty</th>
             <th style="width:10%;">Rate</th>
             <th style="width:9%;">Disc%</th>
             <th style="width:8%;">GST%</th>
-            <th style="width:12%;">Amount</th>
+            <th style="width:13%;">Amount</th>
             <th style="width:7%;"></th>
           </tr>
         </thead>
@@ -423,7 +375,6 @@
   </div>
 </div>
 
-
 <script>
 let products=[], billItems=[], payMode='cash';
 let cpSaleId=null, editSaleId=null, editItems=[];
@@ -431,9 +382,9 @@ let selCustId=null, selCustPts=0;
 let PS={}, LOGO='';
 let custTimeout=null;
 
-// ── TOKEN (SABSE ZAROORI FIX) ──
+// ── TOKEN ──
 function getToken(){return localStorage.getItem('tenantToken')||localStorage.getItem('token')||'';}
-function authH(extra){const t=getToken();return t?{'Authorization':'Bearer '+t,...(extra||{})}:{...(extra||{})};}
+function authH(extra){const t=getToken();return t?{'Authorization':'Bearer '+t,...(extra||{})}:{...(extra||{})};} 
 
 // ── AUTH ──
 function checkAuth(){
@@ -442,41 +393,6 @@ function checkAuth(){
   document.getElementById('navUser').textContent=user?.name||'';
   const branch=JSON.parse(localStorage.getItem('currentBranch')||'null');
   if(branch)document.getElementById('navBranch').textContent=branch.name;
-}
-
-async function loadPharmacyInfo(){
-  try{
-    const token=localStorage.getItem('tenantToken')||localStorage.getItem('token')||'';
-    const res=await fetch('/api/tenant-auth/profile',{headers:{'Authorization':'Bearer '+token}});
-    if(!res.ok)return;
-    const data=await res.json();
-    const settings=data.settings||{};
-    const pname=settings.pharmacyName||data.pharmacyName||'Dawa Hisaab';
-    // Navbar mein pharmacy name
-    const nb=document.getElementById('navPharmacy');
-    if(nb)nb.textContent=pname;
-    // Logo
-    const logoRes=await fetch('/api/tenant-auth/logo',{headers:{'Authorization':'Bearer '+token}});
-    if(logoRes.ok){
-      const ld=await logoRes.json();
-      if(ld.logo){
-        const li=document.getElementById('navLogo');
-        if(li){li.src=ld.logo;li.style.display='block';}
-      }
-    }
-    // Settings store
-    window.pharmacySettings={
-      pharmacyName:pname,
-      gstNo:settings.gstNo||'',
-      address1:settings.address1||'',
-      address2:settings.address2||'',
-      phone:settings.phone||'',
-      licenseNo:settings.licenseNo||'',
-      signatory:settings.signatory||'',
-      footer:settings.footer||'Thank you! Get well soon.',
-      billType:settings.billType||'Retail Invoice'
-    };
-  }catch(e){console.log('Pharmacy info error:',e);}
 }
 function logout(){localStorage.clear();location.href='signup.html';}
 
@@ -497,34 +413,15 @@ async function fetchGSTInfo(gstNo){
   try{
     const res=await fetch('/api/gst/verify/'+gstNo.trim(),{headers:authH()});
     const data=await res.json();
-
-    if(!data.valid){
-      stEl.innerHTML='<span style="color:#C0392B;font-weight:700;">❌ Invalid GST format</span>';
-      return;
-    }
-
-    // State + Entity type dikhao
-    stEl.innerHTML=`
-      <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
-        <span style="color:#1E8449;font-weight:700;">✅ Valid GST</span>
-        <span style="background:#EBF5FB;color:#1B4F72;padding:2px 10px;border-radius:12px;font-size:11px;font-weight:700;">
-          📍 ${data.state}
-        </span>
-        <span style="background:#FEF9E7;color:#B7770D;padding:2px 10px;border-radius:12px;font-size:11px;font-weight:700;">
-          🏢 ${data.entityType}
-        </span>
-        <span style="background:#f8fafc;color:#78909c;padding:2px 10px;border-radius:12px;font-size:11px;">
-          PAN: ${data.pan}
-        </span>
-      </div>`;
-
-    // Auto-open B2B section
+    if(!data.valid){stEl.innerHTML='<span style="color:#C0392B;font-weight:700;">❌ Invalid GST format</span>';return;}
+    stEl.innerHTML=`<div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
+      <span style="color:#1E8449;font-weight:700;">✅ Valid GST</span>
+      <span style="background:#EBF5FB;color:#1B4F72;padding:2px 10px;border-radius:12px;font-size:11px;font-weight:700;">📍 ${data.state}</span>
+      <span style="background:#FEF9E7;color:#B7770D;padding:2px 10px;border-radius:12px;font-size:11px;font-weight:700;">🏢 ${data.entityType}</span>
+      <span style="background:#f8fafc;color:#78909c;padding:2px 10px;border-radius:12px;font-size:11px;">PAN: ${data.pan}</span></div>`;
     const optF=document.getElementById('optFields');
     if(optF&&!optF.classList.contains('open'))toggleOpt();
-
-  }catch(e){
-    stEl.innerHTML='<span style="color:#C0392B;font-weight:700;">❌ Verify error — try again</span>';
-  }
+  }catch(e){stEl.innerHTML='<span style="color:#C0392B;font-weight:700;">❌ Verify error — try again</span>';}
 }
 
 function notif(msg,ok=true){
@@ -534,7 +431,7 @@ function notif(msg,ok=true){
   setTimeout(()=>{el.style.opacity='0';el.style.transition='opacity 0.3s';setTimeout(()=>el.remove(),300);},2800);
 }
 
-// ── LOAD PRODUCTS (with token) ──
+// ── LOAD PRODUCTS ──
 async function loadProducts(){
   const st=document.getElementById('pstatus');
   try{
@@ -548,7 +445,7 @@ async function loadProducts(){
   }catch(e){st.textContent='❌ Load error: '+e.message;console.error('Products:',e);}
 }
 
-// ── PHARMACY DATA (settings + logo) ──
+// ── PHARMACY DATA ──
 async function loadPharmacyData(){
   const user=JSON.parse(localStorage.getItem('user')||'{}');
   const isTenant=user.tenantId||localStorage.getItem('tenantToken');
@@ -561,45 +458,24 @@ async function loadPharmacyData(){
       if(pR.ok){
         const t=await pR.json();
         const s=t?.settings||{};
-        PS={
-          pharmacyName:s.pharmacyName||t.pharmacyName||'Dawa Hisaab Pharmacy',
-          address1:s.address1||'',address2:s.address2||'',
-          phone:s.phone||'',email:s.email||'',gstNo:s.gstNo||'',
-          licenseNo:s.licenseNo||'',billType:s.billType||'Retail Invoice',
-          footer:s.footer||'Thank you! Get well soon.',
-          signatory:s.signatory||t.ownerName||''
-        };
-        // ✅ NAVBAR UPDATE
-        const nb=document.getElementById('navPharmacy');
-        if(nb)nb.textContent=PS.pharmacyName;
-      }
-      if(lR.ok){
-        const d=await lR.json();
-        LOGO=d.logo||'';
-        // ✅ LOGO NAVBAR
-        if(LOGO){
-          const li=document.getElementById('navLogo');
-          if(li){li.src=LOGO;li.style.display='block';}
-        }
-      }
-    }else{
-      const[sR,lR]=await Promise.all([fetch('/api/settings'),fetch('/api/logo')]);
-      if(sR.ok){
-        PS=await sR.json();
-        const nb=document.getElementById('navPharmacy');
-        if(nb)nb.textContent=PS.pharmacyName||'';
+        PS={pharmacyName:s.pharmacyName||t.pharmacyName||'Dawa Hisaab Pharmacy',address1:s.address1||'',address2:s.address2||'',phone:s.phone||'',email:s.email||'',gstNo:s.gstNo||'',licenseNo:s.licenseNo||'',billType:s.billType||'Retail Invoice',footer:s.footer||'Thank you! Get well soon.',signatory:s.signatory||t.ownerName||''};
+        const nb=document.getElementById('navPharmacy');if(nb)nb.textContent=PS.pharmacyName;
       }
       if(lR.ok){
         const d=await lR.json();LOGO=d.logo||'';
         if(LOGO){const li=document.getElementById('navLogo');if(li){li.src=LOGO;li.style.display='block';}}
       }
+    }else{
+      const[sR,lR]=await Promise.all([fetch('/api/settings'),fetch('/api/logo')]);
+      if(sR.ok){PS=await sR.json();const nb=document.getElementById('navPharmacy');if(nb)nb.textContent=PS.pharmacyName||'';}
+      if(lR.ok){const d=await lR.json();LOGO=d.logo||'';if(LOGO){const li=document.getElementById('navLogo');if(li){li.src=LOGO;li.style.display='block';}}}
     }
     const sel=document.getElementById('billTypeSelect');
     if(sel&&PS.billType)sel.value=PS.billType;
   }catch(e){console.log('PharmData:',e);}
 }
 
-// ── CUSTOMER SEARCH (with token) ──
+// ── CUSTOMER SEARCH ──
 async function searchCust(){
   const q=document.getElementById('custName').value.trim();
   const box=document.getElementById('custDrop');
@@ -635,8 +511,6 @@ function pickCust(id,name,phone,pts){
 }
 function clearCust(){selCustId=null;selCustPts=0;document.getElementById('custName').value='';document.getElementById('custPhone').value='';document.getElementById('foundBar').style.display='none';document.getElementById('loyaltyBar').style.display='none';}
 function applyLoyalty(){const pts=parseInt(prompt('Kitne points?\nAvailable: '+selCustPts+'\n(10 pts = ₹1 discount)'));if(!pts||pts<=0||pts>selCustPts)return;document.getElementById('extraDisc').value=Math.floor(pts/10);calcTotal();notif('✅ '+pts+' points applied — ₹'+Math.floor(pts/10)+' discount!');}
-
-// Phone search
 async function phoneInput(){const phone=document.getElementById('custPhone').value.trim();if(phone.length===10&&!selCustId)await phoneSearch(phone);}
 async function phoneBlur(){const phone=document.getElementById('custPhone').value.trim();if(phone.length>=10&&!selCustId)await phoneSearch(phone);}
 async function phoneSearch(phone){
@@ -654,48 +528,161 @@ function srchProducts(){
   const matches=products.filter(p=>(p.name||'').toLowerCase().includes(q)||(p.generic||'').toLowerCase().includes(q)||(p.company||'').toLowerCase().includes(q)).slice(0,12);
   if(!matches.length){box.innerHTML=`<div style="padding:12px;color:#78909c;font-size:13px;">No results for "${q}"</div>`;box.style.display='block';return;}
   box.innerHTML=matches.map(p=>{
-    const stk=p.sellType==='loose'?`${p.stripStock||0}s+${p.looseStock||0} loose`:`${p.stock||0} in stock`;
-    const lbl=p.sellType==='loose'?'Loose':p.sellType==='strip'?'Strip':'Piece';
-    return `<div class="srch-item" onclick="addItem('${p._id}')"><span class="si-stock">${stk}</span><div class="si-name">${p.name} <span class="sell-badge ${p.sellType==='loose'?'loose':''}">${lbl}</span></div><div class="si-meta">${p.company||''} ${p.batch?'· Batch:'+p.batch:''} ${p.expiry?'· Exp:'+p.expiry:''} · MRP:₹${p.mrp}</div></div>`;
+    const cat=p.category||'medicine';
+    let stk='',lbl='';
+    if(cat==='medicine'){
+      const st=p.sellType||'strip';
+      if(st==='loose'){stk=`${p.stripStock||0}s+${p.looseStock||0} loose`;lbl='Loose';}
+      else if(st==='both'){stk=`${p.stripStock||p.stock||0} strips`;lbl='Strip+Loose';}
+      else{stk=`${p.stripStock||p.stock||0} strips`;lbl='Strip';}
+    }else{
+      stk=`${p.stock||0} in stock`;lbl='Piece';
+    }
+    return `<div class="srch-item" onclick="addItem('${p._id}')">
+      <span class="si-stock">${stk}</span>
+      <div class="si-name">${p.name} <span class="sell-badge ${lbl==='Loose'?'loose':''}">${lbl}</span></div>
+      <div class="si-meta">${p.company||''} ${p.batch?'· Batch:'+p.batch:''} ${p.expiry?'· Exp:'+p.expiry:''} · MRP:₹${p.mrp}</div>
+    </div>`;
   }).join('');
   box.style.display='block';
 }
+
+// ── ADD ITEM ──
 function addItem(id){
   const p=products.find(x=>x._id===id);if(!p)return;
   const ex=billItems.find(x=>x.pid===id);
   if(ex){ex.qty++;renderBill();srchClear();return;}
-  let rate=p.salePrice||p.mrp||0,sellUnit='piece',maxQty=p.stock||0;
-  if(p.category==='medicine'){if(p.sellType==='loose'){rate=p.pricePerUnit||parseFloat(((p.mrp||0)/(p.unitsPerStrip||10)).toFixed(2));sellUnit='pill';maxQty=(p.stripStock||0)*(p.unitsPerStrip||10)+(p.looseStock||0);}else if(p.sellType==='strip'){sellUnit='strip';maxQty=p.stripStock||p.stock||0;}}
-  billItems.push({pid:id,name:p.name,cat:p.category,sellType:p.sellType||'piece',origSellType:p.sellType,sellUnit,qty:1,rate:parseFloat((rate||0).toFixed(2)),disc:0,gst:p.gst||0,maxQty,mrp:p.mrp||0,batch:p.batch||'',expiry:p.expiry||''});
+
+  const cat=p.category||'medicine';
+  const pSellType=p.sellType||'strip';
+  let rate=p.salePrice||p.mrp||0;
+  let sellUnit='piece';
+  let maxQty=p.stock||0;
+
+  if(cat==='medicine'){
+    if(pSellType==='loose'){
+      // Sirf loose — pill rate
+      rate=p.pricePerUnit||parseFloat(((p.mrp||0)/(p.unitsPerStrip||10)).toFixed(2));
+      sellUnit='pill';
+      maxQty=(p.stripStock||0)*(p.unitsPerStrip||10)+(p.looseStock||0);
+    }else if(pSellType==='both'){
+      // Both — default strip, dropdown available
+      rate=p.salePrice||p.mrp||0;
+      sellUnit='strip';
+      maxQty=p.stripStock||p.stock||0;
+    }else{
+      // Strip only
+      rate=p.salePrice||p.mrp||0;
+      sellUnit='strip';
+      maxQty=p.stripStock||p.stock||0;
+    }
+  }else{
+    // Non-medicine — piece default
+    sellUnit='piece';
+    maxQty=p.stock||0;
+  }
+
+  billItems.push({
+    pid:id, name:p.name, cat,
+    pSellType, // original product sell type
+    sellUnit,  // current sell unit
+    qty:1, rate:parseFloat((rate||0).toFixed(2)),
+    disc:0, gst:p.gst||0, maxQty,
+    mrp:p.mrp||0, batch:p.batch||'', expiry:p.expiry||''
+  });
   srchClear();renderBill();
 }
 function srchClear(){document.getElementById('srchInput').value='';document.getElementById('srchResults').style.display='none';}
+
+// ── CHANGE SELL UNIT — Medicine strip ↔ pill ──
+function changeSellUnit(i,unit){
+  const item=billItems[i];
+  const p=products.find(x=>x._id===item.pid);if(!p)return;
+  if(unit==='pill'){
+    item.sellUnit='pill';
+    item.rate=p.pricePerUnit||parseFloat(((p.mrp||0)/(p.unitsPerStrip||10)).toFixed(2));
+    item.maxQty=(p.stripStock||0)*(p.unitsPerStrip||10)+(p.looseStock||0);
+  }else{
+    item.sellUnit='strip';
+    item.rate=p.salePrice||p.mrp||0;
+    item.maxQty=p.stripStock||p.stock||0;
+  }
+  item.qty=1;
+  renderBill();
+}
+
+// ── CHANGE OTHER UNIT — Non-medicine piece/box/bottle/nos/unit ──
+function changeOtherUnit(i,unit){
+  billItems[i].sellUnit=unit;
+  renderBill();
+}
 
 // ── RENDER BILL ──
 function renderBill(){
   const tbody=document.getElementById('billBody'),tbl=document.getElementById('billTbl'),emp=document.getElementById('emptyBill'),cnt=document.getElementById('itemCnt');
   if(!billItems.length){tbl.style.display='none';emp.style.display='block';cnt.textContent='';calcTotal();return;}
   tbl.style.display='table';emp.style.display='none';cnt.textContent='('+billItems.length+' items)';
+
   tbody.innerHTML=billItems.map((item,i)=>{
     const lineAmt=(item.qty*item.rate*(1-item.disc/100)).toFixed(2);
+
+    // ── TYPE COLUMN ──
     let typeHtml='';
-    if(item.cat==='medicine'&&item.origSellType==='loose'){typeHtml=`<select onchange="changeSellUnit(${i},this.value)" style="padding:4px 8px;border:1.5px solid #1B4F72;border-radius:6px;font-size:12px;outline:none;cursor:pointer;"><option value="pill" ${item.sellUnit==='pill'?'selected':''}>Pill</option><option value="strip" ${item.sellUnit==='strip'?'selected':''}>📦 Strip</option></select>`;}
-    else if(item.sellType==='strip'){typeHtml='<span class="sell-badge">📦 Strip</span>';}
-    else if(item.cat==='fmcg'){typeHtml='<span class="sell-badge" style="background:#F4ECF7;color:#7D3C98;">🛍️ FMCG</span>';}
-    else{typeHtml='<span style="font-size:12px;color:#78909c;">Piece</span>';}
-    return `<tr><td><div style="font-weight:700;font-size:13px;">${item.name}</div>${item.batch?`<div style="font-size:11px;color:#b0bec5;">Batch:${item.batch}${item.expiry?' · Exp:'+item.expiry:''}</div>`:''}</td>
-    <td>${typeHtml}</td>
-    <td><input type="number" value="${item.qty}" min="1" max="${item.maxQty||9999}" style="width:58px;" onchange="updQty(${i},this.value)" /><div style="font-size:10px;color:#b0bec5;text-align:center;">max ${item.maxQty||'∞'}</div></td>
-    <td style="font-weight:600;">₹${item.rate.toFixed(2)}</td>
-    <td><input type="number" value="${item.disc}" min="0" max="100" style="width:50px;" onchange="updDisc(${i},this.value)" /></td>
-    <td style="font-size:12px;color:#78909c;">${item.gst||0}%</td>
-    <td style="font-weight:700;color:#1B4F72;">₹${lineAmt}</td>
-    <td><button class="rm-btn" onclick="rmItem(${i})">✕</button></td></tr>`;
+    if(item.cat==='medicine'){
+      if(item.pSellType==='both'){
+        // Dropdown: Strip / Per Pill
+        typeHtml=`<select class="type-sel" onchange="changeSellUnit(${i},this.value)">
+          <option value="strip" ${item.sellUnit==='strip'?'selected':''}>📦 Strip</option>
+          <option value="pill" ${item.sellUnit==='pill'?'selected':''}>💊 Per Pill</option>
+        </select>`;
+      }else if(item.pSellType==='loose'){
+        typeHtml='<span class="type-badge pill">💊 Per Pill</span>';
+      }else{
+        // Strip only
+        typeHtml='<span class="type-badge strip">📦 Strip</span>';
+      }
+    }else{
+      // Non-medicine: Dropdown
+      typeHtml=`<select class="type-sel" onchange="changeOtherUnit(${i},this.value)">
+        <option value="piece" ${item.sellUnit==='piece'?'selected':''}>Piece</option>
+        <option value="box" ${item.sellUnit==='box'?'selected':''}>📦 Box</option>
+        <option value="bottle" ${item.sellUnit==='bottle'?'selected':''}>🍶 Bottle</option>
+        <option value="nos" ${item.sellUnit==='nos'?'selected':''}>Nos</option>
+        <option value="unit" ${item.sellUnit==='unit'?'selected':''}>Unit</option>
+      </select>`;
+    }
+
+    // Rate display with per-unit hint
+    const rateHtml=item.cat==='medicine'&&item.sellUnit==='pill'
+      ?`₹${item.rate.toFixed(2)}<div style="font-size:10px;color:#B7770D;">/pill</div>`
+      :`₹${item.rate.toFixed(2)}`;
+
+    return `<tr>
+      <td>
+        <div style="font-weight:700;font-size:13px;">${item.name}</div>
+        ${item.batch?`<div style="font-size:11px;color:#b0bec5;">Batch:${item.batch}${item.expiry?' · Exp:'+item.expiry:''}</div>`:''}
+      </td>
+      <td>${typeHtml}</td>
+      <td>
+        <input type="number" value="${item.qty}" min="1" max="${item.maxQty||9999}" style="width:58px;" onchange="updQty(${i},this.value)" />
+        <div style="font-size:10px;color:#b0bec5;text-align:center;">max ${item.maxQty||'∞'}</div>
+      </td>
+      <td style="font-weight:600;">${rateHtml}</td>
+      <td><input type="number" value="${item.disc}" min="0" max="100" style="width:50px;" onchange="updDisc(${i},this.value)" /></td>
+      <td style="font-size:12px;color:#78909c;">${item.gst||0}%</td>
+      <td style="font-weight:700;color:#1B4F72;">₹${lineAmt}</td>
+      <td><button class="rm-btn" onclick="rmItem(${i})">✕</button></td>
+    </tr>`;
   }).join('');
   calcTotal();
 }
-function changeSellUnit(i,unit){const item=billItems[i];const p=products.find(x=>x._id===item.pid);if(!p)return;if(unit==='pill'){item.sellUnit='pill';item.rate=p.pricePerUnit||parseFloat(((p.mrp||0)/(p.unitsPerStrip||10)).toFixed(2));item.maxQty=(p.stripStock||0)*(p.unitsPerStrip||10)+(p.looseStock||0);}else{item.sellUnit='strip';item.rate=p.salePrice||p.mrp||0;item.maxQty=p.stripStock||p.stock||0;}renderBill();}
-function updQty(i,v){const qty=parseInt(v)||1,max=billItems[i].maxQty||99999;billItems[i].qty=qty>max?max:qty;if(qty>max)notif('⚠️ Max '+max+' '+billItems[i].sellUnit+' in stock!',false);renderBill();}
+
+function updQty(i,v){
+  const qty=parseInt(v)||1,max=billItems[i].maxQty||99999;
+  billItems[i].qty=qty>max?max:qty;
+  if(qty>max)notif('⚠️ Max '+max+' '+billItems[i].sellUnit+' in stock!',false);
+  renderBill();
+}
 function updDisc(i,v){billItems[i].disc=parseFloat(v)||0;renderBill();}
 function rmItem(i){billItems.splice(i,1);renderBill();}
 function selPay(mode,el){payMode=mode;document.querySelectorAll('.pay-btn').forEach(b=>b.classList.remove('sel'));el.classList.add('sel');}
@@ -703,7 +690,12 @@ function selPay(mode,el){payMode=mode;document.querySelectorAll('.pay-btn').forE
 // ── CALC TOTALS ──
 function calcTotal(){
   let sub=0,gst=0,mrpT=0;
-  billItems.forEach(item=>{const base=item.qty*item.rate*(1-item.disc/100);sub+=base;if(item.gst>0)gst+=base*(item.gst/100);mrpT+=item.qty*(item.mrp||item.rate);});
+  billItems.forEach(item=>{
+    const base=item.qty*item.rate*(1-item.disc/100);
+    sub+=base;
+    if(item.gst>0)gst+=base*(item.gst/100);
+    mrpT+=item.qty*(item.mrp||item.rate);
+  });
   const disc=parseFloat(document.getElementById('extraDisc').value)||0;
   const grand=Math.max(0,sub+gst-disc);
   const saving=Math.max(0,mrpT-sub);
@@ -728,10 +720,23 @@ function calcChange(){
 function buildSale(totals,paid){
   const bd=document.getElementById('billDate').value,bt=document.getElementById('billTime').value;
   const dt=bd?new Date(`${bd}T${bt||'00:00'}:00`):new Date();
-  return{customer:document.getElementById('custName').value||'Walk-in Customer',customerPhone:document.getElementById('custPhone').value,customerGST:document.getElementById('custGST').value||'',customerAddress:document.getElementById('custAddr').value||'',customerId:selCustId||undefined,date:dt,
-    items:billItems.map(item=>({product:item.pid,productName:item.name,batch:item.batch,qty:item.qty,mrp:item.mrp,salePrice:item.rate,discount:item.disc,gst:item.gst,sellUnit:item.sellUnit,total:parseFloat((item.qty*item.rate*(1-item.disc/100)).toFixed(2))})),
-    subtotal:parseFloat(totals.sub.toFixed(2)),discount:totals.disc,gstAmount:parseFloat(totals.gst.toFixed(2)),totalAmount:parseFloat(totals.grand.toFixed(2)),
-    paidAmount:payMode==='credit'?0:paid,paymentMode:payMode,paymentStatus:payMode==='credit'?'unpaid':'paid'};
+  return{
+    customer:document.getElementById('custName').value||'Walk-in Customer',
+    customerPhone:document.getElementById('custPhone').value,
+    customerGST:document.getElementById('custGST').value||'',
+    customerAddress:document.getElementById('custAddr').value||'',
+    customerId:selCustId||undefined,date:dt,
+    items:billItems.map(item=>({
+      product:item.pid,productName:item.name,batch:item.batch,
+      qty:item.qty,mrp:item.mrp,salePrice:item.rate,
+      discount:item.disc,gst:item.gst,sellUnit:item.sellUnit,
+      total:parseFloat((item.qty*item.rate*(1-item.disc/100)).toFixed(2))
+    })),
+    subtotal:parseFloat(totals.sub.toFixed(2)),discount:totals.disc,
+    gstAmount:parseFloat(totals.gst.toFixed(2)),totalAmount:parseFloat(totals.grand.toFixed(2)),
+    paidAmount:payMode==='credit'?0:paid,paymentMode:payMode,
+    paymentStatus:payMode==='credit'?'unpaid':'paid'
+  };
 }
 
 // ── SAVE BILL ──
@@ -748,7 +753,11 @@ async function saveBill(mode){
       notif('✅ Bill '+data.sale.billNo+' saved!');
       if(mode==='print'){printInvoice(data.sale,false);}
       else if(mode==='wa'){await shareWA(data.sale,false);resetBill();}
-      else{const phone=document.getElementById('custPhone').value;if(phone&&phone.length>=10){if(confirm('✅ Bill '+data.sale.billNo+' saved!\n\nWhatsApp pe bhejein? 📱 '+phone)){await shareWA(data.sale,false);}}resetBill();}
+      else{
+        const phone=document.getElementById('custPhone').value;
+        if(phone&&phone.length>=10){if(confirm('✅ Bill '+data.sale.billNo+' saved!\n\nWhatsApp pe bhejein? 📱 '+phone)){await shareWA(data.sale,false);}}
+        resetBill();
+      }
     }else notif('❌ Error: '+(data.message||'Failed'),false);
   }catch(e){notif('❌ Server error: '+e.message,false);console.error(e);}
 }
@@ -764,7 +773,6 @@ function resetBill(){
   payMode='cash';selCustId=null;selCustPts=0;
   setNow();renderBill();loadRecentBills();loadProducts();
 }
-
 
 // ── PRINT INVOICE ──
 function printInvoice(sale,fromEdit){
@@ -784,13 +792,13 @@ function printInvoice(sale,fromEdit){
   win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${bType} - ${sale.billNo}</title>
 <style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:'Segoe UI',Arial,sans-serif;background:white;color:#1a1a2e;font-size:13px;}
 .w{max-width:800px;margin:0 auto;padding:30px;}.hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;padding-bottom:16px;border-bottom:3px solid #1B4F72;}
-.ls{display:flex;align-items:center;gap:14px;}.li{width:72px;height:72px;object-fit:contain;border-radius:8px;}.lp{width:72px;height:72px;background:#ffffff;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:32px;}
-.pn{font-size:22px;font-weight:800;color:#1B4F72;}.pt{font-size:11px;color:#78909c;margin-top:2px;}.pa{font-size:11px;color:#546e7a;margin-top:6px;line-height:1.7;}
+.ls{display:flex;align-items:center;gap:14px;}.li{width:72px;height:72px;object-fit:contain;border-radius:8px;}.lp{width:72px;height:72px;background:#EBF5FB;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:32px;}
+.pn{font-size:22px;font-weight:800;color:#1B4F72;}.pa{font-size:11px;color:#546e7a;margin-top:6px;line-height:1.7;}
 .br{text-align:right;}.bt{font-size:20px;font-weight:800;color:#1B4F72;margin-bottom:10px;}.bm{font-size:12px;color:#546e7a;line-height:1.9;}.bm span{font-weight:700;color:#1a2332;margin-left:10px;}
 .sb{display:inline-block;padding:4px 14px;border-radius:20px;font-size:11px;font-weight:700;margin-top:8px;}.sk{background:#EAFAF1;color:#1E8449;}.sc{background:#FDEDEC;color:#C0392B;}.sp{background:#FEF9E7;color:#B7770D;}
 .cs{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;}.ib{background:#EBF5FB;border-radius:10px;padding:14px 16px;border:1px solid #AED6F1;}.ibc{background:#f8faff;border:1px solid #D6EAF8;}
 .ibl{font-size:10px;font-weight:800;color:#1B4F72;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;}.ibn{font-size:15px;font-weight:700;color:#1a2332;margin-bottom:3px;}.ibd{font-size:12px;color:#546e7a;line-height:1.6;}
-.it{width:100%;border-collapse:collapse;margin-bottom:16px;}.it thead tr{background:#ffffff;color:white;}.it thead th{padding:10px 12px;text-align:left;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;}
+.it{width:100%;border-collapse:collapse;margin-bottom:16px;}.it thead tr{background:#1B4F72;color:white;}.it thead th{padding:10px 12px;text-align:left;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;}
 .it thead th.r{text-align:right;}.it thead th.c{text-align:center;}.it tbody tr{border-bottom:1px solid #f0f4f8;}.it tbody tr:nth-child(even){background:#f8faff;}.it tbody td{padding:10px 12px;font-size:12.5px;vertical-align:top;}.it tbody td.r{text-align:right;font-weight:600;}.it tbody td.c{text-align:center;}
 .in{font-weight:700;color:#1a2332;}.im{font-size:10px;color:#999;margin-top:2px;}
 .ts{display:flex;justify-content:flex-end;margin-bottom:20px;}.tb{min-width:270px;border-top:1px solid #e2e8f0;padding-top:10px;}
@@ -804,20 +812,38 @@ function printInvoice(sale,fromEdit){
 .fs{border-top:1.5px solid #e2e8f0;padding-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:14px;}.ft{font-size:11px;color:#78909c;line-height:1.8;}
 .sl{border-top:1.5px solid #546e7a;width:170px;margin-left:auto;margin-top:44px;padding-top:6px;font-size:11px;color:#546e7a;text-align:center;}
 .ty{text-align:center;padding:12px;background:linear-gradient(135deg,#EBF5FB,#EAFAF1);border-radius:10px;font-size:13px;font-weight:600;color:#1B4F72;}
-.wm{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-30deg);font-size:80px;font-weight:900;color:rgba(192,57,43,0.05);pointer-events:none;white-space:nowrap;}
 @media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}.np{display:none!important;}@page{margin:10mm;size:A4;}}</style></head><body>
-${sale.paymentMode==='credit'?'<div class="wm">CREDIT DUE</div>':''}
+${sale.paymentMode==='credit'?'<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-30deg);font-size:80px;font-weight:900;color:rgba(192,57,43,0.05);pointer-events:none;white-space:nowrap;">CREDIT DUE</div>':''}
 <div class="w">
-<div class="hdr"><div class="ls">${LOGO?`<img src="${LOGO}" class="li" onerror="this.style.display='none'" />`:'<div class="lp"></div>'}
-<div><div class="pn">${s.pharmacyName||'Dawa Hisaab Pharmacy'}</div><div class="pt">Your Trusted Healthcare Partner</div>
+<div class="hdr"><div class="ls">${LOGO?`<img src="${LOGO}" class="li" onerror="this.style.display='none'" />`:'<div class="lp">💊</div>'}
+<div><div class="pn">${s.pharmacyName||'Dawa Hisaab Pharmacy'}</div>
 <div class="pa">${s.address1||''}${s.address2?'<br>'+s.address2:''}${s.phone?'<br>📞 '+s.phone:''}${s.email?' | ✉️ '+s.email:''}${s.gstNo?'<br>GST: '+s.gstNo:''}${s.licenseNo?' | DL: '+s.licenseNo:''}</div></div></div>
 <div class="br"><div class="bt">${bType}</div><div class="bm">Bill No <span>${sale.billNo}</span><br>Date <span>${dateStr}</span><br>Day <span>${dayName}</span><br>Time <span>${timeStr}</span></div><span class="sb ${stClass}">${stTxt}</span></div></div>
 <div class="cs">
 <div class="ib ibc"><div class="ibl">👤 Bill To</div><div class="ibn">${sale.customer||'Walk-in Customer'}</div>
 <div class="ibd">${sale.customerPhone?'📞 '+sale.customerPhone:''}${sale.customerGST?'<br>GST: '+sale.customerGST:''}${sale.customerAddress?'<br>📍 '+sale.customerAddress:''}</div></div>
 <div class="ib"><div class="ibl">🏥 Dispensed By</div><div class="ibn">${s.pharmacyName||'Dawa Hisaab'}</div><div class="ibd">${s.licenseNo?'DL: '+s.licenseNo:''}${s.gstNo?'<br>GST: '+s.gstNo:''}</div></div></div>
-<table class="it"><thead><tr><th style="width:5%;">#</th><th style="width:36%;">Medicine / Item</th><th class="c" style="width:10%;">Qty</th><th class="r" style="width:11%;">MRP</th><th class="r" style="width:11%;">Rate</th>${isGST?'<th class="c" style="width:8%;">GST%</th>':''}${disc>0?'<th class="c" style="width:8%;">Disc%</th>':''}<th class="r" style="width:12%;">Amount</th></tr></thead>
-<tbody>${billItems.map((item,idx)=>{const amt=(item.qty*item.rate*(1-item.disc/100)).toFixed(2);return `<tr><td style="color:#78909c;">${idx+1}</td><td><div class="in">${item.name}</div><div class="im">${item.batch?'Batch:'+item.batch:''}${item.expiry?' | Exp:'+item.expiry:''}</div></td><td class="c">${item.qty} ${item.sellType==='strip'?'strip':'pcs'}</td><td class="r">₹${(item.mrp||0).toFixed(2)}</td><td class="r">₹${item.rate.toFixed(2)}</td>${isGST?`<td class="c">${item.gst||0}%</td>`:''} ${disc>0?`<td class="c">${item.disc||0}%</td>`:''}<td class="r">₹${amt}</td></tr>`;}).join('')}</tbody></table>
+<table class="it"><thead><tr>
+  <th style="width:5%;">#</th>
+  <th style="width:32%;">Medicine / Item</th>
+  <th class="c" style="width:12%;">Qty / Unit</th>
+  <th class="r" style="width:11%;">MRP</th>
+  <th class="r" style="width:10%;">Rate</th>
+  ${isGST?'<th class="c" style="width:8%;">GST%</th>':''}
+  ${disc>0?'<th class="c" style="width:8%;">Disc%</th>':''}
+  <th class="r" style="width:12%;">Amount</th>
+</tr></thead>
+<tbody>${billItems.map((item,idx)=>{
+  const amt=(item.qty*item.rate*(1-item.disc/100)).toFixed(2);
+  const uLabel={'strip':'strip','pill':'pill','piece':'pc','box':'box','bottle':'bottle','nos':'nos','unit':'unit'}[item.sellUnit]||item.sellUnit||'pc';
+  return `<tr><td style="color:#78909c;">${idx+1}</td>
+  <td><div class="in">${item.name}</div><div class="im">${item.batch?'Batch:'+item.batch:''}${item.expiry?' | Exp:'+item.expiry:''}</div></td>
+  <td class="c">${item.qty} ${uLabel}</td>
+  <td class="r">₹${(item.mrp||0).toFixed(2)}</td>
+  <td class="r">₹${item.rate.toFixed(2)}${item.sellUnit==='pill'?'<br><span style="font-size:10px;color:#B7770D;">/pill</span>':''}</td>
+  ${isGST?`<td class="c">${item.gst||0}%</td>`:''}
+  ${disc>0?`<td class="c">${item.disc||0}%</td>`:''}
+  <td class="r">₹${amt}</td></tr>`;}).join('')}</tbody></table>
 <div class="ts"><div class="tb">
 ${mrpT>grand+0.01?`<div class="tr"><span class="l">Gross (MRP)</span><span class="v">₹${mrpT.toFixed(2)}</span></div>`:`<div class="tr"><span class="l">Subtotal</span><span class="v">₹${sub.toFixed(2)}</span></div>`}
 ${saving>0.01?`<div class="tr sv"><span class="l">🏷️ You Save</span><span class="v">-₹${saving.toFixed(2)}</span></div>`:''}
@@ -837,7 +863,7 @@ ${isGST&&gst>0?`<table class="gs"><thead><tr><th colspan="5" style="background:#
 ${sale.customerPhone?`<a href="https://wa.me/91${sale.customerPhone.replace(/\D/g,'')}?text=${encodeURIComponent('🏥 *'+(s.pharmacyName||'Dawa Hisaab')+'*\n📋 Bill: *'+sale.billNo+'*\n✅ *Total: ₹'+grand.toFixed(2)+'*\n📅 '+dateStr+'\n🙏 '+(s.footer||'Thank you!'))}" target="_blank" style="padding:12px 28px;background:#25D366;color:white;border-radius:8px;text-decoration:none;font-size:14px;font-weight:700;display:inline-block;">📱 WhatsApp</a>`:''}
 <button onclick="window.close()" style="padding:12px 28px;background:#f0f4f8;color:#333;border:none;border-radius:8px;cursor:pointer;font-size:14px;font-weight:700;">✕ Close</button>
 </div></div>
-<script>setTimeout(()=>window.print(),700);window.onafterprint=()=>window.close();<\/script></body></html>`);
+<script>setTimeout(()=>window.print(),700);window.onafterprint=()=>window.close();<\/script></body>`);
   win.document.close();
   if(!fromEdit)resetBill();
 }
@@ -856,7 +882,13 @@ async function shareWA(sale,fromEdit){
   if(sale.customerGST)msg+=`GST: ${sale.customerGST}\n`;
   if(sale.customerAddress)msg+=`📍 ${sale.customerAddress}\n`;
   msg+=`━━━━━━━━━━━━━━━━━━━━\n*ITEMS:*\n`;
-  billItems.forEach((item,i)=>{const amt=(item.qty*item.rate*(1-item.disc/100)).toFixed(2);msg+=`\n${i+1}. *${item.name}*\n   ${item.qty} × ₹${item.rate.toFixed(2)} = ₹${amt}\n`;if(item.disc>0)msg+=`   Discount: ${item.disc}%\n`;if(item.batch)msg+=`   Batch: ${item.batch}\n`;});
+  billItems.forEach((item,i)=>{
+    const amt=(item.qty*item.rate*(1-item.disc/100)).toFixed(2);
+    const uLabel=item.sellUnit==='pill'?'pills':item.sellUnit==='strip'?'strips':item.sellUnit+'s';
+    msg+=`\n${i+1}. *${item.name}*\n   ${item.qty} ${uLabel} × ₹${item.rate.toFixed(2)} = ₹${amt}\n`;
+    if(item.disc>0)msg+=`   Discount: ${item.disc}%\n`;
+    if(item.batch)msg+=`   Batch: ${item.batch}\n`;
+  });
   msg+=`━━━━━━━━━━━━━━━━━━━━\n✅ *TOTAL: ₹${sale.totalAmount.toFixed(2)}*\n`;
   msg+=`${sale.paymentMode==='cash'?'💵':sale.paymentMode==='upi'?'📱':'💳'} Paid: ₹${sale.paidAmount.toFixed(2)}\n`;
   if((sale.totalAmount-sale.paidAmount)>0.01)msg+=`⚠️ *Balance Due: ₹${(sale.totalAmount-sale.paidAmount).toFixed(2)}*\n`;
@@ -865,7 +897,7 @@ async function shareWA(sale,fromEdit){
   window.open(waUrl,'_blank');
 }
 
-// ── RECENT BILLS (with token) ──
+// ── RECENT BILLS ──
 async function loadRecentBills(){
   try{
     const res=await fetch('/api/sales',{headers:authH()});
@@ -909,14 +941,23 @@ async function recentShareWA(saleId){
     if(!res.ok)throw new Error('HTTP '+res.status);
     const sale=await res.json();
     const saved=[...billItems];
-    billItems=(sale.items||[]).map(item=>({pid:item.product?._id||item.product,name:item.productName||'',batch:item.batch||'',expiry:'',qty:item.qty,rate:item.salePrice,disc:item.discount||0,gst:item.gst||0,mrp:item.mrp,sellType:item.sellUnit==='pill'?'loose':'strip',sellUnit:item.sellUnit||'piece',cat:'medicine',origSellType:item.sellUnit==='pill'?'loose':'strip'}));
+    billItems=(sale.items||[]).map(item=>({pid:item.product?._id||item.product,name:item.productName||'',batch:item.batch||'',expiry:'',qty:item.qty,rate:item.salePrice,disc:item.discount||0,gst:item.gst||0,mrp:item.mrp,pSellType:item.sellUnit==='pill'?'loose':'strip',sellUnit:item.sellUnit||'piece',cat:'medicine'}));
     await shareWA(sale,true);
     billItems=saved;
   }catch(e){notif('❌ Error: '+e.message,false);}
 }
 
 // ── CREDIT PAY MODAL ──
-function openCP(id,customer,total,paid){cpSaleId=id;const bal=total-paid;document.getElementById('cpCust').textContent=customer+' · Due: ₹'+bal.toFixed(2);document.getElementById('cpTotal').textContent='₹'+total.toFixed(2);document.getElementById('cpPaid').textContent='₹'+paid.toFixed(2);document.getElementById('cpBalance').textContent='₹'+bal.toFixed(2);document.getElementById('cpAmt').value=bal.toFixed(2);document.getElementById('cpNote').value='';document.getElementById('cpModal').classList.add('open');}
+function openCP(id,customer,total,paid){
+  cpSaleId=id;const bal=total-paid;
+  document.getElementById('cpCust').textContent=customer+' · Due: ₹'+bal.toFixed(2);
+  document.getElementById('cpTotal').textContent='₹'+total.toFixed(2);
+  document.getElementById('cpPaid').textContent='₹'+paid.toFixed(2);
+  document.getElementById('cpBalance').textContent='₹'+bal.toFixed(2);
+  document.getElementById('cpAmt').value=bal.toFixed(2);
+  document.getElementById('cpNote').value='';
+  document.getElementById('cpModal').classList.add('open');
+}
 function closeCP(){document.getElementById('cpModal').classList.remove('open');cpSaleId=null;}
 async function submitCP(){
   const amount=parseFloat(document.getElementById('cpAmt').value);
@@ -946,7 +987,7 @@ async function openEdit(saleId){
     const sd=new Date(sale.date);
     document.getElementById('eDate').value=sd.toISOString().split('T')[0];
     document.getElementById('eTime').value=sd.toTimeString().slice(0,5);
-    editItems=(sale.items||[]).map(item=>({pid:item.product?._id||item.product,name:item.productName||'',qty:item.qty,rate:item.salePrice,disc:item.discount||0,gst:item.gst||0,mrp:item.mrp,batch:item.batch||'',sellUnit:item.sellUnit||'piece',origSellType:item.sellUnit==='pill'?'loose':'strip',sellType:item.sellUnit==='pill'?'loose':'strip',cat:'medicine'}));
+    editItems=(sale.items||[]).map(item=>({pid:item.product?._id||item.product,name:item.productName||'',qty:item.qty,rate:item.salePrice,disc:item.discount||0,gst:item.gst||0,mrp:item.mrp,batch:item.batch||'',sellUnit:item.sellUnit||'piece',pSellType:item.sellUnit==='pill'?'loose':'strip',cat:'medicine'}));
     renderEditItems();
     document.getElementById('editModal').classList.add('open');
   }catch(e){notif('❌ Error: '+e.message,false);}
@@ -956,26 +997,50 @@ function renderEditItems(){
   const tbody=document.getElementById('eItemsBody');
   if(!editItems.length){tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:16px;color:#b0bec5;">No items</td></tr>';calcEditTotal();return;}
   tbody.innerHTML=editItems.map((item,i)=>{const tot=(item.qty*item.rate*(1-item.disc/100)).toFixed(2);
-    return `<tr style="border-bottom:1px solid #f5f7fa;"><td style="padding:10px 12px;"><strong style="font-size:13px;">${item.name}</strong>${item.batch?`<div style="font-size:11px;color:#b0bec5;">Batch:${item.batch}</div>`:''}</td>
-    <td style="padding:10px;text-align:center;"><input type="number" value="${item.qty}" min="1" onchange="updEI(${i},'qty',this.value)" style="width:60px;padding:5px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:13px;text-align:center;outline:none;" /></td>
-    <td style="padding:10px;text-align:center;font-weight:600;">₹${item.rate.toFixed(2)}</td>
-    <td style="padding:10px;text-align:center;"><input type="number" value="${item.disc}" min="0" max="100" onchange="updEI(${i},'disc',this.value)" style="width:55px;padding:5px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:13px;text-align:center;outline:none;" /></td>
-    <td style="padding:10px;text-align:right;font-weight:700;">₹${tot}</td>
-    <td style="padding:10px;text-align:center;"><button onclick="rmEI(${i})" style="background:#FDEDEC;color:#C0392B;border:none;padding:4px 10px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:700;">✕</button></td></tr>`;}).join('');
+    return `<tr style="border-bottom:1px solid #f5f7fa;">
+      <td style="padding:10px 12px;"><strong style="font-size:13px;">${item.name}</strong>${item.batch?`<div style="font-size:11px;color:#b0bec5;">Batch:${item.batch}</div>`:''}</td>
+      <td style="padding:10px;text-align:center;"><input type="number" value="${item.qty}" min="1" onchange="updEI(${i},'qty',this.value)" style="width:60px;padding:5px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:13px;text-align:center;outline:none;" /></td>
+      <td style="padding:10px;text-align:center;font-weight:600;">₹${item.rate.toFixed(2)}</td>
+      <td style="padding:10px;text-align:center;"><input type="number" value="${item.disc}" min="0" max="100" onchange="updEI(${i},'disc',this.value)" style="width:55px;padding:5px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:13px;text-align:center;outline:none;" /></td>
+      <td style="padding:10px;text-align:right;font-weight:700;">₹${tot}</td>
+      <td style="padding:10px;text-align:center;"><button onclick="rmEI(${i})" style="background:#FDEDEC;color:#C0392B;border:none;padding:4px 10px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:700;">✕</button></td>
+    </tr>`;}).join('');
   calcEditTotal();
 }
 function updEI(i,f,v){if(f==='qty')editItems[i].qty=parseInt(v)||1;if(f==='disc')editItems[i].disc=parseFloat(v)||0;renderEditItems();}
 function rmEI(i){if(editItems.length===1){notif('⚠️ Kam se kam ek item hona chahiye!',false);return;}editItems.splice(i,1);renderEditItems();}
-function calcEditTotal(){let sub=0,gst=0;editItems.forEach(item=>{const b=item.qty*item.rate*(1-item.disc/100);sub+=b;gst+=b*(item.gst/100);});const disc=parseFloat(document.getElementById('eDisc').value)||0;const grand=Math.max(0,sub+gst-disc);document.getElementById('eSubtotal').textContent='₹'+sub.toFixed(2);document.getElementById('eGst').textContent='₹'+gst.toFixed(2);document.getElementById('eTotal').textContent='₹'+grand.toFixed(2);return{sub,gst,disc,grand};}
-function editSrch(){const q=document.getElementById('eSrch').value.toLowerCase().trim();const box=document.getElementById('eSrchRes');if(!q){box.style.display='none';return;}const matches=products.filter(p=>(p.name||'').toLowerCase().includes(q)||(p.generic||'').toLowerCase().includes(q)).slice(0,8);if(!matches.length){box.style.display='none';return;}box.innerHTML=matches.map(p=>`<div onclick="addEI('${p._id}')" style="padding:11px 14px;cursor:pointer;border-bottom:1px solid #f5f7fa;font-size:13px;"><strong>${p.name}</strong><span style="color:#78909c;font-size:11px;margin-left:8px;">₹${p.salePrice||p.mrp} · Stock:${p.stock||0}</span></div>`).join('');box.style.display='block';}
-function addEI(id){const p=products.find(x=>x._id===id);if(!p)return;const ex=editItems.find(x=>x.pid===id);if(ex){ex.qty++;renderEditItems();}else{editItems.push({pid:id,name:p.name,qty:1,rate:p.salePrice||p.mrp,disc:0,gst:p.gst||0,mrp:p.mrp,batch:p.batch||'',sellUnit:p.sellType==='loose'?'pill':'piece',origSellType:p.sellType,sellType:p.sellType||'piece',cat:p.category});renderEditItems();}document.getElementById('eSrch').value='';document.getElementById('eSrchRes').style.display='none';}
+function calcEditTotal(){
+  let sub=0,gst=0;editItems.forEach(item=>{const b=item.qty*item.rate*(1-item.disc/100);sub+=b;gst+=b*(item.gst/100);});
+  const disc=parseFloat(document.getElementById('eDisc').value)||0;
+  const grand=Math.max(0,sub+gst-disc);
+  document.getElementById('eSubtotal').textContent='₹'+sub.toFixed(2);
+  document.getElementById('eGst').textContent='₹'+gst.toFixed(2);
+  document.getElementById('eTotal').textContent='₹'+grand.toFixed(2);
+  return{sub,gst,disc,grand};
+}
+function editSrch(){
+  const q=document.getElementById('eSrch').value.toLowerCase().trim();const box=document.getElementById('eSrchRes');
+  if(!q){box.style.display='none';return;}
+  const matches=products.filter(p=>(p.name||'').toLowerCase().includes(q)||(p.generic||'').toLowerCase().includes(q)).slice(0,8);
+  if(!matches.length){box.style.display='none';return;}
+  box.innerHTML=matches.map(p=>`<div onclick="addEI('${p._id}')" style="padding:11px 14px;cursor:pointer;border-bottom:1px solid #f5f7fa;font-size:13px;"><strong>${p.name}</strong><span style="color:#78909c;font-size:11px;margin-left:8px;">₹${p.salePrice||p.mrp} · Stock:${p.stock||0}</span></div>`).join('');
+  box.style.display='block';
+}
+function addEI(id){
+  const p=products.find(x=>x._id===id);if(!p)return;
+  const ex=editItems.find(x=>x.pid===id);
+  if(ex){ex.qty++;renderEditItems();}
+  else{editItems.push({pid:id,name:p.name,qty:1,rate:p.salePrice||p.mrp,disc:0,gst:p.gst||0,mrp:p.mrp,batch:p.batch||'',sellUnit:p.sellType==='loose'?'pill':'piece',pSellType:p.sellType||'strip',cat:p.category});renderEditItems();}
+  document.getElementById('eSrch').value='';document.getElementById('eSrchRes').style.display='none';
+}
 async function saveEdit(mode){
   if(!editItems.length){notif('⚠️ Koi item nahi!',false);return;}
   const totals=calcEditTotal();const paid=parseFloat(document.getElementById('ePaidAmt').value)||totals.grand;
   const pm=document.getElementById('ePayMode').value;const ed=document.getElementById('eDate').value;const et=document.getElementById('eTime').value;
   const data={customer:document.getElementById('eCustName').value||'Walk-in Customer',customerPhone:document.getElementById('eCustPhone').value,date:ed?new Date(`${ed}T${et||'00:00'}:00`):new Date(),
     items:editItems.map(item=>({product:item.pid,productName:item.name,batch:item.batch,qty:item.qty,mrp:item.mrp,salePrice:item.rate,discount:item.disc,gst:item.gst,sellUnit:item.sellUnit,total:parseFloat((item.qty*item.rate*(1-item.disc/100)).toFixed(2))})),
-    subtotal:parseFloat(totals.sub.toFixed(2)),discount:totals.disc,gstAmount:parseFloat(totals.gst.toFixed(2)),totalAmount:parseFloat(totals.grand.toFixed(2)),paidAmount:pm==='credit'?0:paid,paymentMode:pm,paymentStatus:pm==='credit'?'unpaid':'paid'};
+    subtotal:parseFloat(totals.sub.toFixed(2)),discount:totals.disc,gstAmount:parseFloat(totals.gst.toFixed(2)),totalAmount:parseFloat(totals.grand.toFixed(2)),
+    paidAmount:pm==='credit'?0:paid,paymentMode:pm,paymentStatus:pm==='credit'?'unpaid':'paid'};
   try{
     const res=await fetch('/api/sales/'+editSaleId,{method:'PUT',headers:authH({'Content-Type':'application/json'}),body:JSON.stringify(data)});
     if(!res.ok)throw new Error('HTTP '+res.status);
@@ -988,6 +1053,7 @@ async function saveEdit(mode){
     }else notif('❌ '+(result.message||'Error'),false);
   }catch(e){notif('❌ '+e.message,false);}
 }
+
 async function cancelBill(saleId,billNo){
   if(!confirm('Bill '+billNo+' cancel karna chahte ho?\nStock wapas aa jaayega.'))return;
   try{
@@ -999,7 +1065,10 @@ async function cancelBill(saleId,billNo){
   }catch(e){notif('❌ '+e.message,false);}
 }
 
-function checkRxParams(){const p=new URLSearchParams(window.location.search);if(p.get('patient')){document.getElementById('custName').value=p.get('patient');document.getElementById('custPhone').value=p.get('phone')||'';}}
+function checkRxParams(){
+  const p=new URLSearchParams(window.location.search);
+  if(p.get('patient')){document.getElementById('custName').value=p.get('patient');document.getElementById('custPhone').value=p.get('phone')||'';}
+}
 
 document.addEventListener('click',e=>{
   if(!e.target.closest('.srch-wrap'))document.getElementById('srchResults').style.display='none';
