@@ -205,7 +205,10 @@
     <!-- SEARCH -->
     <div class="card">
       <div class="card-title" style="margin-bottom:12px;">🔍 Search & Add Medicine / Item</div>
-      <div class="srch-wrap">
+      <button id="aiPrescriptionBtn" class="ai-btn" onclick="openPrescriptionReader()" style="margin-bottom:12px;width:100%;display:none;">
+  📋 AI Prescription Reader — Photo se Auto Bill
+</button>
+<div class="srch-wrap">
         <input type="text" id="srchInput" placeholder="Type medicine name, brand, generic, FMCG item..."
           oninput="srchProducts()" autocomplete="off" />
         <div class="srch-results" id="srchResults" style="display:none;"></div>
@@ -527,71 +530,265 @@ function srchProducts(){
   if(!products.length){box.innerHTML='<div style="padding:12px;color:#e65100;font-size:13px;">⚠️ Products nahi mile. Refresh karo.</div>';box.style.display='block';return;}
   const matches=products.filter(p=>(p.name||'').toLowerCase().includes(q)||(p.generic||'').toLowerCase().includes(q)||(p.company||'').toLowerCase().includes(q)).slice(0,12);
   if(!matches.length){box.innerHTML=`<div style="padding:12px;color:#78909c;font-size:13px;">No results for "${q}"</div>`;box.style.display='block';return;}
+
   box.innerHTML=matches.map(p=>{
     const cat=p.category||'medicine';
-    let stk='',lbl='';
-    if(cat==='medicine'){
-      const st=p.sellType||'strip';
-      if(st==='loose'){stk=`${p.stripStock||0}s+${p.looseStock||0} loose`;lbl='Loose';}
-      else if(st==='both'){stk=`${p.stripStock||p.stock||0} strips`;lbl='Strip+Loose';}
-      else{stk=`${p.stripStock||p.stock||0} strips`;lbl='Strip';}
+    const batches=(p.batches||[]).filter(b=>b.qty>0);
+    const totalStock=batches.length>0
+      ?batches.reduce((s,b)=>s+(b.qty||0),0)
+      :(p.stock||0);
+
+    // Sell type label
+    const st=p.sellType||'strip';
+    let lbl=cat==='medicine'
+      ?(st==='loose'?'Loose':st==='both'?'Strip+Loose':'Strip')
+      :'Piece';
+
+    // Stock display
+    let stkHtml='';
+    if(cat==='medicine'&&(st==='loose'||st==='both')){
+      stkHtml=`${p.stripStock||0}s + ${p.looseStock||0} loose`;
     }else{
-      stk=`${p.stock||0} in stock`;lbl='Piece';
+      stkHtml=`${totalStock} in stock`;
     }
-    return `<div class="srch-item" onclick="addItem('${p._id}')">
-      <span class="si-stock">${stk}</span>
-      <div class="si-name">${p.name} <span class="sell-badge ${lbl==='Loose'?'loose':''}">${lbl}</span></div>
-      <div class="si-meta">${p.company||''} ${p.batch?'· Batch:'+p.batch:''} ${p.expiry?'· Exp:'+p.expiry:''} · MRP:₹${p.mrp}</div>
+
+    // Batch preview — multiple batches hain toh dikhao
+    let batchHtml='';
+    if(batches.length>1){
+      // Multiple batches — preview dikhao
+      batchHtml=`<div style="margin-top:5px;display:flex;flex-wrap:wrap;gap:3px;">
+        ${batches.slice(0,3).map(b=>{
+          const now=new Date();
+          const exp=b.expiry?parseExpDate(b.expiry):null;
+          const isExp=exp&&exp<now;
+          const isSoon=exp&&exp>=now&&exp<=new Date(now.getTime()+90*24*60*60*1000);
+          return `<span style="background:${isExp?'#FDEDEC':isSoon?'#FEF9E7':'#EBF5FB'};color:${isExp?'#C0392B':isSoon?'#B7770D':'#1a3a6b'};padding:2px 7px;border-radius:6px;font-size:10px;font-weight:700;">
+            ${b.batchNo||'N/A'} · ₹${b.mrp} · ${b.qty}u${isExp?' ⚠️':isSoon?' ⚡':''}
+          </span>`;
+        }).join('')}
+        ${batches.length>3?`<span style="font-size:10px;color:#78909c;padding:2px 4px;">+${batches.length-3} more</span>`:''}
+      </div>`;
+    }else if(batches.length===1){
+      // Single batch
+      const b=batches[0];
+      batchHtml=`<div style="margin-top:4px;font-size:11px;color:#78909c;">
+        ${b.batchNo?'Batch: '+b.batchNo+' · ':''}
+        ${b.supplier?'🏭 '+b.supplier+' · ':''}
+        ${b.expiry?'Exp: '+b.expiry+' · ':''}
+        MRP: ₹${b.mrp||p.mrp}
+      </div>`;
+    }else{
+      // No batches — legacy
+      batchHtml=`<div style="font-size:11px;color:#78909c;margin-top:4px;">
+        ${p.company||''}
+        ${p.batch?' · Batch:'+p.batch:''}
+        ${p.expiry?' · Exp:'+p.expiry:''}
+        · MRP:₹${p.mrp}
+      </div>`;
+    }
+
+    return `<div class="srch-item" onclick="addItem('${p._id}')" style="padding:12px 16px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div style="flex:1;">
+          <div class="si-name">
+            ${p.name}
+            <span class="sell-badge ${lbl==='Loose'?'loose':''}" style="margin-left:6px;">${lbl}</span>
+            ${batches.length>1?`<span style="background:#F4ECF7;color:#7D3C98;padding:2px 7px;border-radius:8px;font-size:10px;font-weight:700;margin-left:4px;">📦 ${batches.length} Batches</span>`:''}
+          </div>
+          ${batchHtml}
+        </div>
+        <div style="text-align:right;flex-shrink:0;margin-left:10px;">
+          <div style="font-weight:800;color:${totalStock>0?'#1E8449':'#C0392B'};font-size:13px;">${stkHtml}</div>
+          ${batches.length>1?`<div style="font-size:10px;color:#78909c;margin-top:2px;">Tap to select batch</div>`:''}
+        </div>
+      </div>
     </div>`;
   }).join('');
   box.style.display='block';
 }
-
 // ── ADD ITEM ──
 function addItem(id){
   const p=products.find(x=>x._id===id);if(!p)return;
-  const ex=billItems.find(x=>x.pid===id);
-  if(ex){ex.qty++;renderBill();srchClear();return;}
+  const batches=(p.batches||[]).filter(b=>b.qty>0);
+  // Multiple batches hain → selector dikhao
+  if(batches.length>1){
+    srchClear();
+    showBatchSelector(p);
+    return;
+  }
+  // Single ya no batch → direct add
+  addItemWithBatch(p, batches[0]||null);
+  srchClear();
+}
 
+function showBatchSelector(p){
+  let modal=document.getElementById('batchSelectModal');
+  if(!modal){
+    modal=document.createElement('div');
+    modal.id='batchSelectModal';
+    modal.className='modal-bg';
+    document.body.appendChild(modal);
+  }
+  const now=new Date();
+  const in90=new Date();in90.setDate(now.getDate()+90);
+  const batches=[...(p.batches||[])].filter(b=>b.qty>0).sort((a,b)=>{
+    return parseExpDate(a.expiry)-parseExpDate(b.expiry);
+  });
+  modal.innerHTML=`
+    <div class="modal" style="max-width:520px;">
+      <div class="modal-hdr">
+        <div>
+          <div class="modal-title">📦 Batch Select karo</div>
+          <div style="font-size:14px;font-weight:700;color:#1a2332;margin-top:4px;">${p.name}</div>
+          <div style="font-size:12px;color:#78909c;">Konsa batch bill karna hai?</div>
+        </div>
+        <button class="modal-close" onclick="document.getElementById('batchSelectModal').classList.remove('open')">✕</button>
+      </div>
+      <div style="background:#EBF5FB;border-radius:8px;padding:8px 12px;font-size:12px;color:#1a3a6b;margin-bottom:12px;">
+        💡 FIFO order mein hain — pehla batch pehle nikalna chahiye
+      </div>
+      ${batches.map((b,i)=>{
+        const expDate=parseExpDate(b.expiry);
+        const isExp=expDate<now;
+        const isSoon=expDate>=now&&expDate<=in90;
+        const margin=b.mrp>0?(((b.mrp-b.purchasePrice)/b.mrp)*100).toFixed(1):0;
+        const borderColor=isExp?'#FDEDEC':i===0?'#1a3a6b':'#e2e8f0';
+        const bgColor=isExp?'#fff5f5':i===0?'#f0f7ff':'white';
+        return `
+          <div onclick="${isExp?'':(`selectBatch('`+p._id+`','`+b.batchNo+`')`)}"
+            style="padding:14px;border:2px solid ${borderColor};border-radius:12px;margin-bottom:8px;cursor:${isExp?'not-allowed':'pointer'};background:${bgColor};transition:all 0.2s;">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+              <div style="flex:1;">
+                <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;flex-wrap:wrap;">
+                  <span style="font-weight:800;font-size:14px;">${b.batchNo||'No Batch'}</span>
+                  ${i===0?'<span style="background:#1a3a6b;color:white;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;">FIFO ★</span>':''}
+                  ${isExp?'<span style="background:#FDEDEC;color:#C0392B;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;">⚠️ Expired</span>':''}
+                  ${isSoon&&!isExp?'<span style="background:#FEF9E7;color:#B7770D;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;">⚡ Expiring</span>':''}
+                </div>
+                <div style="font-size:12px;color:#546e7a;">🏭 ${b.supplier||'Unknown'}</div>
+                <div style="font-size:12px;color:#78909c;">📅 Expiry: ${b.expiry||'N/A'}</div>
+              </div>
+              <div style="text-align:right;flex-shrink:0;margin-left:12px;">
+                <div style="font-size:20px;font-weight:800;color:#1a3a6b;">₹${b.mrp||0}</div>
+                <div style="font-size:11px;color:#78909c;">MRP</div>
+                <div style="font-size:12px;color:#546e7a;margin-top:2px;">Buy: ₹${b.purchasePrice||0}</div>
+                <div style="font-size:11px;font-weight:700;color:${margin>=20?'#1E8449':'#B7770D'};">Margin: ${margin}%</div>
+                <div style="margin-top:6px;"><span style="background:${b.qty>10?'#EAFAF1':'#FEF9E7'};color:${b.qty>10?'#1E8449':'#B7770D'};padding:3px 10px;border-radius:10px;font-size:12px;font-weight:700;">${b.qty} units</span></div>
+              </div>
+            </div>
+          </div>`;
+      }).join('')}
+      <button onclick="document.getElementById('batchSelectModal').classList.remove('open')"
+        style="width:100%;padding:11px;background:#f0f4f8;border:none;border-radius:8px;cursor:pointer;font-size:14px;font-weight:700;color:#546e7a;margin-top:4px;">
+        Cancel
+      </button>
+    </div>`;
+  modal.classList.add('open');
+}
+
+function selectBatch(productId,batchNo){
+  const p=products.find(x=>x._id===productId);if(!p)return;
+  const batch=p.batches?.find(b=>b.batchNo===batchNo);
+  addItemWithBatch(p,batch);
+  document.getElementById('batchSelectModal')?.classList.remove('open');
+}
+
+function addItemWithBatch(p,batch){
+  const ex=billItems.find(x=>x.pid===p._id&&x.batchNo===(batch?.batchNo||''));
+  if(ex){ex.qty++;renderBill();return;}
   const cat=p.category||'medicine';
   const pSellType=p.sellType||'strip';
-  let rate=p.salePrice||p.mrp||0;
+  let rate=batch?.mrp||p.salePrice||p.mrp||0;
   let sellUnit='piece';
-  let maxQty=p.stock||0;
-
+  let maxQty=batch?.qty||p.stock||0;
   if(cat==='medicine'){
     if(pSellType==='loose'){
-      // Sirf loose — pill rate
-      rate=p.pricePerUnit||parseFloat(((p.mrp||0)/(p.unitsPerStrip||10)).toFixed(2));
+      rate=p.pricePerUnit||parseFloat(((batch?.mrp||p.mrp||0)/(p.unitsPerStrip||10)).toFixed(2));
       sellUnit='pill';
       maxQty=(p.stripStock||0)*(p.unitsPerStrip||10)+(p.looseStock||0);
     }else if(pSellType==='both'){
-      // Both — default strip, dropdown available
-      rate=p.salePrice||p.mrp||0;
       sellUnit='strip';
-      maxQty=p.stripStock||p.stock||0;
     }else{
-      // Strip only
-      rate=p.salePrice||p.mrp||0;
       sellUnit='strip';
-      maxQty=p.stripStock||p.stock||0;
     }
-  }else{
-    // Non-medicine — piece default
-    sellUnit='piece';
-    maxQty=p.stock||0;
+  }
+  billItems.push({
+    pid:p._id,name:p.name,cat,pSellType,sellUnit,
+    batchNo:batch?.batchNo||p.batch||'',
+    expiry:batch?.expiry||p.expiry||'',
+    supplier:batch?.supplier||'',
+    qty:1,
+    rate:parseFloat((rate||0).toFixed(2)),
+    disc:0,
+    gst:batch?.gst||p.gst||0,
+    maxQty,
+    mrp:batch?.mrp||p.mrp||0,
+    purchasePrice:batch?.purchasePrice||p.purchasePrice||0,
+  });
+  renderBill();
+}
+
+function parseExpDate(mmyy){
+  if(!mmyy)return new Date('9999-12-31');
+  const parts=mmyy.split('/');
+  if(parts.length<2)return new Date('9999-12-31');
+  return new Date(parseInt('20'+parts[1]),parseInt(parts[0])-1,28);
+}
+function selectBatch(productId, batchNo) {
+  const p = products.find(x => x._id === productId);
+  if (!p) return;
+  const batch = p.batches?.find(b => b.batchNo === batchNo);
+  addItemWithBatch(p, batch);
+  document.getElementById('batchSelectModal')?.classList.remove('open');
+}
+
+function addItemWithBatch(p, batch) {
+  const ex = billItems.find(x => x.pid === p._id && x.batchNo === (batch?.batchNo || ''));
+  if (ex) { ex.qty++; renderBill(); return; }
+
+  const cat = p.category || 'medicine';
+  const pSellType = p.sellType || 'strip';
+  let rate = batch?.mrp || p.salePrice || p.mrp || 0;
+  let sellUnit = 'piece';
+  let maxQty = batch?.qty || p.stock || 0;
+
+  if (cat === 'medicine') {
+    if (pSellType === 'loose') {
+      rate = p.pricePerUnit || parseFloat(((batch?.mrp || p.mrp || 0) / (p.unitsPerStrip || 10)).toFixed(2));
+      sellUnit = 'pill';
+    } else {
+      sellUnit = 'strip';
+    }
   }
 
   billItems.push({
-    pid:id, name:p.name, cat,
-    pSellType, // original product sell type
-    sellUnit,  // current sell unit
-    qty:1, rate:parseFloat((rate||0).toFixed(2)),
-    disc:0, gst:p.gst||0, maxQty,
-    mrp:p.mrp||0, batch:p.batch||'', expiry:p.expiry||''
+    pid: p._id,
+    name: p.name,
+    cat,
+    pSellType,
+    sellUnit,
+    batchNo: batch?.batchNo || p.batch || '',
+    expiry: batch?.expiry || p.expiry || '',
+    supplier: batch?.supplier || '',
+    qty: 1,
+    rate: parseFloat((rate || 0).toFixed(2)),
+    disc: 0,
+    gst: batch?.gst || p.gst || 0,
+    maxQty,
+    mrp: batch?.mrp || p.mrp || 0,
+    purchasePrice: batch?.purchasePrice || p.purchasePrice || 0,
+    batch: batch || null
   });
-  srchClear();renderBill();
+  renderBill();
 }
+
+function parseExpDate(mmyy) {
+  if (!mmyy) return new Date('9999-12-31');
+  const parts = mmyy.split('/');
+  if (parts.length < 2) return new Date('9999-12-31');
+  return new Date(parseInt('20' + parts[1]), parseInt(parts[0]) - 1, 28);
+}
+
 function srchClear(){document.getElementById('srchInput').value='';document.getElementById('srchResults').style.display='none';}
 
 // ── CHANGE SELL UNIT — Medicine strip ↔ pill ──
@@ -630,7 +827,6 @@ function renderBill(){
     let typeHtml='';
     if(item.cat==='medicine'){
       if(item.pSellType==='both'){
-        // Dropdown: Strip / Per Pill
         typeHtml=`<select class="type-sel" onchange="changeSellUnit(${i},this.value)">
           <option value="strip" ${item.sellUnit==='strip'?'selected':''}>📦 Strip</option>
           <option value="pill" ${item.sellUnit==='pill'?'selected':''}>💊 Per Pill</option>
@@ -638,11 +834,9 @@ function renderBill(){
       }else if(item.pSellType==='loose'){
         typeHtml='<span class="type-badge pill">💊 Per Pill</span>';
       }else{
-        // Strip only
         typeHtml='<span class="type-badge strip">📦 Strip</span>';
       }
     }else{
-      // Non-medicine: Dropdown
       typeHtml=`<select class="type-sel" onchange="changeOtherUnit(${i},this.value)">
         <option value="piece" ${item.sellUnit==='piece'?'selected':''}>Piece</option>
         <option value="box" ${item.sellUnit==='box'?'selected':''}>📦 Box</option>
@@ -652,22 +846,46 @@ function renderBill(){
       </select>`;
     }
 
-    // Rate display with per-unit hint
+    // ── BATCH INFO under type ──
+    if(item.batchNo||item.batch){
+      const bn=item.batchNo||item.batch||'';
+      const sup=item.supplier||'';
+      const exp=item.expiry||'';
+      typeHtml+=`<div style="font-size:10px;color:#90a4ae;margin-top:4px;line-height:1.5;">
+        ${bn?'<span style="background:#f0f4f8;padding:1px 5px;border-radius:4px;">'+bn+'</span>':''}
+        ${exp?'<br>'+exp:''}
+        ${sup?'<br><span style="color:#7D3C98;">'+sup+'</span>':''}
+      </div>`;
+    }
+
+    // ── RATE DISPLAY ──
     const rateHtml=item.cat==='medicine'&&item.sellUnit==='pill'
       ?`₹${item.rate.toFixed(2)}<div style="font-size:10px;color:#B7770D;">/pill</div>`
       :`₹${item.rate.toFixed(2)}`;
 
+    // ── MARGIN HINT (optional, small) ──
+    const margin=item.mrp>0&&item.purchasePrice>0
+      ?(((item.mrp-item.purchasePrice)/item.mrp)*100).toFixed(0)
+      :null;
+
     return `<tr>
       <td>
         <div style="font-weight:700;font-size:13px;">${item.name}</div>
-        ${item.batch?`<div style="font-size:11px;color:#b0bec5;">Batch:${item.batch}${item.expiry?' · Exp:'+item.expiry:''}</div>`:''}
+        <div style="font-size:11px;color:#b0bec5;margin-top:2px;">
+          ${item.batchNo||item.batch?'Batch: '+(item.batchNo||item.batch):''}
+          ${item.expiry?' · Exp:'+item.expiry:''}
+        </div>
+        ${item.supplier?`<div style="font-size:10px;color:#7D3C98;">🏭 ${item.supplier}</div>`:''}
       </td>
       <td>${typeHtml}</td>
       <td>
         <input type="number" value="${item.qty}" min="1" max="${item.maxQty||9999}" style="width:58px;" onchange="updQty(${i},this.value)" />
         <div style="font-size:10px;color:#b0bec5;text-align:center;">max ${item.maxQty||'∞'}</div>
       </td>
-      <td style="font-weight:600;">${rateHtml}</td>
+      <td>
+        <div style="font-weight:600;">${rateHtml}</div>
+        ${margin?`<div style="font-size:10px;color:#1E8449;margin-top:2px;">${margin}% margin</div>`:''}
+      </td>
       <td><input type="number" value="${item.disc}" min="0" max="100" style="width:50px;" onchange="updDisc(${i},this.value)" /></td>
       <td style="font-size:12px;color:#78909c;">${item.gst||0}%</td>
       <td style="font-weight:700;color:#1B4F72;">₹${lineAmt}</td>
@@ -1082,6 +1300,410 @@ loadProducts();
 loadRecentBills();
 loadPharmacyData();
 checkRxParams();
+
+</script>
+
+<!-- AI Module -->
+<script src="/js/ai.js"></script>
+<script>
+
+  // ── AI FEATURE GATE — Sirf MedXpert ke liye ──
+function isAIEnabled() {
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const tenantId = user.tenantId || '';
+  return tenantId === 'medxpert-pharmacy-872200';
+}
+
+// Prescription Reader button hide/show
+function initAIFeatures() {
+  const aiBtn = document.getElementById('aiPrescriptionBtn');
+  if (!aiBtn) return;
+  if (isAIEnabled()) {
+    aiBtn.style.display = 'block';
+  } else {
+    aiBtn.style.display = 'none';
+  }
+}
+// ── AI DRUG INTERACTION — Bill mein items add hone ke baad auto check ──
+async function aiCheckInteractions() {
+  if (!DH_AI.isReady()) return;
+  if (billItems.length < 2) return;
+  const meds = billItems.filter(i => i.cat === 'medicine');
+  if (meds.length < 2) return;
+  try {
+    const result = await DH_AI.checkDrugInteraction(meds);
+    if (result?.hasInteraction && result.severity !== 'none') {
+      showInteractionAlert(result);
+    }
+  } catch(e) { console.log('AI interaction check:', e.message); }
+}
+
+function showInteractionAlert(result) {
+  const existing = document.getElementById('interactionAlert');
+  if (existing) existing.remove();
+  const colors = { mild: '#FEF9E7', moderate: '#FEF3CD', severe: '#FDEDEC' };
+  const icons  = { mild: '⚠️', moderate: '🔶', severe: '🚨' };
+  const div = document.createElement('div');
+  div.id = 'interactionAlert';
+  div.style.cssText = `margin-top:12px;padding:14px;border-radius:10px;background:${colors[result.severity]||'#FEF9E7'};border:1px solid #F9E79F;`;
+  div.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <span style="font-weight:800;font-size:13px;color:#B7770D;">${icons[result.severity]||'⚠️'} AI Drug Interaction Alert</span>
+      <button onclick="document.getElementById('interactionAlert').remove()" style="background:none;border:none;cursor:pointer;font-size:16px;color:#78909c;">✕</button>
+    </div>
+    ${result.interactions.map(i=>`
+      <div style="background:white;border-radius:8px;padding:10px;margin-bottom:6px;border-left:3px solid #F39C12;">
+        <div style="font-weight:700;font-size:12px;color:#1a2332;">${i.drug1} + ${i.drug2}</div>
+        <div style="font-size:12px;color:#546e7a;margin-top:3px;">${i.effect}</div>
+        <div style="font-size:11px;color:#B7770D;margin-top:4px;font-weight:700;">💡 ${i.advice}</div>
+      </div>`).join('')}
+    <div style="font-size:12px;color:#78909c;margin-top:6px;">${result.overallAdvice||''}</div>`;
+  // Bill Items card ke andar add karo
+  const billCard = document.querySelector('#billTbl')?.closest('.card');
+  if (billCard) billCard.appendChild(div);
+}
+
+// ── AI SUBSTITUTE — Out of stock hone par ──
+async function aiSuggestSubstitute(medicine) {
+  if (!DH_AI.isReady()) return;
+  try {
+    const result = await DH_AI.findSubstitute(medicine, products);
+    if (!result?.substitutes?.length) {
+      DH_AI.showNotif('❌ AI: Koi substitute nahi mila stock mein', false);
+      return;
+    }
+    showSubstituteModal(medicine, result);
+  } catch(e) { console.log('AI substitute:', e.message); }
+}
+
+function showSubstituteModal(original, result) {
+  let modal = document.getElementById('aiSubModal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'aiSubModal';
+    modal.className = 'modal-bg';
+    document.body.appendChild(modal);
+  }
+  modal.innerHTML = `
+    <div class="modal" style="max-width:500px;">
+      <div class="modal-hdr">
+        <div>
+          <div class="modal-title">🤖 AI Substitute Suggestions</div>
+          <div style="font-size:12px;color:#78909c;margin-top:3px;">${original.name} — Out of Stock</div>
+        </div>
+        <button class="modal-close" onclick="document.getElementById('aiSubModal').classList.remove('open')">✕</button>
+      </div>
+      ${result.substitutes.map(s=>`
+        <div style="padding:12px;border:1px solid #e2e8f0;border-radius:10px;margin-bottom:8px;cursor:pointer;transition:all 0.2s;"
+          onclick="addSubstituteToBill('${s.name}');document.getElementById('aiSubModal').classList.remove('open')"
+          onmouseover="this.style.background='#EBF5FB'" onmouseout="this.style.background='white'">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div>
+              <div style="font-weight:700;font-size:14px;">${s.name}</div>
+              <div style="font-size:11px;color:#78909c;margin-top:3px;">${s.reason}</div>
+              ${s.caution?`<div style="font-size:11px;color:#B7770D;margin-top:3px;">⚠️ ${s.caution}</div>`:''}
+            </div>
+            <div style="text-align:right;">
+              <span style="background:${s.matchType==='exact'?'#EAFAF1':'#EBF5FB'};color:${s.matchType==='exact'?'#1E8449':'#1B4F72'};padding:3px 10px;border-radius:10px;font-size:11px;font-weight:700;">
+                ${s.matchType==='exact'?'✅ Exact':'🔄 Therapeutic'} ${s.confidence}%
+              </span>
+              <div style="font-size:11px;color:#1a3a6b;font-weight:700;margin-top:4px;">Tap to add →</div>
+            </div>
+          </div>
+        </div>`).join('')}
+      ${result.pharmacistNote?`<div style="background:#f0fdf4;border-radius:8px;padding:10px;font-size:12px;color:#1e6b3a;"><b>💊 Pharmacist Note:</b> ${result.pharmacistNote}</div>`:''}
+    </div>`;
+  modal.classList.add('open');
+}
+
+function addSubstituteToBill(medicineName) {
+  const p = products.find(x => x.name === medicineName);
+  if (p) { addItem(p._id); DH_AI.showNotif('✅ Substitute added: ' + medicineName); }
+  else DH_AI.showNotif('❌ Product not found', false);
+}
+
+
+
+// ── AI PRESCRIPTION READER ──
+function openPrescriptionReader() {
+  if (!DH_AI.isReady()) { DH_AI.showSetup(); return; }
+  let modal = document.getElementById('rxModal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'rxModal';
+    modal.className = 'modal-bg';
+    modal.innerHTML = `
+      <div class="modal" style="max-width:480px;">
+        <div class="modal-hdr">
+          <div class="modal-title">📋 AI Prescription Reader</div>
+          <button class="modal-close" onclick="document.getElementById('rxModal').classList.remove('open')">✕</button>
+        </div>
+        <div style="border:2px dashed #1a3a6b;border-radius:12px;padding:30px;text-align:center;cursor:pointer;background:#f8fafc;"
+          onclick="document.getElementById('rxImageInput').click()">
+          <div style="font-size:36px;margin-bottom:8px;">📷</div>
+          <div style="font-weight:700;color:#1a3a6b;">Prescription Photo Click Karo</div>
+          <div style="font-size:12px;color:#78909c;margin-top:4px;">Camera ya Gallery se</div>
+        </div>
+        <input id="rxImageInput" type="file" accept="image/*" capture="environment" style="display:none" onchange="processRxImage(this)" />
+        <div id="rxResult" style="margin-top:14px;"></div>
+      </div>`;
+    document.body.appendChild(modal);
+  }
+  modal.classList.add('open');
+}
+
+async function processRxImage(input) {
+  const file = input.files[0]; if (!file) return;
+ 
+  // Show preview
+  const previewDiv = document.getElementById('rxResult');
+  previewDiv.innerHTML = '<div style="text-align:center;padding:20px;color:#7D3C98;font-weight:700;"><span style="font-size:24px;display:block;margin-bottom:8px;">🤖</span>AI prescription pad raha hai...<br><span style="font-size:11px;color:#90a4ae;margin-top:6px;display:block;">Handwritten text detect ho raha hai</span></div>';
+ 
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    const base64 = e.target.result.split(',')[1];
+    const mime = file.type;
+    try {
+      const result = await DH_AI.readPrescription(base64, mime);
+      showRxEditableResults(result);
+    } catch(e) {
+      // Rate limit ya error — show manual entry
+      if (e.message.includes('limit') || e.message.includes('quota') || e.message.includes('429')) {
+        showManualRxEntry();
+      } else {
+        previewDiv.innerHTML = `
+          <div style="background:#FEF9E7;border-radius:10px;padding:14px;text-align:center;">
+            <div style="font-size:20px;margin-bottom:6px;">⚠️</div>
+            <div style="font-weight:700;color:#B7770D;margin-bottom:4px;">AI se read nahi hua</div>
+            <div style="font-size:12px;color:#78909c;margin-bottom:12px;">${e.message}</div>
+            <button onclick="showManualRxEntry()" style="padding:8px 20px;background:#1a3a6b;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:700;">✍️ Manually Enter Karo</button>
+          </div>`;
+      }
+    }
+  };
+  reader.readAsDataURL(file);
+}
+ 
+// Show editable medicine list that user can correct
+function showRxEditableResults(result) {
+  const rxResult = document.getElementById('rxResult');
+  const meds = result?.medicines || [];
+ 
+  rxResult.innerHTML = `
+    <div style="margin-bottom:10px;">
+      <div style="font-weight:800;color:#1a2332;font-size:13px;margin-bottom:4px;">
+        🤖 AI ne ${meds.length} medicine detect ki — naam check karke correct karo:
+      </div>
+      <div style="font-size:11px;color:#78909c;background:#FEF9E7;padding:8px;border-radius:8px;">
+        ⚠️ Doctor ki handwriting mushkil hoti hai — galat naam manually fix karo
+      </div>
+    </div>
+    <div id="rxMedList">
+      ${meds.map((m, i) => `
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;" id="rxRow${i}">
+          <input type="checkbox" id="rxChk${i}" checked style="width:16px;height:16px;flex-shrink:0;" />
+          <div style="flex:1;position:relative;">
+            <input type="text" id="rxName${i}" value="${m.name}"
+              placeholder="Medicine naam type karo..."
+              style="width:100%;padding:8px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;outline:none;"
+              oninput="rxSearchMed(${i}, this.value)"
+              onfocus="rxSearchMed(${i}, this.value)" />
+            <div id="rxDrop${i}" style="display:none;position:absolute;top:100%;left:0;right:0;background:white;border:1px solid #e2e8f0;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.1);z-index:100;max-height:150px;overflow-y:auto;margin-top:2px;"></div>
+          </div>
+          <button onclick="document.getElementById('rxRow${i}').remove()"
+            style="background:#FDEDEC;border:none;color:#C0392B;padding:6px 10px;border-radius:6px;cursor:pointer;font-weight:700;flex-shrink:0;">✕</button>
+        </div>`).join('')}
+    </div>
+ 
+    <button onclick="addRxMedRow()"
+      style="width:100%;padding:8px;background:#f0f4f8;border:1.5px dashed #b0bec5;border-radius:8px;cursor:pointer;color:#546e7a;font-weight:700;margin-bottom:10px;">
+      + Aur Medicine Add Karo
+    </button>
+ 
+    <button onclick="addCheckedRxMeds()"
+      style="width:100%;padding:12px;background:linear-gradient(135deg,#1a3a6b,#1e6b3a);color:white;border:none;border-radius:10px;cursor:pointer;font-size:14px;font-weight:700;">
+      ➕ Selected Medicines Bill Mein Add Karo
+    </button>`;
+}
+ 
+// Search stock while typing in prescription field
+function rxSearchMed(idx, query) {
+  const drop = document.getElementById('rxDrop' + idx);
+  if (!query || query.length < 2) { drop.style.display = 'none'; return; }
+ 
+  const matches = products.filter(p =>
+    (p.name||'').toLowerCase().includes(query.toLowerCase()) ||
+    (p.generic||'').toLowerCase().includes(query.toLowerCase())
+  ).slice(0, 5);
+ 
+  if (!matches.length) { drop.style.display = 'none'; return; }
+ 
+  drop.innerHTML = matches.map(p => `
+    <div onclick="selectRxMed(${idx}, '${p.name.replace(/'/g,"\\'")}', '${p._id}')"
+      style="padding:8px 12px;cursor:pointer;border-bottom:1px solid #f5f7fa;font-size:13px;"
+      onmouseover="this.style.background='#EBF5FB'" onmouseout="this.style.background='white'">
+      <div style="font-weight:700;">${p.name}</div>
+      <div style="font-size:11px;color:#78909c;">Stock: ${p.stock||0} | ₹${p.mrp||0}</div>
+    </div>`).join('');
+  drop.style.display = 'block';
+}
+ 
+function selectRxMed(idx, name, pid) {
+  document.getElementById('rxName' + idx).value = name;
+  document.getElementById('rxDrop' + idx).style.display = 'none';
+  // Store product id
+  document.getElementById('rxName' + idx).dataset.pid = pid;
+}
+ 
+// Add new empty medicine row
+function addRxMedRow() {
+  const list = document.getElementById('rxMedList');
+  const idx = Date.now();
+  const div = document.createElement('div');
+  div.id = 'rxRow' + idx;
+  div.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:8px;';
+  div.innerHTML = `
+    <input type="checkbox" id="rxChk${idx}" checked style="width:16px;height:16px;flex-shrink:0;" />
+    <div style="flex:1;position:relative;">
+      <input type="text" id="rxName${idx}" placeholder="Medicine naam type karo..."
+        style="width:100%;padding:8px 10px;border:1.5px solid #1a3a6b;border-radius:8px;font-size:13px;outline:none;"
+        oninput="rxSearchMed('${idx}', this.value)" onfocus="rxSearchMed('${idx}', this.value)" />
+      <div id="rxDrop${idx}" style="display:none;position:absolute;top:100%;left:0;right:0;background:white;border:1px solid #e2e8f0;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.1);z-index:100;max-height:150px;overflow-y:auto;margin-top:2px;"></div>
+    </div>
+    <button onclick="document.getElementById('rxRow${idx}').remove()"
+      style="background:#FDEDEC;border:none;color:#C0392B;padding:6px 10px;border-radius:6px;cursor:pointer;font-weight:700;flex-shrink:0;">✕</button>`;
+  list.appendChild(div);
+  document.getElementById('rxName' + idx).focus();
+}
+ 
+// Manual entry if AI fails
+function showManualRxEntry() {
+  document.getElementById('rxResult').innerHTML = `
+    <div style="background:#FEF9E7;border-radius:8px;padding:10px;margin-bottom:10px;font-size:12px;color:#B7770D;">
+      ⏳ AI rate limit — manually enter karo ya 1 minute baad try karo
+    </div>
+    <div id="rxMedList">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;" id="rxRow0">
+        <input type="checkbox" id="rxChk0" checked style="width:16px;height:16px;flex-shrink:0;" />
+        <div style="flex:1;position:relative;">
+          <input type="text" id="rxName0" placeholder="Medicine naam type karo..."
+            style="width:100%;padding:8px 10px;border:1.5px solid #1a3a6b;border-radius:8px;font-size:13px;outline:none;"
+            oninput="rxSearchMed(0, this.value)" onfocus="rxSearchMed(0, this.value)" />
+          <div id="rxDrop0" style="display:none;position:absolute;top:100%;left:0;right:0;background:white;border:1px solid #e2e8f0;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.1);z-index:100;max-height:150px;overflow-y:auto;margin-top:2px;"></div>
+        </div>
+      </div>
+    </div>
+    <button onclick="addRxMedRow()"
+      style="width:100%;padding:8px;background:#f0f4f8;border:1.5px dashed #b0bec5;border-radius:8px;cursor:pointer;color:#546e7a;font-weight:700;margin-bottom:10px;">
+      + Aur Medicine Add Karo
+    </button>
+    <button onclick="addCheckedRxMeds()"
+      style="width:100%;padding:12px;background:linear-gradient(135deg,#1a3a6b,#1e6b3a);color:white;border:none;border-radius:10px;cursor:pointer;font-size:14px;font-weight:700;">
+      ➕ Bill Mein Add Karo
+    </button>`;
+}
+ 
+// Add checked medicines to bill
+function addCheckedRxMeds() {
+  let added = 0, notFound = [];
+  // Find all rxChk checkboxes
+  document.querySelectorAll('[id^="rxChk"]').forEach(chk => {
+    if (!chk.checked) return;
+    const idx = chk.id.replace('rxChk', '');
+    const nameInput = document.getElementById('rxName' + idx);
+    if (!nameInput) return;
+    const pid = nameInput.dataset.pid;
+    const name = nameInput.value.trim();
+    if (!name) return;
+ 
+    let p = null;
+    if (pid) p = products.find(x => x._id === pid);
+    if (!p) p = products.find(x => x.name.toLowerCase().includes(name.toLowerCase().split(' ')[0]) || name.toLowerCase().includes(x.name.toLowerCase().split(' ')[0]));
+ 
+    if (p) { addItem(p._id); added++; }
+    else notFound.push(name);
+  });
+ 
+  document.getElementById('rxModal').classList.remove('open');
+  if (added > 0) DH_AI.showNotif(`✅ ${added} medicines bill mein add ki`);
+  if (notFound.length > 0) DH_AI.showNotif(`⚠️ Stock mein nahi mili: ${notFound.join(', ')}`, false);
+}
+ 
+// Close dropdowns on outside click
+document.addEventListener('click', e => {
+  if (!e.target.closest('[id^="rxDrop"]') && !e.target.closest('[id^="rxName"]')) {
+    document.querySelectorAll('[id^="rxDrop"]').forEach(d => d.style.display = 'none');
+  }
+});
+
+function addRxMedicinesToBill(medicines) {
+  let added = 0, notFound = [];
+  medicines.forEach((m, i) => {
+    const cb = document.getElementById('rxMed' + i);
+    if (!cb?.checked) return;
+    const p = products.find(x => x.name.toLowerCase().includes(m.name.toLowerCase().split(' ')[0]) || m.name.toLowerCase().includes(x.name.toLowerCase().split(' ')[0]));
+    if (p) { addItem(p._id); added++; }
+    else notFound.push(m.name);
+  });
+  document.getElementById('rxModal').classList.remove('open');
+  DH_AI.showNotif(`✅ ${added} medicines added to bill${notFound.length?' | Not found: '+notFound.join(', '):''}`);
+}
+
+// ── AI CREDIT CHECK — Customer select hone pe ──
+async function aiCreditCheck(customer, customerId) {
+  if (!DH_AI.isReady() || !customerId) return;
+  try {
+    const res = await fetch('/api/sales?customerId=' + customerId, {headers: authH()});
+    if (!res.ok) return;
+    const history = await res.json();
+    if (!Array.isArray(history) || !history.length) return;
+    const result = await DH_AI.analyzeCreditRisk(customer, history);
+    if (result?.riskLevel === 'high' || result?.recommendation === 'cash_only') {
+      const bar = document.getElementById('foundBar');
+      let creditDiv = document.getElementById('aiCreditAlert');
+      if (!creditDiv) { creditDiv = document.createElement('div'); creditDiv.id = 'aiCreditAlert'; bar.parentNode.insertBefore(creditDiv, bar.nextSibling); }
+      creditDiv.innerHTML = `
+        <div style="background:#FDEDEC;border:1px solid #F1948A;border-radius:8px;padding:10px 14px;margin-top:8px;display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <div style="font-weight:700;font-size:12px;color:#C0392B;">🤖 AI Credit Alert</div>
+            <div style="font-size:12px;color:#546e7a;margin-top:2px;">${result.message}</div>
+            ${result.dueAmount>0?`<div style="font-size:12px;font-weight:700;color:#C0392B;">Due: ₹${result.dueAmount}</div>`:''}
+          </div>
+          <button onclick="document.getElementById('aiCreditAlert').remove()" style="background:none;border:none;cursor:pointer;color:#78909c;font-size:16px;">✕</button>
+        </div>`;
+    }
+  } catch(e) { console.log('AI credit check:', e.message); }
+}
+
+// ── OVERRIDE pickCust to add AI credit check ──
+const _origPickCust = pickCust;
+window.pickCust = function(id, name, phone, pts) {
+  _origPickCust(id, name, phone, pts);
+  if (!isAIEnabled()) return;
+  aiCreditCheck({ name, phone }, id);
+};
+
+// ── OVERRIDE addItem to trigger interaction check ──
+const _origAddItem = addItem;
+window.addItem = function(id) {
+  _origAddItem(id);
+  if (!isAIEnabled()) return;
+  document.getElementById('interactionAlert')?.remove();
+  setTimeout(() => aiCheckInteractions(), 500);
+};
+
+(function() {
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const isMediaxpert = (user.tenantId || '') === 'medxpert-pharmacy-872200';
+  
+  // Button show/hide
+  const btn = document.getElementById('aiPrescriptionBtn');
+  if (btn) btn.style.display = isMediaxpert ? 'block' : 'none';
+  
+  console.log('AI Features:', isMediaxpert ? '✅ Active' : '❌ Hidden');
+})();
+
+
 </script>
 </body>
 </html>

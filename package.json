@@ -1,18 +1,18 @@
 {
-  "name": "medxpert-pharmacy",
+  "name": "dawa-hisaab",
   "version": "1.0.0",
-  "description": "MedXpert Pharmacy Management System",
+  "description": "Dawa Hisaab - Smart Pharmacy Management",
   "main": "electron.js",
   "scripts": {
-    "start": "node server.js",
-    "electron": "node_modules\\.bin\\electron.cmd .",
+    "start": "electron .",
+    "server": "node server.js",
     "build-win": "node_modules\\.bin\\electron-builder.cmd --win",
     "build-mac": "node_modules\\.bin\\electron-builder.cmd --mac"
   },
   "build": {
-    "appId": "com.medxpert.pharmacy",
-    "productName": "MedXpert Pharmacy",
-    "copyright": "Copyright 2024 MedXpert",
+    "appId": "com.dawahisaab.pharmacy",
+    "productName": "Dawa Hisaab",
+    "copyright": "Copyright 2025 Dawa Hisaab",
     "icon": "assets/icon",
     "directories": {
       "output": "dist"
@@ -21,10 +21,7 @@
       "target": [
         {
           "target": "nsis",
-          "arch": [
-            "x64",
-            "ia32"
-          ]
+          "arch": ["x64", "ia32"]
         }
       ],
       "icon": "assets/icon.ico"
@@ -39,7 +36,7 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "MedXpert Pharmacy"
+      "shortcutName": "Dawa Hisaab"
     }
   },
   "dependencies": {

@@ -71,16 +71,21 @@ app.get('/api/platform-logo', (req, res) => {
 // ── SETTINGS API (MedXpert default — file se) ──
 app.get('/api/settings', (req, res) => {
   try {
-    const settings = JSON.parse(fs.readFileSync(path.join(__dirname, 'assets', 'settings.json'), 'utf8'));
+    const tenantId = req.headers['x-tenant-id'] || 'default';
+    const settingsPath = path.join(__dirname, 'assets', `settings_${tenantId}.json`);
+    const defaultPath = path.join(__dirname, 'assets', 'settings.json');
+    const filePath = fs.existsSync(settingsPath) ? settingsPath : defaultPath;
+    const settings = JSON.parse(fs.readFileSync(filePath, 'utf8'));
     res.json(settings);
   } catch(e) {
-    res.json({ pharmacyName: 'MedXpert Pharmacy', address: '', phone: '', gstNo: '', licenseNo: '', billType: 'Retail Invoice' });
+    res.json({ pharmacyName: 'My Pharmacy', address: '', phone: '', gstNo: '' });
   }
 });
 
 app.put('/api/settings', (req, res) => {
   try {
-    const settingsPath = path.join(__dirname, 'assets', 'settings.json');
+    const tenantId = req.headers['x-tenant-id'] || 'default';
+    const settingsPath = path.join(__dirname, 'assets', `settings_${tenantId}.json`);
     if (!fs.existsSync(path.join(__dirname, 'assets'))) {
       fs.mkdirSync(path.join(__dirname, 'assets'), { recursive: true });
     }

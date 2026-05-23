@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Stock / Inventory — Dawa Hisaab</title>
 <style>
+
+  .modal-bg.open {
+  display: flex !important;
+}
   * { margin:0; padding:0; box-sizing:border-box; }
   body { font-family:'Segoe UI',sans-serif; background:#f0f4f8; }
 
@@ -16,6 +20,8 @@
   .nav-badge { background:#f0f4f8; padding:6px 14px; border-radius:20px; font-size:12px; cursor:pointer; color:#1a2332; border:1px solid #e2e8f0; }
   .btn-logout { background:transparent; border:1.5px solid #d0d7de; color:#1a2332; padding:7px 18px; border-radius:8px; cursor:pointer; font-size:13px; font-weight:600; }
   .btn-logout:hover { background:#f0f4f8; }
+  .btn-batch { background:#FEF9E7; color:#B7770D; border:none; padding:6px 12px; border-radius:8px; cursor:pointer; font-size:11px; font-weight:700; transition:all 0.2s; }
+.btn-batch:hover { background:#B7770D; color:white; }
 
   .sidebar { position:fixed; left:0; top:60px; width:230px; height:calc(100vh - 60px); background:white; border-right:1px solid #e2e8f0; padding:20px 0; overflow-y:auto; }
   .sidebar-section { padding:8px 20px; font-size:10px; font-weight:700; color:#b0bec5; text-transform:uppercase; letter-spacing:1px; margin-top:12px; }
@@ -115,8 +121,16 @@
   .form-group label { font-size:11px; color:#546e7a; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; }
   .form-group input, .form-group select { padding:10px 12px; border:1.5px solid #e2e8f0; border-radius:10px; font-size:14px; outline:none; transition:border 0.2s; background:#f8fafc; color:#333; }
   .form-group input:focus, .form-group select:focus { border-color:#1a3a6b; background:white; }
-  .section-label { grid-column:1/-1; font-size:11px; font-weight:800; color:#1a3a6b; text-transform:uppercase; letter-spacing:1px; padding:4px 0 2px; border-bottom:2px solid #EBF5FB; }
-  .strip-info { grid-column:1/-1; background:#EBF5FB; border-radius:10px; padding:10px 14px; font-size:12px; color:#1a3a6b; border-left:3px solid #1a3a6b; }
+.section-label {
+  font-size:11px;
+  font-weight:800;
+  color:#1a3a6b;
+  text-transform:uppercase;
+  letter-spacing:1px;
+  padding:4px 0 2px;
+  border-bottom:2px solid #EBF5FB;
+  margin-top:6px;
+}  .strip-info { grid-column:1/-1; background:#EBF5FB; border-radius:10px; padding:10px 14px; font-size:12px; color:#1a3a6b; border-left:3px solid #1a3a6b; }
   .modal-footer { display:flex; gap:10px; margin-top:24px; padding-top:16px; border-top:1px solid #f0f4f8; }
   .btn-cancel { flex:1; padding:12px; background:#f0f4f8; color:#546e7a; border:none; border-radius:10px; cursor:pointer; font-size:14px; font-weight:700; }
   .btn-cancel:hover { background:#e2e8f0; }
@@ -702,8 +716,11 @@ function renderTable() {
         <div class="action-btns">
           <button class="btn-edit" onclick="editProduct('${p._id}')">✏️ Edit</button>
           ${subBtn}
-          <button class="btn-del" onclick="deleteProduct('${p._id}')">🗑️</button>
-        </div>
+<button class="btn-batch" onclick="showBatches('${p._id}')">📦 Batches</button>
+<button onclick="openAddBatchModal('${p._id}','${p.name}')" 
+  style="background:#EAFAF1;color:#1E8449;border:none;padding:6px 12px;border-radius:8px;cursor:pointer;font-size:11px;font-weight:700;">
+  ➕ New Batch
+</button><button class="btn-del" onclick="deleteProduct('${p._id}')">🗑️</button>        </div>
       </td>
     </tr>`;
   }).join('');
@@ -823,32 +840,9 @@ function calcPackUnitPrice() {
 }
 
 /* ── MODAL OPEN/CLOSE ── */
-function openModal(reset = true) {
-  if (reset) {
-    editingId = null;
-    document.getElementById('modalTitle').textContent = '➕ Add New Item';
-    ['f_name','f_company','f_batch','f_expiry','f_mrp','f_purchase','f_sale',
-     'f_stock','f_min','f_hsn','f_rack','f_looseStock','f_pricePerUnit',
-     'f_packUnits','f_packUnitPrice'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.value = '';
-    });
-    document.getElementById('f_gst').value = '0';
-    document.getElementById('f_unitsPerStrip').value = '10';
-    document.getElementById('f_stripStock').value = '0';
-    const pu = document.getElementById('f_packUnits'); if(pu) pu.value = '1';
-    document.getElementById('f_category').value = 'medicine';
-    document.getElementById('f_sellType').value = 'strip';
-    resetTags();
-    onCategoryChange();
-  }
-  document.getElementById('modalBg').classList.add('show');
+function openModal(){
+  openUniversalProductModal('', 'stock');
 }
-function closeModal() {
-  document.getElementById('modalBg').classList.remove('show');
-  editingId = null;
-}
-
 /* ── EDIT PRODUCT ── */
 function editProduct(id) {
   const p = allProducts.find(x => x._id === id);
@@ -1134,9 +1128,630 @@ document.getElementById('subSearchModal').addEventListener('click', e => {
   if (e.target === document.getElementById('subSearchModal')) closeSubSearch();
 });
 
+function showBatches(productId){
+  const p=allProducts.find(x=>x._id===productId);if(!p)return;
+  document.getElementById('batchModalTitle').textContent='📦 '+p.name;
+  const batches=p.batches||[];
+  document.getElementById('batchModalSub').textContent=
+    'Total Stock: '+(p.stock||0)+' units | '+batches.length+' batch'+(batches.length!==1?'es':'');
+  const now=new Date();
+  const in90=new Date();in90.setDate(now.getDate()+90);
+  const content=document.getElementById('batchContent');
+  if(!batches.length){
+    content.innerHTML='<div style="text-align:center;padding:30px;color:#b0bec5;"><div style="font-size:36px;">📦</div><p style="margin-top:8px;">Koi batch nahi — Purchase Entry se stock add karo</p></div>';
+  }else{
+    const sorted=[...batches].sort((a,b)=>parseExpiryDate(a.expiry)-parseExpiryDate(b.expiry));
+    content.innerHTML=`
+      <table style="width:100%;border-collapse:collapse;font-size:13px;">
+        <thead>
+          <tr style="background:linear-gradient(135deg,#1a3a6b,#154360);">
+            <th style="padding:10px 12px;text-align:left;color:rgba(255,255,255,0.9);font-size:11px;font-weight:700;text-transform:uppercase;">Batch</th>
+            <th style="padding:10px 12px;text-align:left;color:rgba(255,255,255,0.9);font-size:11px;font-weight:700;text-transform:uppercase;">Supplier</th>
+            <th style="padding:10px 12px;text-align:center;color:rgba(255,255,255,0.9);font-size:11px;font-weight:700;text-transform:uppercase;">Expiry</th>
+            <th style="padding:10px 12px;text-align:right;color:rgba(255,255,255,0.9);font-size:11px;font-weight:700;text-transform:uppercase;">MRP</th>
+            <th style="padding:10px 12px;text-align:right;color:rgba(255,255,255,0.9);font-size:11px;font-weight:700;text-transform:uppercase;">Purchase</th>
+            <th style="padding:10px 12px;text-align:right;color:rgba(255,255,255,0.9);font-size:11px;font-weight:700;text-transform:uppercase;">Margin</th>
+            <th style="padding:10px 12px;text-align:center;color:rgba(255,255,255,0.9);font-size:11px;font-weight:700;text-transform:uppercase;">Stock</th>
+            <th style="padding:10px 12px;text-align:center;color:rgba(255,255,255,0.9);font-size:11px;font-weight:700;text-transform:uppercase;">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${sorted.map((b,i)=>{
+            const expDate=parseExpiryDate(b.expiry);
+            const isExp=expDate<now;
+            const isSoon=expDate>=now&&expDate<=in90;
+            const margin=b.mrp>0?(((b.mrp-b.purchasePrice)/b.mrp)*100).toFixed(1):0;
+            const rowBg=isExp?'#fff5f5':isSoon?'#fffdf0':i%2===0?'white':'#f8fafc';
+            const expBadge=isExp
+              ?'<span style="background:#FDEDEC;color:#C0392B;padding:2px 7px;border-radius:8px;font-size:10px;font-weight:700;">⚠️ Expired</span>'
+              :isSoon
+              ?'<span style="background:#FEF9E7;color:#B7770D;padding:2px 7px;border-radius:8px;font-size:10px;font-weight:700;">⚡ Expiring</span>'
+              :'<span style="background:#EAFAF1;color:#1E8449;padding:2px 7px;border-radius:8px;font-size:10px;font-weight:700;">✅ Good</span>';
+            return `<tr style="background:${rowBg};border-bottom:1px solid #f0f4f8;">
+              <td style="padding:10px 12px;font-weight:700;">
+                ${b.batchNo||'—'}
+                ${i===0?'<span style="background:#EBF5FB;color:#1a3a6b;padding:1px 6px;border-radius:6px;font-size:10px;margin-left:4px;">FIFO</span>':''}
+              </td>
+              <td style="padding:10px 12px;color:#546e7a;">${b.supplier||'—'}</td>
+              <td style="padding:10px 12px;text-align:center;">${b.expiry||'—'}<br>${expBadge}</td>
+              <td style="padding:10px 12px;text-align:right;font-weight:700;">₹${b.mrp||0}</td>
+              <td style="padding:10px 12px;text-align:right;color:#546e7a;">₹${b.purchasePrice||0}</td>
+              <td style="padding:10px 12px;text-align:right;font-weight:700;color:${margin>=20?'#1E8449':margin>=10?'#B7770D':'#C0392B'};">${margin}%</td>
+              <td style="padding:10px 12px;text-align:center;font-weight:800;font-size:15px;color:#1a3a6b;">${b.qty||0}</td>
+              <td style="padding:10px 12px;text-align:center;">${b.qty>0?'<span style="background:#EAFAF1;color:#1E8449;padding:3px 10px;border-radius:10px;font-size:11px;font-weight:700;">In Stock</span>':'<span style="background:#FDEDEC;color:#C0392B;padding:3px 10px;border-radius:10px;font-size:11px;font-weight:700;">Empty</span>'}</td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+        <tfoot>
+          <tr style="background:#f0f4f8;">
+            <td colspan="6" style="padding:10px 12px;text-align:right;font-weight:800;">Total:</td>
+            <td style="padding:10px 12px;text-align:center;font-size:16px;font-weight:800;color:#1a3a6b;">${sorted.reduce((s,b)=>s+(b.qty||0),0)}</td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>`;
+  }
+  document.getElementById('batchModal').classList.add('show');
+}
+
+function parseExpiryDate(mmyy){
+  if(!mmyy)return new Date('9999-12-31');
+  const parts=mmyy.split('/');
+  if(parts.length<2)return new Date('9999-12-31');
+  return new Date(parseInt('20'+parts[1]),parseInt(parts[0])-1,28);
+}
+
+
+// ══════════════════════════════════════════
+//  UNIVERSAL PRODUCT MODAL — Stock version
+// ══════════════════════════════════════════
+function openUniversalProductModal(prefillName='', context='stock'){
+  let modal = document.getElementById('universalProductModal');
+  if(!modal){
+    modal = document.createElement('div');
+    modal.id = 'universalProductModal';
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(21,67,96,0.55);z-index:500;display:flex;align-items:flex-start;justify-content:center;overflow-y:auto;padding:20px;backdrop-filter:blur(3px);';
+    document.body.appendChild(modal);
+  }
+  const supplierName = typeof getSupplierName === 'function' ? getSupplierName() : (document.getElementById('supplier')?.value||'');
+  const S = 'padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:14px;outline:none;width:100%;box-sizing:border-box;';
+  const L = 'font-size:11px;color:#546e7a;font-weight:700;text-transform:uppercase;display:block;margin-bottom:5px;';
+  const SEC = 'font-size:11px;font-weight:800;color:#1a3a6b;text-transform:uppercase;letter-spacing:1px;padding:6px 0 4px;border-bottom:2px solid #EBF5FB;margin:14px 0 10px;grid-column:1/-1;';
+  const G = 'display:flex;flex-direction:column;';
+
+  modal.innerHTML = `
+  <div style="background:white;border-radius:20px;padding:28px;width:700px;max-width:96vw;margin:auto;box-shadow:0 20px 60px rgba(21,67,96,0.25);">
+
+    <!-- Header -->
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;padding-bottom:14px;border-bottom:2px solid #EBF5FB;">
+      <div>
+        <div style="font-size:20px;font-weight:800;color:#1a2332;">➕ New Product</div>
+        <div style="font-size:12px;color:#78909c;margin-top:3px;">Stock + Purchase dono update honge</div>
+      </div>
+      <button onclick="closeUniversalModal()" style="background:#f0f4f8;border:none;width:36px;height:36px;border-radius:10px;cursor:pointer;font-size:18px;color:#546e7a;display:flex;align-items:center;justify-content:center;">✕</button>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+
+      <!-- ── PRODUCT INFO ── -->
+      <div style="${SEC}">📋 Product Info</div>
+
+      <div style="grid-column:1/-1;${G}">
+        <label style="${L}">Product Name *</label>
+        <input id="up_name" value="${prefillName}" placeholder="e.g. Dolo 650, Bourbon Biscuits" style="${S}" />
+      </div>
+
+      <div style="${G}">
+        <label style="${L}">Category *</label>
+        <select id="up_category" onchange="upCatChange()" style="${S}background:#f8fafc;">
+          <option value="medicine">💊 Medicine</option>
+          <option value="fmcg">🛍️ FMCG</option>
+          <option value="cosmetic">💄 Cosmetic</option>
+          <option value="surgical">🏥 Surgical</option>
+          <option value="other">📦 Other</option>
+        </select>
+      </div>
+
+      <div style="${G}">
+        <label style="${L}">Company / Brand</label>
+        <input id="up_company" placeholder="e.g. Cipla, Nestle" style="${S}" />
+      </div>
+
+      <div id="up_compSection" style="grid-column:1/-1;${G}">
+        <label style="${L}">Drug Composition <span style="color:#90a4ae;font-weight:400;">(Enter dabao)</span></label>
+        <div id="up_tagsWrap" onclick="document.getElementById('up_tagInput').focus()"
+          style="display:flex;flex-wrap:wrap;gap:6px;padding:8px 10px;border:1.5px solid #e2e8f0;border-radius:10px;background:#f8fafc;min-height:46px;align-items:center;cursor:text;">
+          <div id="up_tags" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
+          <input id="up_tagInput" placeholder="e.g. Paracetamol 500mg..."
+            style="border:none;outline:none;background:transparent;font-size:13px;min-width:140px;flex:1;"
+            onkeydown="if(event.key==='Enter'||event.key===','){event.preventDefault();upAddTag();}" />
+        </div>
+      </div>
+
+      <!-- ── BATCH & EXPIRY ── -->
+      <div style="${SEC}">📦 Batch & Expiry</div>
+
+      <div style="${G}">
+        <label style="${L}">Batch No</label>
+        <input id="up_batch" placeholder="e.g. BT2024" style="${S}" />
+      </div>
+
+      <div style="${G}">
+        <label style="${L}">Expiry (MM/YY)</label>
+        <input id="up_expiry" placeholder="e.g. 12/27" style="${S}" />
+      </div>
+
+      <div style="${G}">
+        <label style="${L}">HSN Code</label>
+        <input id="up_hsn" placeholder="e.g. 30049099" style="${S}" />
+      </div>
+
+      <div style="${G}">
+        <label style="${L}">GST %</label>
+        <select id="up_gst" style="${S}background:#f8fafc;">
+          <option value="0">0% — No GST</option>
+          <option value="5">5% GST</option>
+          <option value="12">12% GST</option>
+          <option value="18">18% GST</option>
+          <option value="28">28% GST</option>
+        </select>
+      </div>
+
+      <!-- ── PRICING ── -->
+      <div style="${SEC}">💰 Pricing</div>
+
+      <div style="${G}">
+        <label style="${L}">MRP (₹) *</label>
+        <input id="up_mrp" type="number" min="0" step="0.01" placeholder="0.00" oninput="upCalcPillPrice()" style="${S}" />
+      </div>
+
+      <div style="${G}">
+        <label style="font-size:11px;color:#F39C12;font-weight:700;text-transform:uppercase;display:block;margin-bottom:5px;">Purchase Price (₹)</label>
+        <input id="up_purchase" type="number" min="0" step="0.01" placeholder="0.00"
+          style="${S}border-color:#F39C12;background:#fff9e6;" />
+      </div>
+
+      <div style="${G}">
+        <label style="${L}">Sale Price (₹)</label>
+        <input id="up_sale" type="number" min="0" step="0.01" placeholder="= MRP if empty" style="${S}" />
+      </div>
+
+      <div style="${G}">
+        <label style="${L}">Sell Type</label>
+        <select id="up_sellType" onchange="upSellTypeChange()" style="${S}background:#f8fafc;">
+          <option value="piece">Piece</option>
+          <option value="strip">Strip</option>
+          <option value="loose">Loose (Pills)</option>
+          <option value="both">Strip + Loose</option>
+          <option value="bottle">Bottle</option>
+          <option value="box">Box/Packet</option>
+        </select>
+      </div>
+
+      <div id="up_stripSection" style="grid-column:1/-1;display:none;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+          <div style="${G}">
+            <label style="${L}">Units Per Strip</label>
+            <input id="up_units" type="number" placeholder="10" value="10" oninput="upCalcPillPrice()" style="${S}" />
+          </div>
+          <div style="${G}">
+            <label style="font-size:11px;color:#1E8449;font-weight:700;text-transform:uppercase;display:block;margin-bottom:5px;">💊 Per Pill Price (₹)</label>
+            <input id="up_pillPrice" type="number" readonly placeholder="Auto"
+              style="${S}border-color:#A9DFBF;background:#f0fdf4;color:#1E8449;font-weight:700;" />
+          </div>
+        </div>
+      </div>
+
+      <!-- ── STOCK ── -->
+      <div style="${SEC}">📊 Stock</div>
+
+      <div style="${G}">
+        <label style="${L}">Opening Qty</label>
+        <input id="up_qty" type="number" min="0" placeholder="0" style="${S}" />
+      </div>
+
+      <div style="${G}">
+        <label style="${L}">Min Stock Alert</label>
+        <input id="up_minStock" type="number" min="0" placeholder="10" value="10" style="${S}" />
+      </div>
+
+      <div style="${G}">
+        <label style="${L}">Rack / Location</label>
+        <input id="up_rack" placeholder="e.g. A-12" style="${S}" />
+      </div>
+
+      <!-- ── SUPPLIER ── -->
+      <div style="${SEC}">🏭 Supplier Details <span style="font-weight:400;color:#90a4ae;font-size:10px;text-transform:none;">— Optional</span></div>
+
+      <div style="${G}">
+        <label style="${L}">Supplier Name</label>
+        <input id="up_supplier" value="${supplierName}" placeholder="e.g. Amit Medicose" style="${S}" />
+      </div>
+
+      <div style="${G}">
+        <label style="${L}">Invoice No</label>
+        <input id="up_invoice" placeholder="e.g. INV-001" style="${S}" />
+      </div>
+
+      <div style="${G}">
+        <label style="${L}">Supplier GST</label>
+        <input id="up_supplierGST" placeholder="27XXXXX1234Z1" style="${S}text-transform:uppercase;"
+          oninput="this.value=this.value.toUpperCase()" />
+      </div>
+
+      <div style="${G}">
+        <label style="${L}">Supplier Discount %</label>
+        <input id="up_supplierDisc" type="number" min="0" max="100" placeholder="0" style="${S}" />
+      </div>
+
+    </div>
+
+    <!-- Info -->
+    <div style="background:#f0fdf4;border-radius:10px;padding:12px 14px;margin-top:16px;font-size:12px;color:#1e6b3a;line-height:1.7;">
+      ✅ Product <b>Stock mein add</b> hoga + <b>Purchase record</b> bhi banega (agar supplier fill kiya)
+    </div>
+
+    <!-- Buttons -->
+    <div style="display:flex;gap:10px;margin-top:16px;">
+      <button onclick="closeUniversalModal()"
+        style="flex:1;padding:13px;background:#f0f4f8;border:none;border-radius:10px;cursor:pointer;font-size:14px;font-weight:700;color:#546e7a;">
+        Cancel
+      </button>
+      <button onclick="saveUniversalProduct('${context}')"
+        style="flex:2;padding:13px;background:linear-gradient(135deg,#1a3a6b,#1e6b3a);color:white;border:none;border-radius:10px;cursor:pointer;font-size:15px;font-weight:700;">
+        ✅ Save Product
+      </button>
+    </div>
+  </div>`;
+
+  modal.style.display = 'flex';
+  window._upTags = [];
+  window._upContext = context;
+  setTimeout(()=>document.getElementById('up_name')?.focus(), 200);
+}
+
+function closeUniversalModal(){
+  const modal = document.getElementById('universalProductModal');
+  if(modal){ modal.style.display='none'; }
+  window._upTags = [];
+}
+
+function upAddTag(){
+  const input=document.getElementById('up_tagInput');
+  const tag=(input.value||'').trim();
+  if(!tag||window._upTags.includes(tag)){input.value='';return;}
+  window._upTags.push(tag);
+  upRenderTags();
+  input.value='';
+  input.focus();
+}
+
+function upRemoveTag(i){
+  window._upTags.splice(i,1);
+  upRenderTags();
+}
+
+function upRenderTags(){
+  const wrap=document.getElementById('up_tags');if(!wrap)return;
+  wrap.innerHTML=(window._upTags||[]).map((t,i)=>
+    `<span style="background:#EBF5FB;color:#1a3a6b;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:700;display:flex;align-items:center;gap:6px;border:1px solid #D6EAF8;">
+      ${t}<span onclick="upRemoveTag(${i})" style="cursor:pointer;color:#78909c;font-size:15px;line-height:1;">×</span>
+    </span>`
+  ).join('');
+}
+
+function upCatChange(){
+  const cat=document.getElementById('up_category').value;
+  const comp=document.getElementById('up_compSection');
+  if(comp)comp.style.display=cat==='medicine'?'grid':'none';
+  const gstMap={medicine:'0',fmcg:'5',cosmetic:'18',surgical:'12',other:'0'};
+  const gstEl=document.getElementById('up_gst');
+  if(gstEl)gstEl.value=gstMap[cat]||'0';
+}
+
+function upSellTypeChange(){
+  const type=document.getElementById('up_sellType').value;
+  const sec=document.getElementById('up_stripSection');
+  if(sec)sec.style.display=['strip','loose','both'].includes(type)?'block':'none';
+}
+
+function upCalcPillPrice(){
+  const mrp=parseFloat(document.getElementById('up_mrp')?.value)||0;
+  const units=parseInt(document.getElementById('up_units')?.value)||10;
+  const el=document.getElementById('up_pillPrice');
+  if(el&&mrp&&units)el.value=(mrp/units).toFixed(2);
+}
+
+async function saveUniversalProduct(context){
+  const name=document.getElementById('up_name')?.value?.trim();
+  const mrp=parseFloat(document.getElementById('up_mrp')?.value)||0;
+  const purchasePrice=parseFloat(document.getElementById('up_purchase')?.value)||0;
+  if(!name){alert('Product name zaroori hai!');return;}
+  if(!mrp){alert('MRP zaroori hai!');return;}
+
+  const salePrice=parseFloat(document.getElementById('up_sale')?.value)||mrp;
+  const qty=parseInt(document.getElementById('up_qty')?.value)||0;
+  const supplier=document.getElementById('up_supplier')?.value?.trim()||'';
+  const batch=document.getElementById('up_batch')?.value?.trim()||'';
+  const expiry=document.getElementById('up_expiry')?.value?.trim()||'';
+
+  const productData={
+    name,
+    category:document.getElementById('up_category')?.value||'medicine',
+    company:document.getElementById('up_company')?.value||'',
+    composition:window._upTags||[],
+    generic:(window._upTags||[]).join(' + '),
+    batch,expiry,
+    hsnCode:document.getElementById('up_hsn')?.value||'',
+    gst:parseInt(document.getElementById('up_gst')?.value)||0,
+    mrp,salePrice,purchasePrice,
+    sellType:document.getElementById('up_sellType')?.value||'piece',
+    unitsPerStrip:parseInt(document.getElementById('up_units')?.value)||10,
+    pricePerUnit:parseFloat(document.getElementById('up_pillPrice')?.value)||0,
+    stock:qty,
+    minStock:parseInt(document.getElementById('up_minStock')?.value)||10,
+    rack:document.getElementById('up_rack')?.value||''
+  };
+
+  try{
+    const tk=localStorage.getItem('tenantToken')||localStorage.getItem('token')||'';
+    const headers={'Content-Type':'application/json','Authorization':'Bearer '+tk};
+
+    const pRes=await fetch('/api/products',{method:'POST',headers,body:JSON.stringify(productData)});
+    if(!pRes.ok)throw new Error('Product save failed');
+    const pData=await pRes.json();
+    const productId=pData._id||pData.product?._id;
+
+    if(supplier&&purchasePrice>0&&productId){
+      const purchaseData={
+        supplier,
+        invoiceNo:document.getElementById('up_invoice')?.value||'',
+        supplierGST:document.getElementById('up_supplierGST')?.value||'',
+        date:new Date(),
+        stockUpdateMode:'set',
+        items:[{
+          product:productId,productName:name,
+          batch,expiry,qty:qty||1,
+          purchasePrice,mrp,salePrice,
+          gst:parseInt(document.getElementById('up_gst')?.value)||0,
+          discount:parseFloat(document.getElementById('up_supplierDisc')?.value)||0,
+          total:purchasePrice*(qty||1)
+        }],
+        subtotal:purchasePrice*(qty||1),
+        gstAmount:0,
+        totalAmount:purchasePrice*(qty||1),
+        paidAmount:0,
+        paymentMode:'credit',
+        paymentStatus:'unpaid'
+      };
+      await fetch('/api/purchases',{method:'POST',headers,body:JSON.stringify(purchaseData)});
+    }
+
+    closeUniversalModal();
+    if(typeof loadProducts==='function')await loadProducts();
+    if(typeof loadStockData==='function')await loadStockData();
+
+    notif(supplier
+      ?`✅ ${name} — Stock + Purchase dono save!`
+      :`✅ ${name} — Stock mein add ho gaya!`
+    );
+  }catch(e){alert('Error: '+e.message);}
+}
+
+
+function openAddBatchModal(productId, productName){
+  let modal = document.getElementById('addBatchModal');
+  if(!modal){
+    modal = document.createElement('div');
+    modal.id = 'addBatchModal';
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(21,67,96,0.55);z-index:500;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(3px);';
+    document.body.appendChild(modal);
+  }
+
+  const S = 'padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:14px;outline:none;width:100%;box-sizing:border-box;';
+  const L = 'font-size:11px;color:#546e7a;font-weight:700;text-transform:uppercase;display:block;margin-bottom:5px;';
+  const G = 'display:flex;flex-direction:column;margin-bottom:12px;';
+
+  modal.innerHTML = `
+    <div style="background:white;border-radius:20px;padding:28px;width:500px;max-width:95vw;box-shadow:0 20px 60px rgba(21,67,96,0.25);">
+
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;padding-bottom:14px;border-bottom:2px solid #EBF5FB;">
+        <div>
+          <div style="font-size:18px;font-weight:800;color:#1a2332;">➕ New Batch Add Karo</div>
+          <div style="font-size:13px;font-weight:700;color:#1a3a6b;margin-top:4px;">📦 ${productName}</div>
+          <div style="font-size:12px;color:#78909c;">Naya batch — alag MRP/supplier/expiry</div>
+        </div>
+        <button onclick="document.getElementById('addBatchModal').style.display='none'"
+          style="background:#f0f4f8;border:none;width:36px;height:36px;border-radius:10px;cursor:pointer;font-size:18px;">✕</button>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+
+        <div style="${G}">
+          <label style="${L}">Batch No</label>
+          <input id="nb_batch" placeholder="e.g. BT2025" style="${S}" />
+        </div>
+
+        <div style="${G}">
+          <label style="${L}">Expiry (MM/YY)</label>
+          <input id="nb_expiry" placeholder="e.g. 12/28" style="${S}" />
+        </div>
+
+        <div style="${G}">
+          <label style="${L}">MRP (₹) *</label>
+          <input id="nb_mrp" type="number" min="0" step="0.01" placeholder="0.00" style="${S}" />
+        </div>
+
+        <div style="${G}">
+          <label style="font-size:11px;color:#F39C12;font-weight:700;text-transform:uppercase;display:block;margin-bottom:5px;">Purchase Price (₹)</label>
+          <input id="nb_purchase" type="number" min="0" step="0.01" placeholder="0.00"
+            style="${S}border-color:#F39C12;background:#fff9e6;" />
+        </div>
+
+        <div style="${G}">
+          <label style="${L}">Sale Price (₹)</label>
+          <input id="nb_sale" type="number" min="0" step="0.01" placeholder="= MRP if empty" style="${S}" />
+        </div>
+
+        <div style="${G}">
+          <label style="${L}">Qty *</label>
+          <input id="nb_qty" type="number" min="1" placeholder="0" style="${S}" />
+        </div>
+
+        <div style="${G}">
+          <label style="${L}">Supplier</label>
+          <input id="nb_supplier" placeholder="e.g. Amit Medicose" style="${S}" />
+        </div>
+
+        <div style="${G}">
+          <label style="${L}">GST %</label>
+          <select id="nb_gst" style="${S}background:#f8fafc;">
+            <option value="0">0%</option>
+            <option value="5">5%</option>
+            <option value="12">12%</option>
+            <option value="18">18%</option>
+          </select>
+        </div>
+
+      </div>
+
+      <div style="background:#EBF5FB;border-radius:10px;padding:10px 14px;margin:4px 0 16px;font-size:12px;color:#1a3a6b;">
+        💡 Yeh batch existing product mein add hoga — duplicate product nahi banega
+      </div>
+
+      <div style="display:flex;gap:10px;">
+        <button onclick="document.getElementById('addBatchModal').style.display='none'"
+          style="flex:1;padding:12px;background:#f0f4f8;border:none;border-radius:10px;cursor:pointer;font-size:14px;font-weight:700;color:#546e7a;">
+          Cancel
+        </button>
+        <button onclick="saveNewBatch('${productId}')"
+          style="flex:2;padding:12px;background:linear-gradient(135deg,#1E8449,#1a3a6b);color:white;border:none;border-radius:10px;cursor:pointer;font-size:14px;font-weight:700;">
+          ✅ Batch Save Karo
+        </button>
+      </div>
+    </div>`;
+
+  modal.style.display = 'flex';
+  setTimeout(()=>document.getElementById('nb_batch')?.focus(), 200);
+}
+
+async function saveNewBatch(productId){
+  const mrp = parseFloat(document.getElementById('nb_mrp')?.value)||0;
+  const qty = parseInt(document.getElementById('nb_qty')?.value)||0;
+
+  if(!mrp){ alert('MRP zaroori hai!'); return; }
+  if(!qty){ alert('Qty zaroori hai!'); return; }
+
+  const purchasePrice = parseFloat(document.getElementById('nb_purchase')?.value)||0;
+  const salePrice = parseFloat(document.getElementById('nb_sale')?.value)||mrp;
+  const batch = document.getElementById('nb_batch')?.value?.trim()||'';
+  const expiry = document.getElementById('nb_expiry')?.value?.trim()||'';
+  const supplier = document.getElementById('nb_supplier')?.value?.trim()||'';
+  const gst = parseInt(document.getElementById('nb_gst')?.value)||0;
+
+  try {
+    const tk = localStorage.getItem('tenantToken')||localStorage.getItem('token')||'';
+    const headers = {'Content-Type':'application/json','Authorization':'Bearer '+tk};
+
+    // Product ka current data lo
+    const pRes = await fetch('/api/products/'+productId, {headers});
+    if(!pRes.ok) throw new Error('Product fetch failed');
+    const product = await pRes.json();
+
+    // New batch banao
+    const newBatch = { batchNo:batch, supplier, mrp, purchasePrice, salePrice, qty, expiry, gst, addedDate: new Date() };
+
+    // Existing batches mein add karo
+    const batches = product.batches || [];
+
+    // Same batch already hai?
+    const existIdx = batch ? batches.findIndex(b => b.batchNo === batch && b.supplier === supplier) : -1;
+    if(existIdx >= 0){
+      batches[existIdx].qty += qty;
+      batches[existIdx].mrp = mrp;
+      batches[existIdx].purchasePrice = purchasePrice;
+    } else {
+      batches.push(newBatch);
+    }
+
+    // Total stock recalculate
+    const totalStock = batches.reduce((s,b) => s+(b.qty||0), 0);
+
+    // Product update karo
+    const updateRes = await fetch('/api/products/'+productId, {
+      method: 'PUT',
+      headers,
+      body: JSON.stringify({
+        batches,
+        stock: totalStock,
+        mrp,          // Latest batch MRP
+        purchasePrice,
+        salePrice,
+        batch,
+        expiry
+      })
+    });
+
+    if(!updateRes.ok) throw new Error('Update failed');
+
+    // Purchase record bhi banao agar supplier hai
+    if(supplier && purchasePrice > 0){
+      await fetch('/api/purchases', {
+        method:'POST', headers,
+        body: JSON.stringify({
+          supplier,
+          date: new Date(),
+          stockUpdateMode: 'add',
+          items:[{
+            product: productId,
+            productName: product.name,
+            batch, expiry, qty,
+            purchasePrice, mrp, salePrice, gst,
+            total: purchasePrice * qty
+          }],
+          subtotal: purchasePrice * qty,
+          gstAmount: 0,
+          totalAmount: purchasePrice * qty,
+          paidAmount: 0,
+          paymentMode: 'credit',
+          paymentStatus: 'unpaid'
+        })
+      });
+    }
+
+    document.getElementById('addBatchModal').style.display = 'none';
+    await loadStockData();
+
+    // Notification
+    notif(`✅ ${product.name} — Naya batch add hua! Total stock: ${totalStock}`);
+
+  } catch(e) {
+    alert('Error: ' + e.message);
+  }
+}
+
 /* ── INIT ── */
 checkAuth();
 loadProducts();
 </script>
+
+<div class="modal-bg" id="batchModal">
+  <div class="modal" style="max-width:700px;">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="batchModalTitle">📦 Stock Batches</div>
+        <div style="font-size:12px;color:#78909c;margin-top:3px;" id="batchModalSub"></div>
+      </div>
+      <button class="modal-close" onclick="document.getElementById('batchModal').classList.remove('show')">✕</button>
+    </div>
+    <div id="batchContent" style="overflow-x:auto;max-height:450px;overflow-y:auto;"></div>
+    <div style="padding-top:12px;border-top:1px solid #f0f4f8;margin-top:8px;">
+      <button onclick="document.getElementById('batchModal').classList.remove('show')"
+        style="width:100%;padding:11px;background:#f0f4f8;border:none;border-radius:8px;cursor:pointer;font-size:14px;font-weight:700;color:#546e7a;">
+        Close
+      </button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
