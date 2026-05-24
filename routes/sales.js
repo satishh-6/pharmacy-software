@@ -21,29 +21,48 @@ async function generateBillNo(tenantId) {
 }
 
 // ── STOCK DEDUCT ──
+
 async function deductStock(items, tenantId) {
   for (const item of items) {
     const p = await Product.findOne({ _id: item.product, tenantId });
     if (!p) continue;
-    if (p.sellType === 'loose') {
-      const qty = item.qty;
-      let loose = p.looseStock || 0;
-      let strips = p.stripStock || 0;
-      const ups = p.unitsPerStrip || 10;
-      if (loose >= qty) {
-        loose -= qty;
-      } else {
-        const rem = qty - loose;
-        loose = 0;
-        const stripsNeeded = Math.ceil(rem / ups);
-        strips = Math.max(0, strips - stripsNeeded);
-        loose = (stripsNeeded * ups) - rem;
+
+    if (item.sellUnit === 'pill' || p.sellType === 'loose') {
+      // Pill wise deduction
+      await Product.findByIdAndUpdate(item.product, {
+        $inc: { looseStock: -item.qty, stock: -1 }
+      });
+    } else if (p.batches && p.batches.length > 0) {
+      // ✅ Batch-wise FIFO deduction
+      let remaining = item.qty;
+      const batches = [...p.batches].sort((a,b)=>{
+        const da = parseExp(a.expiry), db = parseExp(b.expiry);
+        return da-db;
+      });
+      for(const batch of batches){
+        if(remaining <= 0) break;
+        if(batch.batchNo === item.batchNo || !item.batchNo){
+          const deduct = Math.min(batch.qty, remaining);
+          batch.qty -= deduct;
+          remaining -= deduct;
+        }
       }
-      await Product.findByIdAndUpdate(item.product, { looseStock: loose, stripStock: strips });
+      const totalStock = batches.reduce((s,b)=>s+(b.qty||0),0);
+      await Product.findOneAndUpdate(
+        { _id: item.product, tenantId },
+        { batches: batches.filter(b=>b.qty>0), stock: totalStock }
+      );
     } else {
+      // Simple deduction
       await Product.findByIdAndUpdate(item.product, { $inc: { stock: -item.qty } });
     }
   }
+}
+
+function parseExp(mmyy){
+  if(!mmyy) return new Date('9999-12-31');
+  const p = mmyy.split('/');
+  return p.length<2 ? new Date('9999-12-31') : new Date(parseInt('20'+p[1]),parseInt(p[0])-1,28);
 }
 
 // ── STOCK RESTORE ──
