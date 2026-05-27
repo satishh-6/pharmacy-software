@@ -33,7 +33,7 @@
  padding:24px 28px; margin-bottom:24px; display:flex; align-items:center; gap:20px; position:relative; overflow:hidden; }
   .profile-banner::before { content:''; position:absolute; top:-30px; right:-30px; width:180px; height:180px; background:rgba(255,255,255,0.06); border-radius:50%; }
   .profile-banner::after { content:''; position:absolute; bottom:-40px; right:100px; width:120px; height:120px; background:rgba(255,255,255,0.04); border-radius:50%; }
-  .profile-avatar { width:72px; height:72px; border-radius:18px; background:rgba(255,255,255,0.2); display:flex; align-items:center; justify-content:center; font-size:32px; flex-shrink:0; position:relative; z-index:1; border:2px solid rgba(255,255,255,0.3); }
+  .profile-avatar { width:80px; height:80px; border-radius:18px; background:rgba(255,255,255,0.15); display:flex; align-items:center; justify-content:center; font-size:32px; flex-shrink:0; position:relative; z-index:1; border:2px solid rgba(255,255,255,0.3); overflow:hidden; }
   .profile-info { flex:1; position:relative; z-index:1; }
   .profile-name { font-size:20px; font-weight:800; color:white; }
   .profile-sub { font-size:13px; color:rgba(255,255,255,0.7); margin-top:4px; }
@@ -162,7 +162,7 @@
   .tab-btn.active { background:linear-gradient(135deg,#1a3a6b,#1e6b3a) !important; color:#ffffff !important; }
 
   /* Profile banner */
-  .profile-banner { background:linear-gradient(135deg,#1a3a6b,#1e6b3a) !important; }
+  .profile-banner { background:linear-gradient(135deg,#0d1b2a,#1a2e4a,#0d2137) !important; }
   .profile-name { color:#ffffff !important; }
   .profile-sub { color:rgba(255,255,255,0.75) !important; }
 
@@ -209,12 +209,7 @@
         <span class="pbadge green" id="bannerRole">Owner</span>
       </div>
     </div>
-    <div style="position:relative;z-index:1;text-align:right;">
-      <div id="logoSmall" style="display:none;">
-        <img id="logoSmallImg" style="max-width:80px;max-height:50px;object-fit:contain;border-radius:8px;background:rgba(255,255,255,0.1);padding:4px;" />
-        <div style="font-size:11px;color:rgba(255,255,255,0.6);margin-top:4px;">Your Logo</div>
-      </div>
-    </div>
+    
   </div>
 
   <!-- TABS -->
@@ -529,9 +524,10 @@
       <div class="form-group">
         <label>Role</label>
         <select id="sf_role">
-          <option value="staff">👤 Staff — Basic access (Billing only)</option>
-          <option value="manager">👔 Manager — Full access (No settings)</option>
-        </select>
+  <option value="staff">👤 Staff — Basic access (Billing only)</option>
+  <option value="manager">👔 Manager — Full access (No settings)</option>
+  <option value="owner">👑 Owner — Full access including Settings</option>
+</select>
       </div>
       <div class="info-box" style="margin:0;">
         💡 Staff login karne ke liye: <strong>username</strong> aur yeh password use karenge.
@@ -540,6 +536,48 @@
     <div style="display:flex;gap:10px;margin-top:20px;">
       <button class="btn btn-secondary" onclick="closeStaffModal()" style="flex:1;">Cancel</button>
       <button class="btn btn-primary" onclick="saveStaff()" style="flex:2;">✅ Add Staff Member</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONTACT US CARD -->
+<div class="card" style="margin-top:16px;border:2px solid #1a3a6b33;">
+  <div class="card-hdr">
+    <div class="card-title">📞 Subscription & Support</div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:20px;">
+    <div style="background:#EBF5FB;border-radius:12px;padding:16px;text-align:center;">
+      <div style="font-size:11px;color:#78909c;font-weight:700;text-transform:uppercase;margin-bottom:6px;">Basic</div>
+      <div style="font-size:22px;font-weight:900;color:#1a3a6b;">FREE</div>
+      <!--<div style="font-size:11px;color:#78909c;">forever</div> -->
+    </div>
+    <div style="background:#F4ECF7;border-radius:12px;padding:16px;text-align:center;">
+      <div style="font-size:11px;color:#78909c;font-weight:700;text-transform:uppercase;margin-bottom:6px;">Pro ⭐</div>
+      <div style="font-size:22px;font-weight:900;color:#7D3C98;">₹1,500</div>
+      <div style="font-size:11px;color:#78909c;">per year</div>
+    </div>
+    <div style="background:#EAFAF1;border-radius:12px;padding:16px;text-align:center;">
+      <div style="font-size:11px;color:#78909c;font-weight:700;text-transform:uppercase;margin-bottom:6px;">Enterprise 🚀</div>
+      <div style="font-size:22px;font-weight:900;color:#1E8449;">₹3,000</div>
+      <div style="font-size:11px;color:#78909c;">per year</div>
+    </div>
+  </div>
+  <div style="background:#f8fafc;border-radius:12px;padding:18px;border:1px solid #e2e8f0;text-align:center;">
+    <div style="font-size:14px;font-weight:700;color:#1a2332;margin-bottom:14px;">
+      Plan lene ke liye humse contact karo 👇
+    </div>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+      <a href="tel:7620184623" class="btn btn-primary" style="text-decoration:none;">
+        📞 Call: 7620184623
+      </a>
+      <a href="https://wa.me/917620184623?text=Hi%2C%20I%20want%20to%20upgrade%20my%20Dawa%20Hisaab%20plan"
+        target="_blank" class="btn"
+        style="background:linear-gradient(135deg,#25D366,#128C7E);color:white;text-decoration:none;">
+        💬 WhatsApp Karo
+      </a>
+    </div>
+    <div style="font-size:12px;color:#90a4ae;margin-top:12px;">
+      Mon–Sat: 9am – 7pm &nbsp;|&nbsp; Support: 7620184623
     </div>
   </div>
 </div>
@@ -674,18 +712,22 @@ async function loadProfile(){
 
     // ── Logo ──
     const logoRes=await fetch('/api/tenant-auth/logo',{headers:authH()});
-    if(logoRes.ok){
-      const logoData=await logoRes.json();
-      if(logoData.logo){
-        logoBase64=logoData.logo;
-        document.getElementById('logoPlaceholder').style.display='none';
-        document.getElementById('logoPreview').src=logoData.logo;
-        document.getElementById('logoPreview').style.display='block';
-        document.getElementById('logoZone').classList.add('has-logo');
-        document.getElementById('logoSmall').style.display='block';
-        document.getElementById('logoSmallImg').src=logoData.logo;
-      }
-    }
+if(logoRes.ok){
+  const logoData=await logoRes.json();
+  if(logoData.logo){
+    logoBase64=logoData.logo;
+    document.getElementById('logoPlaceholder').style.display='none';
+    document.getElementById('logoPreview').src=logoData.logo;
+    document.getElementById('logoPreview').style.display='block';
+    document.getElementById('logoZone').classList.add('has-logo');
+    
+
+    // ✅ Banner mein logo dikhao "M" ki jagah
+    document.getElementById('bannerAvatar').innerHTML=
+      `<img src="${logoData.logo}"
+        style="width:100%;height:100%;object-fit:contain;border-radius:14px;background:white;padding:4px;" />`;
+  }
+}
 
     if(!currentSettings.pharmacyName){
   const saved=JSON.parse(localStorage.getItem('pharmacySettings')||'{}');
@@ -976,5 +1018,7 @@ updateBillPreview();
 loadProfile();
 </script>
 
+<script src="/js/plan-guard.js"></script>
+<script src="/js/upgrade-check.js"></script>
 </body>
 </html>

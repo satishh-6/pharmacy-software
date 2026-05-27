@@ -599,7 +599,7 @@ body {
   </div>
 
   <div class="badges">
-    <div class="badge highlight"><span class="live-dot"></span>14 Days FREE Trial</div>
+    <div class="badge highlight"><span class="live-dot"></span>3 Days FREE Trial</div>
     <div class="badge">✓ No Card Required</div>
     <div class="badge">✓ Cancel Anytime</div>
     <div class="badge">🔒 100% Secure</div>
@@ -619,7 +619,7 @@ body {
     <!-- ── REGISTER FORM ── -->
     <div class="form-section active" id="secRegister">
       <div class="form-title">Shuru karo aaj hi</div>
-      <div class="form-sub">14 din free — koi credit card nahi chahiye</div>
+      <div class="form-sub">3 din free trial — koi credit card nahi chahiye</div>
 
       <div id="regErr" class="err-msg"></div>
       <div id="regSuccess" class="success-msg"></div>
@@ -662,7 +662,7 @@ body {
       </div>
 
       <button class="submit-btn" id="regBtn" onclick="doRegister()">
-        <span id="regBtnTxt">🚀 Start Free Trial — 14 Days</span>
+        <span id="regBtnTxt">🚀 Start Free Trial — 3 Days</span>
         <div class="spinner" id="regSpinner"></div>
       </button>
 
@@ -879,6 +879,9 @@ async function doRegister(){
       if(data.token){
         localStorage.setItem('tenantToken',data.token);
         localStorage.setItem('user',JSON.stringify({name:owner,pharmacyName:pharmacy,role:'owner',tenantId:data.tenantId||''}));
+        localStorage.setItem('showUpgrade','true');
+        localStorage.setItem('trialDaysLeft','3');
+        localStorage.setItem('isTrialExpired','false');
       }
       setTimeout(()=>location.href='index.html',1800);
     } else {
@@ -916,27 +919,42 @@ async function doLogin(){
     });
     const data=await res.json();
 
-    if(data.trialExpired){
-      showErr('loginErr','Trial expire ho gaya! Support se contact karo.');
-      setLoading('loginBtn','loginBtnTxt','loginSpinner',false);
-      return;
-    }
+  if(data.trialExpired){
+  localStorage.setItem('showUpgrade','true');
+  localStorage.setItem('trialDaysLeft','0');
+  localStorage.setItem('isTrialExpired','true');
+}
 
     if(res.ok&&(data.token||data.success)){
       const token=data.token||data.tenantToken;
       localStorage.setItem('tenantToken',token);
       localStorage.removeItem('token');
       const u=data.tenant||data.user||{};
-      localStorage.setItem('user',JSON.stringify({
-        name:u.ownerName||u.name||'Owner',
-        pharmacyName:u.pharmacyName||'My Pharmacy',
-        role:u.role||'owner',
-        tenantId:u.tenantId||u._id||''
-      }));
+      localStorage.setItem('user', JSON.stringify({
+  name: u.ownerName||u.name||'Owner',
+  pharmacyName: u.pharmacyName||'My Pharmacy',
+  role: u.role||'owner',
+  tenantId: u.tenantId||u._id||'',
+  plan: u.plan||'trial'
+}));
       if(u.logo) localStorage.setItem('tenantLogo',u.logo);
-      showOk('loginSuccess','Login successful!');
-      showToast('Welcome back! 🎉','success');
-      setTimeout(()=>location.href='/index.html',1000);
+
+// Trial upgrade flag
+if(u.plan==='trial'){
+  const daysLeft=data.tenant?.trialDaysLeft||0;
+  const isExpired=data.tenant?.isTrialExpired||false;
+  localStorage.setItem('showUpgrade','true');
+  localStorage.setItem('trialDaysLeft', daysLeft);
+  localStorage.setItem('isTrialExpired', isExpired);
+} else {
+  localStorage.removeItem('showUpgrade');
+  localStorage.removeItem('trialDaysLeft');
+  localStorage.removeItem('isTrialExpired');
+}
+
+showOk('loginSuccess','Login successful!');
+showToast('Welcome back! 🎉','success');
+setTimeout(()=>location.href='/index.html',1000);
     } else {
       const msg=data.message||data.error||'Invalid credentials!';
       showErr('loginErr',msg);

@@ -206,9 +206,9 @@ router.post('/tenants/:tenantId/impersonate', verifySuperAdmin, async (req, res)
 router.patch('/tenants/:tenantId/plan', verifySuperAdmin, async (req, res) => {
   try {
     const { plan, months } = req.body;
-    const prices = { basic: 499, pro: 999, enterprise: 1999 };
+    const prices = { basic: 500, pro: 1500, enterprise: 3000 };
     const subscriptionEnd = new Date();
-    subscriptionEnd.setMonth(subscriptionEnd.getMonth() + (months || 1));
+    subscriptionEnd.setFullYear(subscriptionEnd.getFullYear() + (months || 1));
     await Tenant.findOneAndUpdate(
       { tenantId: req.params.tenantId },
       {

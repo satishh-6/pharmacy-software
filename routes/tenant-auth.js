@@ -88,8 +88,10 @@ router.post('/login', async (req, res) => {
 
     // Trial check
     const now = new Date();
-    if (tenant.plan === 'trial' && tenant.trialEnds < now)
-      return res.status(403).json({ success:false, message:'Trial expired!', trialExpired:true });
+    const isTrialExpired = tenant.plan === 'trial' && new Date(tenant.trialEnds) < now;
+    const daysLeft = tenant.trialEnds
+  ? Math.max(0, Math.ceil((new Date(tenant.trialEnds) - now)/(1000*60*60*24)))
+  : 0;
 
     await Tenant.findByIdAndUpdate(tenant._id, { lastLogin: now });
 
@@ -97,17 +99,18 @@ router.post('/login', async (req, res) => {
       { tenantId: tenant.tenantId, email: tenant.email, type:'tenant', role },
       process.env.JWT_SECRET, { expiresIn:'30d' }
     );
-
-    res.json({ success:true, token, tenant: {
-      tenantId: tenant.tenantId,
-      pharmacyName: tenant.pharmacyName,
-      ownerName: staffMember ? staffMember.name : tenant.ownerName,
-      email: tenant.email, plan: tenant.plan,
-      trialEnds: tenant.trialEnds,
-      subscriptionEnd: tenant.subscriptionEnd,
-      settings: tenant.settings,
-      role, logo: tenant.logo || tenant.settings?.logo || ''
-    }});
+res.json({ success:true, token, tenant: {
+  tenantId: tenant.tenantId,
+  pharmacyName: tenant.pharmacyName,
+  ownerName: staffMember ? staffMember.name : tenant.ownerName,
+  email: tenant.email, plan: tenant.plan,
+  trialEnds: tenant.trialEnds,
+  subscriptionEnd: tenant.subscriptionEnd,
+  settings: tenant.settings,
+  role, logo: tenant.logo || tenant.settings?.logo || '',
+  isTrialExpired,
+  trialDaysLeft: daysLeft
+}});
   } catch(err) { res.status(500).json({ success:false, message:err.message }); }
 });
 

@@ -397,6 +397,43 @@ function checkAuth(){
   const branch=JSON.parse(localStorage.getItem('currentBranch')||'null');
   if(branch)document.getElementById('navBranch').textContent=branch.name;
 }
+
+function checkUpgradeStatus(){
+  const showUpgrade = localStorage.getItem('showUpgrade');
+  const daysLeft = parseInt(localStorage.getItem('trialDaysLeft') || '0');
+  const isExpired = localStorage.getItem('isTrialExpired') === 'true';
+
+  const btn = document.getElementById('upgradeNavBtn');
+  if(btn && showUpgrade === 'true'){
+    btn.style.display = 'flex';
+  }
+
+  // Bottom banner
+  if(showUpgrade === 'true'){
+    const color = isExpired ? '#C0392B' : daysLeft <= 1 ? '#e65100' : '#B7770D';
+    const msg = isExpired
+      ? '⚠️ Trial expire ho gaya! Koi bhi plan lo aur kaam jari rakho.'
+      : `⏳ Trial mein <strong>${daysLeft} din</strong> bache hain — plan upgrade karo.`;
+
+    const banner = document.createElement('div');
+    banner.id = 'trialBanner';
+    banner.innerHTML = `
+      <span style="font-size:13px;">${msg}</span>
+      <a href="profile.html" style="background:white;color:${color};padding:5px 16px;border-radius:20px;font-size:12px;font-weight:800;text-decoration:none;white-space:nowrap;">🚀 Plans Dekho</a>
+    `;
+    Object.assign(banner.style, {
+      position:'fixed', bottom:'0', left:'225px', right:'0', zIndex:'998',
+      background:color, color:'white', padding:'10px 24px',
+      display:'flex', justifyContent:'space-between', alignItems:'center',
+      gap:'16px', boxShadow:'0 -4px 20px rgba(0,0,0,0.2)'
+    });
+    document.body.appendChild(banner);
+  }
+}
+
+checkUpgradeStatus();
+
+
 function logout(){localStorage.clear();location.href='signup.html';}
 
 function setNow(){
@@ -2088,5 +2125,7 @@ window.addItem = function(id) {
 
 
 </script>
+<script src="/js/plan-guard.js"></script>
+<script src="/js/upgrade-check.js"></script>
 </body>
 </html>

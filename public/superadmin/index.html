@@ -42,7 +42,7 @@
   .fgroup label { font-size:10.5px; color:#78909c; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; }
   .fgroup input { padding:11px 14px; background:#f8fafc; border:1.5px solid #e2e8f0; border-radius:9px; color:#1a2332; font-size:14px; outline:none; transition:all 0.2s; }
   .fgroup input:focus { border-color:#1B4F72; background:white; box-shadow:0 0 0 3px rgba(27,79,114,0.08); }
-  .login-btn { width:100%; padding:13px; background:#ffffff; color:white; border:none; border-radius:10px; font-size:15px; font-weight:700; cursor:pointer; transition:all 0.2s; margin-top:4px; }
+.login-btn { width:100%; padding:13px; background:linear-gradient(135deg,#1a3a6b,#1e6b3a); color:white; border:none; border-radius:10px; font-size:15px; font-weight:700; cursor:pointer; transition:all 0.2s; margin-top:4px; }
   .login-btn:hover { transform:translateY(-1px); box-shadow:0 8px 24px rgba(27,79,114,0.3); }
 
   /* KPI CARDS */
@@ -84,8 +84,9 @@
   /* TABLE */
   .table-wrap { overflow-x:auto; }
   .data-table { width:100%; border-collapse:collapse; min-width:900px; }
-  .data-table thead tr { background:#ffffff; }
-  .data-table thead th { padding:11px 14px; text-align:left; font-size:10.5px; color:rgba(255,255,255,0.88); font-weight:700; text-transform:uppercase; letter-spacing:0.5px; white-space:nowrap; }
+.data-table thead tr { background:linear-gradient(135deg,#1a3a6b,#154360); }
+.data-table thead th { padding:11px 14px; text-align:left; font-size:10.5px; color:rgba(255,255,255,0.9); font-weight:700; text-transform:uppercase; letter-spacing:0.5px; white-space:nowrap; }
+
   .data-table tbody tr { border-bottom:1px solid #f5f7fa; transition:background 0.12s; }
   .data-table tbody tr:hover { background:#f8fafd; }
   .data-table tbody td { padding:12px 14px; font-size:13px; color:#546e7a; vertical-align:middle; }
@@ -138,8 +139,7 @@
   /* DETAIL TABS */
   .detail-tabs { display:flex; gap:4px; background:#f8fafc; border-radius:10px; padding:4px; margin-bottom:20px; overflow-x:auto; border:1px solid #e2e8f0; }
   .dtab { padding:8px 16px; border-radius:8px; cursor:pointer; font-size:12px; font-weight:700; color:#78909c; background:transparent; border:none; transition:all 0.2s; white-space:nowrap; }
-  .dtab.active { background:#ffffff; color:white; box-shadow:0 3px 10px rgba(27,79,114,0.2); }
-
+.dtab.active { background:#1a3a6b; color:white !important; box-shadow:0 3px 10px rgba(27,79,114,0.2); }
   /* INFO GRID */
   .info-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:16px; }
   .info-item { background:#f8fafc; border-radius:10px; padding:12px 14px; border:1px solid #e2e8f0; }
@@ -219,6 +219,58 @@
   }
   .btn-logout:hover { background: #f0f4f8 !important; }
 
+  .nav-user {
+  background:#f0f4f8 !important;
+  border:1px solid #e2e8f0 !important;
+  color:#1a2332 !important;
+}
+.nav-logout {
+  background:transparent !important;
+  border:1.5px solid #e2e8f0 !important;
+  color:#1a2332 !important;
+}
+.nav-logout:hover { background:#f0f4f8 !important; color:#C0392B !important; }
+
+/* Super Admin badge */
+.navbar h1 .sa {
+  background:#EBF5FB !important;
+  color:#1a3a6b !important;
+  border:1px solid #D6EAF8 !important;
+}
+
+/* Table headers */
+.data-table thead tr { background:linear-gradient(135deg,#1a3a6b,#154360) !important; }
+.data-table thead th { color:rgba(255,255,255,0.92) !important; }
+.mini-table thead tr { background:linear-gradient(135deg,#1a3a6b,#154360) !important; }
+.mini-table thead th { color:rgba(255,255,255,0.92) !important; }
+
+/* Detail tabs active */
+.dtab { color:#546e7a !important; background:transparent !important; }
+.dtab.active { background:#1a3a6b !important; color:#ffffff !important; }
+
+/* All primary buttons */
+.btn-primary {
+  background:linear-gradient(135deg,#1a3a6b,#1e6b3a) !important;
+  color:#ffffff !important;
+}
+.btn-primary:hover { box-shadow:0 6px 20px rgba(26,58,107,0.3) !important; }
+
+/* Login button */
+.login-btn {
+  background:linear-gradient(135deg,#1a3a6b,#1e6b3a) !important;
+  color:white !important;
+}
+
+/* Plan modal save button */
+#planModal button:last-child {
+  background:linear-gradient(135deg,#1a3a6b,#1e6b3a) !important;
+  color:white !important;
+}
+
+/* View All button */
+.btn-navy { background:#EBF5FB !important; color:#1a3a6b !important; border:1px solid #D6EAF8 !important; }
+.btn-navy:hover { background:#1a3a6b !important; color:white !important; }
+
 </style>
 
 </head>
@@ -283,7 +335,7 @@
       <div class="kpi-grid">
         <div class="kpi-card blue"><div class="kpi-icon">🏥</div><div class="kpi-label">Total Pharmacies</div><div class="kpi-value" id="st-total">—</div><div class="kpi-sub">Registered tenants</div></div>
         <div class="kpi-card green"><div class="kpi-icon">✅</div><div class="kpi-label">Active</div><div class="kpi-value" id="st-active">—</div><div class="kpi-sub">Paying + Trial</div></div>
-        <div class="kpi-card orange"><div class="kpi-icon">⏳</div><div class="kpi-label">On Trial</div><div class="kpi-value" id="st-trial">—</div><div class="kpi-sub">Free 14 days</div></div>
+        <div class="kpi-card orange"><div class="kpi-icon">⏳</div><div class="kpi-label">On Trial</div><div class="kpi-value" id="st-trial">—</div><div class="kpi-sub">Free 3 days</div></div>
         <div class="kpi-card purple"><div class="kpi-icon">💰</div><div class="kpi-label">Paid Users</div><div class="kpi-value" id="st-paid">—</div><div class="kpi-sub">Subscribed</div></div>
         <div class="kpi-card teal"><div class="kpi-icon">📈</div><div class="kpi-label">Monthly Revenue</div><div class="kpi-value" id="st-revenue">—</div><div class="kpi-sub">MRR estimate</div></div>
         <div class="kpi-card red"><div class="kpi-icon">⚠️</div><div class="kpi-label">Expiring Soon</div><div class="kpi-value" id="st-expiring">—</div><div class="kpi-sub">In next 3 days</div></div>
@@ -362,8 +414,8 @@
       <div style="font-size:22px;font-weight:800;color:#1a2332;margin-bottom:20px;">💰 Plans & Revenue</div>
 
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px;">
-        <div class="kpi-card teal"><div class="kpi-icon">💰</div><div class="kpi-label">Monthly Revenue</div><div class="kpi-value" id="pr-mrr">—</div><div class="kpi-sub">MRR estimate</div></div>
-        <div class="kpi-card blue"><div class="kpi-icon">📅</div><div class="kpi-label">Annual Run Rate</div><div class="kpi-value" id="pr-arr">—</div><div class="kpi-sub">ARR estimate</div></div>
+        <div class="kpi-card teal"><div class="kpi-icon">💰</div><div class="kpi-label">Monthly Revenue</div><div class="kpi-value" id="pr-mrr">—</div><div class="kpi-sub">Annual revenue</div></div>
+        <div class="kpi-card blue"><div class="kpi-icon">📅</div><div class="kpi-label">Annual Run Rate</div><div class="kpi-value" id="pr-arr">—</div><div class="kpi-sub">Total collected</div></div>
         <div class="kpi-card purple"><div class="kpi-icon">📊</div><div class="kpi-label">Avg Revenue/User</div><div class="kpi-value" id="pr-arpu">—</div><div class="kpi-sub">ARPU</div></div>
       </div>
 
@@ -371,19 +423,19 @@
         <div class="plan-card basic">
           <div style="font-size:16px;font-weight:800;color:#1B4F72;margin-bottom:8px;">🔵 Basic</div>
           <div style="font-size:32px;font-weight:800;color:#1a2332;" id="pr-basic-count">0</div>
-          <div style="font-size:13px;color:#78909c;margin-top:4px;">₹499/month</div>
-          <div style="font-size:15px;font-weight:800;color:#1B4F72;margin-top:8px;" id="pr-basic-rev">₹0/mo</div>
+          <div style="font-size:13px;color:#1E8449;font-weight:700;margin-top:4px;">FREE Forever</div>
+          <div style="font-size:15px;font-weight:800;color:#1B4F72;margin-top:8px;" id="pr-basic-rev">₹0</div>
         </div>
         <div class="plan-card pro">
           <div style="font-size:16px;font-weight:800;color:#7D3C98;margin-bottom:8px;">⭐ Pro</div>
           <div style="font-size:32px;font-weight:800;color:#1a2332;" id="pr-pro-count">0</div>
-          <div style="font-size:13px;color:#78909c;margin-top:4px;">₹999/month</div>
+          <div style="font-size:13px;color:#78909c;margin-top:4px;">₹1500/year</div>
           <div style="font-size:15px;font-weight:800;color:#7D3C98;margin-top:8px;" id="pr-pro-rev">₹0/mo</div>
         </div>
         <div class="plan-card enterprise">
           <div style="font-size:16px;font-weight:800;color:#1E8449;margin-bottom:8px;">🚀 Enterprise</div>
           <div style="font-size:32px;font-weight:800;color:#1a2332;" id="pr-ent-count">0</div>
-          <div style="font-size:13px;color:#78909c;margin-top:4px;">₹1999/month</div>
+          <div style="font-size:13px;color:#78909c;margin-top:4px;">₹3000/year</div>
           <div style="font-size:15px;font-weight:800;color:#1E8449;margin-top:8px;" id="pr-ent-rev">₹0/mo</div>
         </div>
       </div>
@@ -566,10 +618,11 @@
       <div class="fgroup">
         <label>Plan</label>
         <select id="plan-select" style="padding:10px 12px;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:8px;color:#1a2332;font-size:14px;outline:none;">
-          <option value="trial">⏳ Trial (Free — 14 days)</option>
-          <option value="basic">🔵 Basic — ₹499/month</option>
-          <option value="pro">⭐ Pro — ₹999/month</option>
-          <option value="enterprise">🚀 Enterprise — ₹1999/month</option>
+          <option value="trial">⏳ Trial (Free — 3 days)</option>
+          <option value="basic">🔵 Basic — FREE</option>
+
+          <option value="pro">⭐ Pro — ₹1500/year</option>
+          <option value="enterprise">🚀 Enterprise — ₹3000/year</option>
         </select>
       </div>
       <div class="fgroup">
@@ -579,7 +632,7 @@
     </div>
     <div style="display:flex;gap:10px;margin-top:20px;">
       <button onclick="closePlanModal()" style="flex:1;padding:11px;background:#f0f4f8;color:#546e7a;border:none;border-radius:9px;cursor:pointer;font-size:14px;font-weight:700;">Cancel</button>
-      <button onclick="updatePlan()" style="flex:2;padding:11px;background:#ffffff;color:white;border:none;border-radius:9px;cursor:pointer;font-size:14px;font-weight:700;">✅ Update Plan</button>
+      <button onclick="updatePlan()" style="flex:2;padding:11px;background:linear-gradient(135deg,#1a3a6b,#1e6b3a);color:white;border:none;border-radius:9px;cursor:pointer;font-size:14px;font-weight:700;">✅ Update Plan</button>
     </div>
   </div>
 </div>
@@ -641,7 +694,8 @@ async function loadDashboard(){
     set('st-total',s.totalTenants||0);set('st-active',s.activeTenants||0);
     set('st-trial',s.trialTenants||0);set('st-paid',s.paidTenants||0);
     set('st-revenue',fmtMoney(s.monthlyRevenue||0));set('st-expiring',s.expiringTrials||0);
-    set('st-bills',s.totalBillsToday||'—');set('st-customers',s.totalCustomers||'—');
+    set('st-bills', s.totalBillsToday!=null ? s.totalBillsToday : (allTenants.reduce((a,t)=>a+(t.totalSales||0),0)||'—'));
+    set('st-customers', s.totalCustomers!=null ? s.totalCustomers : (allTenants.reduce((a,t)=>a+(t.totalCustomers||0),0)||'—'));
 
     const recent=data.recentTenants||[];
     document.getElementById('recentSignups').innerHTML=recent.length?recent.map(t=>`<tr>
@@ -952,10 +1006,10 @@ async function loadPlansSection(){
   const basic=allTenants.filter(t=>t.plan==='basic');
   const pro=allTenants.filter(t=>t.plan==='pro');
   const ent=allTenants.filter(t=>t.plan==='enterprise');
-  const mrr=basic.length*499+pro.length*999+ent.length*1999;
+  const mrr=basic.length*0+pro.length*1500+ent.length*3000;
   const paid=basic.length+pro.length+ent.length;
   const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
-  set('pr-mrr',fmtMoney(mrr));set('pr-arr',fmtMoney(mrr*12));
+  set('pr-mrr',fmtMoney(mrr));set('pr-arr',fmtMoney(mrr));
   set('pr-arpu',paid?fmtMoney(mrr/paid):'₹0');
   set('pr-basic-count',basic.length);set('pr-pro-count',pro.length);set('pr-ent-count',ent.length);
   set('pr-basic-rev',fmtMoney(basic.length*499)+'/mo');
@@ -965,7 +1019,7 @@ async function loadPlansSection(){
     <td><div class="tenant-name">${t.pharmacyName}</div></td>
     <td>${t.ownerName}</td>
     <td><span class="badge badge-${t.plan}">${(t.plan||'').toUpperCase()}</span></td>
-    <td style="font-weight:700;color:#1E8449;">${fmtMoney(t.plan==='basic'?499:t.plan==='pro'?999:1999)}/mo</td>
+    <td style="font-weight:700;color:#1E8449;">${fmtMoney(t.plan==='basic'?500:t.plan==='pro'?1500:3000)}/yr</td>
     <td>${fmtDate(t.planStartDate||t.createdAt)}</td>
     <td>${t.planExpiry?fmtDate(t.planExpiry):'—'}</td>
     <td><button class="btn btn-navy" onclick="openPlanModal('${t.tenantId}','${(t.pharmacyName||'').replace(/'/g,"\\'")}','${t.plan}')">💰 Update</button></td>
