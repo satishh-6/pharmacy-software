@@ -931,12 +931,36 @@ async function doLogin(){
       localStorage.removeItem('token');
       const u=data.tenant||data.user||{};
       localStorage.setItem('user', JSON.stringify({
-  name: u.ownerName||u.name||'Owner',
+  name:         u.ownerName||u.name||'Owner',
   pharmacyName: u.pharmacyName||'My Pharmacy',
-  role: u.role||'owner',
-  tenantId: u.tenantId||u._id||'',
-  plan: u.plan||'trial'
+  role:         u.role||'owner',
+  tenantId:     u.tenantId||u._id||'',
+  plan:         u.plan||'trial'
 }));
+
+// Trial flags
+var isPaid = ['pro','enterprise'].includes((u.plan||'').toLowerCase());
+if(isPaid){
+  localStorage.removeItem('showUpgrade');
+  localStorage.removeItem('isTrialExpired');
+  localStorage.removeItem('trialDaysLeft');
+} else {
+  localStorage.setItem('showUpgrade','true');
+  localStorage.setItem('trialDaysLeft', String(u.trialDaysLeft||3));
+  if(u.isTrialExpired) localStorage.setItem('isTrialExpired','true');
+}
+
+// Trial flags
+var isPaid = ['pro','enterprise'].includes((u.plan||'').toLowerCase());
+if(isPaid){
+  localStorage.removeItem('showUpgrade');
+  localStorage.removeItem('isTrialExpired');
+  localStorage.removeItem('trialDaysLeft');
+} else {
+  localStorage.setItem('showUpgrade','true');
+  localStorage.setItem('trialDaysLeft', String(u.trialDaysLeft||3));
+  if(u.isTrialExpired) localStorage.setItem('isTrialExpired','true');
+}
       if(u.logo) localStorage.setItem('tenantLogo',u.logo);
 
 // Trial upgrade flag
