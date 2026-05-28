@@ -225,25 +225,7 @@
       </div>
     </div>
 
-    <!-- ✅ STOCK MODE SELECTOR -->
-    <div class="card" style="padding:18px 20px;">
-      <div style="font-size:13px;font-weight:800;color:#1a2332;margin-bottom:12px;">📦 Stock Update Mode — Kaise add hoga stock?</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
-        <div class="mode-card active-add" id="modeAddBtn" onclick="setStockMode('add')">
-          <div style="font-size:22px;">➕</div>
-          <div style="font-size:13px;font-weight:800;color:#1B4F72;margin-top:6px;">Naya Purchase</div>
-          <div style="font-size:11px;color:#78909c;margin-top:4px;line-height:1.4;">Supplier se naya maal aaya<br>Stock mein ADD hoga</div>
-        </div>
-        <div class="mode-card" id="modeSetBtn" onclick="setStockMode('set')">
-          <div style="font-size:22px;">📋</div>
-          <div style="font-size:13px;font-weight:800;color:#546e7a;margin-top:6px;">Opening Stock</div>
-          <div style="font-size:11px;color:#78909c;margin-top:4px;line-height:1.4;">Pehle se rakha hua stock<br>Quantity SET hogi (replace)</div>
-        </div>
-      </div>
-      <div id="stockModeInfo" style="padding:10px 14px;background:#EAFAF1;border-radius:8px;font-size:12px;color:#1E8449;font-weight:700;border:1px solid #A9DFBF;">
-        ➕ Add Mode: Purchase stock mein ADD hogi — Normal purchases ke liye use karo
-      </div>
-    </div>
+    
 
     <!-- ✅ SUPPLIER DETAILS with GST field -->
     <div class="card">
@@ -446,7 +428,6 @@
 
 <script>
 let products=[], purchaseItems=[], payMode='cash';
-let stockMode='add'; // ✅ 'add' = new purchase, 'set' = opening stock
 let payModalId=null, delModalId=null;
 let editId=null;
 
@@ -471,28 +452,7 @@ function setToday(){
   document.getElementById('purchaseDate').value=new Date().toISOString().split('T')[0];
 }
 
-// ✅ STOCK MODE SWITCHER
-function setStockMode(mode){
-  stockMode=mode;
-  const addBtn=document.getElementById('modeAddBtn');
-  const setBtn=document.getElementById('modeSetBtn');
-  const info=document.getElementById('stockModeInfo');
-  if(mode==='add'){
-    addBtn.className='mode-card active-add';
-    addBtn.querySelector('div:nth-child(2)').style.color='#1B4F72';
-    setBtn.className='mode-card';
-    setBtn.querySelector('div:nth-child(2)').style.color='#546e7a';
-    info.style.cssText='padding:10px 14px;background:#EAFAF1;border-radius:8px;font-size:12px;color:#1E8449;font-weight:700;border:1px solid #A9DFBF;';
-    info.textContent='➕ Add Mode: Purchase stock mein ADD hogi — Normal purchases ke liye use karo';
-  }else{
-    setBtn.className='mode-card active-set';
-    setBtn.querySelector('div:nth-child(2)').style.color='#B7770D';
-    addBtn.className='mode-card';
-    addBtn.querySelector('div:nth-child(2)').style.color='#546e7a';
-    info.style.cssText='padding:10px 14px;background:#FEF9E7;border-radius:8px;font-size:12px;color:#B7770D;font-weight:700;border:1px solid #F9E79F;';
-    info.textContent='📋 Opening Stock Mode: Quantity SET hogi — Existing stock replace ho jaayegi';
-  }
-}
+
 
 // ── LOAD PRODUCTS ──
 async function loadProducts(){
@@ -1131,7 +1091,7 @@ function buildData(){
     supplierPhone:document.getElementById('supplierPhone').value.trim(),
     notes:document.getElementById('purchaseNotes').value.trim(),
     date:pd?new Date(pd):new Date(),
-    stockUpdateMode:stockMode, // ✅ NEW
+    stockUpdateMode:'add',    
     items:purchaseItems.map(item=>({
       product:item.pid,productName:item.name,
       batch:item.batch,expiry:item.expiry,
@@ -1176,8 +1136,7 @@ async function savePurchase(){
 }
 
 function resetForm(){
-  purchaseItems=[];editId=null;stockMode='add';
-  setStockMode('add');
+  purchaseItems=[];editId=null;
 ['supplier','invoiceNo','supplierPhone','supplierGST','supplierEmail','purchaseNotes','paidAmt','discountPercent','discountAmount'].forEach(id=>{    const el=document.getElementById(id);if(el)el.value='';
   });
   document.getElementById('purchaseDate').value=new Date().toISOString().split('T')[0];
@@ -1267,7 +1226,6 @@ async function editPurchase(id){
     document.getElementById('purchaseNotes').value=p.notes||'';
     document.getElementById('paidAmt').value=p.paidAmount||0;
     if(p.date)document.getElementById('purchaseDate').value=new Date(p.date).toISOString().split('T')[0];
-    setStockMode(p.stockUpdateMode||'add');
     purchaseItems=(p.items||[]).map(item=>({
       pid:item.product?._id||item.product,name:item.productName||'',
       cat:'medicine',sellType:'strip',
