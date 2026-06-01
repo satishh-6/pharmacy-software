@@ -13,9 +13,10 @@ const tenantSchema = new mongoose.Schema({
   plan: { type: String, enum: ['trial','basic','pro','enterprise'], default: 'trial' },
   planPrice: { type: Number, default: 0 },
   trialEnds: {
-  type: Date,
-  default: () => new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
-}  subscriptionStart: { type: Date },
+    type: Date,
+    default: () => new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
+  },                                       
+  subscriptionStart: { type: Date },
   subscriptionEnd: { type: Date },
   isActive: { type: Boolean, default: true },
   isSuspended: { type: Boolean, default: false },
@@ -32,14 +33,14 @@ const tenantSchema = new mongoose.Schema({
 
   // Business Settings — editable by tenant
   settings: {
-    pharmacyName: String,      // Bill pe naam
+    pharmacyName: String,
     address1: String,
     address2: String,
     phone: String,
     email: String,
-    gstNo: String,             // Optional
-    licenseNo: String,         // Optional
-    signatory: String,         // Authorized signatory
+    gstNo: String,
+    licenseNo: String,
+    signatory: String,
     billType: { type: String, default: 'Retail Invoice' },
     footer: String,
     logo: String
@@ -47,7 +48,7 @@ const tenantSchema = new mongoose.Schema({
 
   // Locked fields — only super admin change kar sakta hai
   lockedFields: {
-    pharmacyName: { type: Boolean, default: false }, // true = locked
+    pharmacyName: { type: Boolean, default: false },
     ownerName: { type: Boolean, default: false }
   },
 
@@ -65,8 +66,8 @@ tenantSchema.pre('save', function(next) {
   }
   if (!this.trialEnds) {
     const trial = new Date();
-    trial.setDate(trial.getDate() + 14);
-    this.trialEnds = trial;
+    trial.setDate(trial.getDate() + 3);
+  this.trialEnds = trial;
   }
   next();
 });
