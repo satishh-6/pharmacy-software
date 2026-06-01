@@ -12,7 +12,7 @@
   "build": {
     "appId": "com.dawahisaab.pharmacy",
     "productName": "Dawa Hisaab",
-    "copyright": "Copyright 2025 Dawa Hisaab",
+    "copyright": "Copyright 2025 RudraX System",
     "icon": "assets/icon",
     "directories": {
       "output": "dist"

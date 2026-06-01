@@ -49,7 +49,7 @@ function createWindow() {
 // ── SYSTEM TRAY ──
 function createTray() {
   try {
-    const trayIcon = nativeImage.createEmpty();
+    const trayIcon = nativeImage.createFromPath(path.join(__dirname, 'assets', 'icon.png'));
     tray = new Tray(trayIcon);
     const contextMenu = Menu.buildFromTemplate([
       { label: '💊 Dawa Hisaab', enabled: false },

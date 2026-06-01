@@ -139,6 +139,25 @@ mongoose.connect(process.env.MONGODB_URI, {
 .then(() => console.log('✅ MongoDB Connected!'))
 .catch(err => console.log('❌ MongoDB Error:', err.message));
 
+// ── TEMP: Fix all trial tenants to 3 days ──
+app.get('/admin-fix-trial', async (req, res) => {
+  try {
+    const Tenant = require('./models/Tenant');
+    // Sabhi trial tenants ko registration date + 3 days set karo
+    const tenants = await Tenant.find({ plan: 'trial' });
+    let updated = 0;
+    for (const t of tenants) {
+      const reg = new Date(t.createdAt || t._id.getTimestamp());
+      const newTrialEnd = new Date(reg.getTime() + 3 * 24 * 60 * 60 * 1000);
+      await Tenant.updateOne({ _id: t._id }, { $set: { trialEnds: newTrialEnd } });
+      updated++;
+    }
+    res.json({ success: true, updated, message: `${updated} tenants fixed to 3-day trial` });
+  } catch(e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 // ── START SERVER ──
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => console.log(`🚀 Server running on port ${PORT}`));

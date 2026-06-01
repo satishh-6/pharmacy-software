@@ -12,8 +12,10 @@ const tenantSchema = new mongoose.Schema({
   // Subscription
   plan: { type: String, enum: ['trial','basic','pro','enterprise'], default: 'trial' },
   planPrice: { type: Number, default: 0 },
-  trialEnds: { type: Date },
-  subscriptionStart: { type: Date },
+  trialEnds: {
+  type: Date,
+  default: () => new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
+}  subscriptionStart: { type: Date },
   subscriptionEnd: { type: Date },
   isActive: { type: Boolean, default: true },
   isSuspended: { type: Boolean, default: false },
