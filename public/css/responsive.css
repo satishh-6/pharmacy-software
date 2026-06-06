@@ -1,0 +1,478 @@
+/* ═══════════════════════════════════════════════
+   DAWA HISAAB — GLOBAL RESPONSIVE CSS
+   Add karo: <link rel="stylesheet" href="/css/responsive.css">
+   Har HTML page ke <head> mein — existing CSS ke BAAD
+   ═══════════════════════════════════════════════ */
+
+/* ── TABLET (max 1024px) ── */
+@media (max-width: 1024px) {
+  .sidebar { width: 200px; }
+  .main { margin-left: 200px; }
+}
+
+/* ═══════════════════════════════
+   MOBILE (max 768px)
+   ═══════════════════════════════ */
+@media (max-width: 768px) {
+
+  /* ── SIDEBAR → BOTTOM NAV ── */
+  .sidebar {
+    position: fixed;
+    left: 0; right: 0;
+    top: auto !important;
+    bottom: 0;
+    width: 100% !important;
+    height: 64px !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center;
+    justify-content: space-around;
+    padding: 0 !important;
+    overflow: hidden;
+    border-right: none !important;
+    border-top: 1px solid #e2e8f0;
+    z-index: 99;
+    background: white;
+    box-shadow: 0 -4px 16px rgba(0,0,0,0.08);
+  }
+
+  /* Sidebar sections hide */
+  .sidebar-section { display: none !important; }
+
+  /* Sidebar links — icon only */
+  .sidebar a {
+    flex-direction: column !important;
+    padding: 6px 4px !important;
+    font-size: 9px !important;
+    border-left: none !important;
+    border-top: 3px solid transparent;
+    gap: 2px !important;
+    flex: 1;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    min-width: 0;
+  }
+
+  .sidebar a.active {
+    border-left: none !important;
+    border-top: 3px solid #1a3a6b !important;
+    background: #EBF5FB !important;
+  }
+
+  .sidebar a .sicon {
+    width: 24px !important;
+    height: 24px !important;
+    font-size: 14px !important;
+    background: transparent !important;
+  }
+
+  /* Hide text labels for non-essential items */
+  .sidebar a[href="prescriptions.html"],
+  .sidebar a[href="branches.html"],
+  .sidebar a[href="reports.html"],
+  .sidebar a[href="customers.html"] {
+    display: none !important;
+  }
+
+  /* Show only main 5 items */
+  .sidebar a[href="index.html"],
+  .sidebar a[href="stock.html"],
+  .sidebar a[href="billing.html"],
+  .sidebar a[href="purchase.html"],
+  .sidebar a[href="profile.html"] {
+    display: flex !important;
+  }
+
+  /* ── MAIN CONTENT ── */
+  .main {
+    margin-left: 0 !important;
+    margin-top: 60px !important;
+    padding: 12px !important;
+    padding-bottom: 80px !important; /* bottom nav space */
+    display: flex !important;
+    flex-direction: column !important;
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+    min-height: calc(100vh - 60px) !important;
+  }
+
+  /* ── NAVBAR ── */
+  .navbar {
+    padding: 0 12px !important;
+    height: 56px !important;
+  }
+
+  .navbar h1 {
+    font-size: 18px !important;
+  }
+
+  .nav-badge {
+    display: none !important;
+  }
+
+  /* Keep only logout and user name */
+  .nav-right {
+    gap: 6px !important;
+  }
+
+  .btn-logout, .btn-back {
+    padding: 5px 10px !important;
+    font-size: 11px !important;
+  }
+
+  /* ── CARDS ── */
+  .card {
+    padding: 14px !important;
+    border-radius: 10px !important;
+  }
+
+  /* ── GRIDS → SINGLE COLUMN ── */
+  .grid2,
+  .form-grid,
+  .grid3 {
+    grid-template-columns: 1fr !important;
+  }
+
+  .form-group.full,
+  .fgroup.full {
+    grid-column: 1 !important;
+  }
+
+  /* ── STAT STRIP ── */
+  .stat-strip {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 10px !important;
+  }
+
+  .stat-mini {
+    padding: 12px !important;
+    gap: 8px !important;
+  }
+
+  .stat-icon {
+    width: 36px !important;
+    height: 36px !important;
+    font-size: 16px !important;
+  }
+
+  .stat-info .val {
+    font-size: 16px !important;
+  }
+
+  .stat-info .lbl {
+    font-size: 9px !important;
+  }
+
+  /* ── BILLING TABLE ── */
+  .bill-tbl,
+  .pur-tbl {
+    font-size: 11px !important;
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  .bill-tbl thead th,
+  .pur-tbl thead th {
+    padding: 7px 8px !important;
+    font-size: 9px !important;
+  }
+
+  .bill-tbl tbody td,
+  .pur-tbl tbody td {
+    padding: 7px 8px !important;
+    font-size: 11px !important;
+  }
+
+  .bill-tbl input,
+  .pur-tbl input {
+    width: 50px !important;
+    padding: 4px 6px !important;
+    font-size: 11px !important;
+  }
+
+  /* ── RIGHT PANEL (Billing/Purchase Summary) ── */
+  .right-panel,
+  .right-sticky {
+    position: static !important;
+    width: 100% !important;
+  }
+
+  .left-panel,
+  .right-panel {
+    width: 100% !important;
+  }
+
+  /* ── PAYMENT GRID ── */
+  .pay-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 6px !important;
+  }
+
+  .pay-btn {
+    padding: 8px 4px !important;
+    font-size: 11px !important;
+  }
+
+  /* ── ACTION BUTTONS ── */
+  .abtn {
+    padding: 12px !important;
+    font-size: 13px !important;
+  }
+
+  /* ── TABS ── */
+  .tabs-wrap {
+    padding: 4px !important;
+    gap: 2px !important;
+    overflow-x: auto;
+  }
+
+  .tab-btn {
+    padding: 8px 10px !important;
+    font-size: 11px !important;
+    white-space: nowrap;
+    gap: 4px !important;
+  }
+
+  /* ── MODALS ── */
+  .modal-bg {
+    padding: 0 !important;
+    align-items: flex-end !important;
+  }
+
+  .modal {
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 18px 18px 0 0 !important;
+    padding: 20px 16px !important;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  /* ── PROFILE BANNER ── */
+  .profile-banner {
+    padding: 16px !important;
+    gap: 12px !important;
+    flex-wrap: wrap;
+  }
+
+  .profile-avatar {
+    width: 56px !important;
+    height: 56px !important;
+    font-size: 24px !important;
+  }
+
+  .profile-name {
+    font-size: 16px !important;
+  }
+
+  /* ── SEARCH BOX ── */
+  .srch-wrap input {
+    padding: 10px 14px !important;
+    font-size: 13px !important;
+  }
+
+  .srch-results {
+    max-height: 200px !important;
+  }
+
+  .srch-item {
+    padding: 9px 12px !important;
+  }
+
+  .si-name {
+    font-size: 13px !important;
+  }
+
+  /* ── BILLING — Customer section ── */
+  .found-bar,
+  .loyalty-bar {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 8px 12px !important;
+  }
+
+  /* ── BILL SUMMARY ── */
+  .total-row {
+    font-size: 18px !important;
+  }
+
+  .srow {
+    font-size: 13px !important;
+  }
+
+  .disc-input {
+    width: 70px !important;
+  }
+
+  /* ── RECENT BILLS/PURCHASES ── */
+  .rbill, .rpurch {
+    padding: 8px 0 !important;
+  }
+
+  .rbill-btns, .rpurch-btns {
+    gap: 4px !important;
+    flex-wrap: wrap;
+  }
+
+  .rbtn {
+    padding: 5px 8px !important;
+    font-size: 10px !important;
+    min-width: 44px !important;
+  }
+
+  /* ── BOTTOM BANNER ── */
+  #trialBanner {
+    left: 0 !important;
+    bottom: 64px !important; /* above bottom nav */
+    font-size: 11px !important;
+    padding: 8px 12px !important;
+    flex-wrap: wrap;
+    gap: 8px !important;
+  }
+
+  /* ── UPGRADE NAV BUTTON ── */
+  #upgradeNavBtn a {
+    font-size: 10px !important;
+    padding: 4px 10px !important;
+  }
+
+  /* ── PLAN CARDS (Profile) ── */
+  #basicPlanCard,
+  .card [style*="flex:1"] {
+    min-width: 0 !important;
+  }
+
+  /* ── SUPERADMIN TABLE ── */
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  /* ── PAGE HEADER ── */
+  .page-hdr {
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start !important;
+  }
+
+  .page-title {
+    font-size: 18px !important;
+  }
+
+  /* ── WELCOME BAR (Dashboard) ── */
+  .welcome-bar {
+    padding: 16px !important;
+    flex-direction: column !important;
+    gap: 8px;
+  }
+
+  /* ── OPT FIELDS ── */
+  .opt-fields {
+    padding: 10px !important;
+  }
+
+  /* ── SAVE BAR ── */
+  .save-bar {
+    flex-wrap: wrap;
+    gap: 8px !important;
+  }
+
+  /* ── BUTTONS ── */
+  .btn {
+    padding: 8px 14px !important;
+    font-size: 12px !important;
+  }
+
+  /* ── FORM INPUTS ── */
+  .fgroup input,
+  .fgroup select {
+    font-size: 14px !important; /* prevent zoom on iOS */
+    padding: 10px 12px !important;
+  }
+
+  /* ── CUSTOMER DROPDOWN ── */
+  .cust-drop {
+    max-height: 180px !important;
+  }
+
+  /* ── SIGNUP PAGE ── */
+  .auth-container,
+  .login-box,
+  .signup-box {
+    width: 95% !important;
+    padding: 20px 16px !important;
+    margin: 10px auto !important;
+  }
+
+  /* ── MODE CARDS (Purchase) ── */
+  .mode-card {
+    padding: 10px !important;
+  }
+}
+
+/* ═══════════════════════════════
+   SMALL MOBILE (max 480px)
+   ═══════════════════════════════ */
+@media (max-width: 480px) {
+
+  .navbar h1 {
+    font-size: 16px !important;
+  }
+
+  .stat-strip {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  .stat-mini {
+    padding: 10px 8px !important;
+  }
+
+  .stat-info .val {
+    font-size: 14px !important;
+  }
+
+  .abtn {
+    font-size: 12px !important;
+    padding: 10px !important;
+  }
+
+  .total-row {
+    font-size: 16px !important;
+  }
+
+  .card {
+    padding: 12px !important;
+  }
+
+  /* Billing action buttons stack */
+  .abtn + .abtn {
+    margin-top: 6px !important;
+  }
+}
+
+/* ═══════════════════════════════
+   TOUCH IMPROVEMENTS
+   ═══════════════════════════════ */
+@media (max-width: 768px) {
+  /* Larger touch targets */
+  .rm-btn,
+  .rbtn,
+  button {
+    min-height: 36px;
+    cursor: pointer;
+  }
+
+  /* No hover effects on touch */
+  .stat-mini:hover,
+  .card:hover {
+    transform: none !important;
+  }
+
+  /* Smooth scrolling */
+  * {
+    -webkit-overflow-scrolling: touch;
+  }
+}

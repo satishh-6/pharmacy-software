@@ -9,9 +9,9 @@ const app = express();
 const JWT_SECRET = 'pharmacy_secret_key_2024';
 
 app.use(express.json({ limit: '10mb' }));
-app.use(express.static(path.join(__dirname, 'public')));
-app.use('/superadmin', express.static(path.join(__dirname, 'public', 'superadmin')));
-
+const PUBLIC_DIR = path.join(process.cwd(), 'public');
+app.use(express.static(PUBLIC_DIR));
+app.use('/superadmin', express.static(path.join(PUBLIC_DIR, 'superadmin')));
 // ── HELPER ──
 function getToken(req) {
   return req.headers.authorization?.split(' ')[1];
